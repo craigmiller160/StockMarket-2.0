@@ -1,4 +1,8 @@
+# Class files
 *.class
+
+# Class directory
+bin/
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
