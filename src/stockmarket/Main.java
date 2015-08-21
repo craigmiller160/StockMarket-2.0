@@ -52,18 +52,6 @@ import stockmarket.util.LoggerCSVFormat;
 @NotThreadSafe
 public class Main {
 	
-	/*
-	 * This is just some random testing changes for GitHub
-	 * Want to test out branches, merging, etc etc etc.
-	 * blah 
-	 * blah
-	 * blah blah blah blah blah
-	 * 
-	 * more changes
-	 * hahahahahaha
-	 * 
-	 */
-	
 	//TODO when everything else is done, create a splash image
 	
 	//TODO the early error dialogs, redo them to fit the new dialog API
