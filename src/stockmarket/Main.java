@@ -52,11 +52,13 @@ import stockmarket.util.LoggerCSVFormat;
 @NotThreadSafe
 public class Main {
 	
-	//TODO making a change for github test
+	//TODO making a change for github test blah se blah
 	
 	//TODO when everything else is done, create a splash image
 	
 	//TODO the early error dialogs, redo them to fit the new dialog API
+	
+	//hahaha asdfasd
 	
 	/**
 	 * The logger for this program. With the exception of the default

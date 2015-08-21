@@ -37,6 +37,8 @@ import stockmarket.gui.ProperyChangeView;
 public abstract class AbstractConcurrentListenerController 
 extends AbstractListenerController{
 
+	//TODO hahahaha
+	
 	//protected so it can be manually accessed by subclasses
 	protected final ExecutorService eventExecutor;
 	
