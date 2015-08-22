@@ -139,8 +139,6 @@ implements ActionListener, ListenerDialog {
 		listeners = new ArrayList<>();
 		this.owner = owner;
 		dialog = createDialog(owner, modal);
-		init();
-		assembleDialog();
 	}
 	
 	/**
@@ -183,6 +181,7 @@ implements ActionListener, ListenerDialog {
 
 	@Override
 	public void showDialog() {
+		assembleDialog();
 		dialog.pack();
 		dialog.setLocationRelativeTo(owner);
 		dialog.setVisible(true);
@@ -241,13 +240,6 @@ implements ActionListener, ListenerDialog {
 		
 		return buttonPanel;
 	}
-	
-	/**
-	 * Optional method for initializing components and attributes for
-	 * that this dialog may require. If not needed, implement as a
-	 * blank method and override this documentation.
-	 */
-	protected abstract void init();
 	
 	/**
 	 * Create and return the <tt>String</tt> that should be used as the text

@@ -104,14 +104,17 @@ public class OpenPortfolioDialog extends AbstractDefaultDialog {
 	
 	public OpenPortfolioDialog() {
 		super();
+		init();
 	}
 
 	public OpenPortfolioDialog(Frame owner) {
 		super(owner);
+		init();
 	}
 
 	public OpenPortfolioDialog(Frame owner, boolean modal) {
 		super(owner, modal);
+		init();
 	}
 
 	@Override
@@ -149,8 +152,7 @@ public class OpenPortfolioDialog extends AbstractDefaultDialog {
 		});
 	}
 
-	@Override
-	protected void init() {
+	private void init() {
 		portfolioNameList = new JList<>();
 		portfolioNameList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		portfolioNameList.setCellRenderer(new SavedPortfolioListCellRenderer());

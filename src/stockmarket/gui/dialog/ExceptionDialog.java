@@ -116,6 +116,7 @@ public class ExceptionDialog extends AbstractDefaultDialog {
 	 */
 	public ExceptionDialog() {
 		super();
+		init();
 	}
 
 	/**
@@ -125,6 +126,7 @@ public class ExceptionDialog extends AbstractDefaultDialog {
 	 */
 	public ExceptionDialog(Frame owner) {
 		super(owner);
+		init();
 	}
 
 	/**
@@ -135,6 +137,7 @@ public class ExceptionDialog extends AbstractDefaultDialog {
 	 */
 	public ExceptionDialog(Frame owner, boolean modal) {
 		super(owner, modal);
+		init();
 	}
 
 	@Override
@@ -234,8 +237,7 @@ public class ExceptionDialog extends AbstractDefaultDialog {
 		exceptionLabel.setText(builder.toString());
 	}
 
-	@Override
-	protected void init() {
+	private void init() {
 		exceptionLabel = createLabel("", Fonts.SMALL_FIELD_FONT);
 		exceptionTitleLabel = createLabel("", Fonts.LABEL_FONT);
 		stackTraceLabel = createLabel("", null);

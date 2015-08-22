@@ -86,6 +86,7 @@ public class PortfolioNameDialog extends AbstractDefaultDialog {
 	 */
 	public PortfolioNameDialog() {
 		super();
+		init();
 	}
 
 	/**
@@ -95,6 +96,7 @@ public class PortfolioNameDialog extends AbstractDefaultDialog {
 	 */
 	public PortfolioNameDialog(Frame owner) {
 		super(owner);
+		init();
 	}
 
 	/**
@@ -105,10 +107,10 @@ public class PortfolioNameDialog extends AbstractDefaultDialog {
 	 */
 	public PortfolioNameDialog(Frame owner, boolean modal) {
 		super(owner, modal);
+		init();
 	}
 	
-	@Override
-	protected void init(){
+	private void init(){
 		titleLabel = createLabel(LANGUAGE.getString("name_dialog_title"), 
 				Fonts.LABEL_FONT);
 		

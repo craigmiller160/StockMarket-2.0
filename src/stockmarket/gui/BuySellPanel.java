@@ -1,12 +1,12 @@
 package stockmarket.gui;
 
-import static stockmarket.controller.StockMarketController.BUY_STOCK_ACTION;
+import static stockmarket.controller.StockMarketController.BUY_STOCK_PREP_ACTION;
 import static stockmarket.controller.StockMarketController.COMPONENTS_ENABLED_PROPERTY;
 import static stockmarket.controller.StockMarketController.ENABLE_LOOKUP_STOCK_LOADED;
 import static stockmarket.controller.StockMarketController.ENABLE_NO_PORTFOLIO_OPEN;
 import static stockmarket.controller.StockMarketController.ENABLE_NO_STOCK_LOADED;
 import static stockmarket.controller.StockMarketController.ENABLE_OWNED_STOCK_LOADED;
-import static stockmarket.controller.StockMarketController.SELL_STOCK_ACTION;
+import static stockmarket.controller.StockMarketController.SELL_STOCK_PREP_ACTION;
 
 import java.awt.Font;
 import java.beans.PropertyChangeEvent;
@@ -99,11 +99,11 @@ public class BuySellPanel extends AbstractListenerView {
 		programLabel.setHorizontalAlignment(JLabel.CENTER);
 		
 		buyButton = createButton(LANGUAGE.getString("buy_button_label"), "buy",
-				LANGUAGE.getString("buy_button_tooltip"), BUY_STOCK_ACTION);
+				LANGUAGE.getString("buy_button_tooltip"), BUY_STOCK_PREP_ACTION);
 		buyButton.setEnabled(false);
 		
 		sellButton = createButton(LANGUAGE.getString("sell_button_label"), "sell",
-				LANGUAGE.getString("sell_button_tooltip"), SELL_STOCK_ACTION);
+				LANGUAGE.getString("sell_button_tooltip"), SELL_STOCK_PREP_ACTION);
 		sellButton.setEnabled(false);
 	}
 	
