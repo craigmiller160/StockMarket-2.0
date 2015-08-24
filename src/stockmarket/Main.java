@@ -52,6 +52,12 @@ import stockmarket.util.LoggerCSVFormat;
 @NotThreadSafe
 public class Main {
 	
+	/*asdfasdf
+	 * adkfja;sd
+	 * asdfasdjk;
+	 * TODO testing a conflict between branches.
+	 */
+	
 	//TODO when everything else is done, create a splash image
 	
 	//TODO the early error dialogs, redo them to fit the new dialog API
