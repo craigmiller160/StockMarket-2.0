@@ -51,16 +51,7 @@ import stockmarket.util.LoggerCSVFormat;
  */
 @NotThreadSafe
 public class Main {
-	
-<<<<<<< HEAD
-	//TODO making a conflicting commit with different branches
-=======
-	/*asdfasdf
-	 * adkfja;sd
-	 * asdfasdjk;
-	 * TODO testing a conflict between branches.
-	 */
->>>>>>> dialog-work
+
 	
 	//TODO when everything else is done, create a splash image
 	
