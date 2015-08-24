@@ -88,6 +88,10 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 	
 	public static final String STOCK_HISTORY_INTERVAL_ACTION = "StockHistoryInterval";
 	
+	public static final String BUY_STOCK_PREP_ACTION = "BuyStockPrep";
+	
+	public static final String SELL_STOCK_PREP_ACTION = "SellStockPrep";
+	
 	public static final String BUY_STOCK_ACTION = "BuyStock";
 	
 	public static final String SELL_STOCK_ACTION = "SellStock";

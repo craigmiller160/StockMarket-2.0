@@ -86,6 +86,7 @@ public class PortfolioNameDialog extends AbstractDefaultDialog {
 	 */
 	public PortfolioNameDialog() {
 		super();
+		init();
 	}
 
 	/**
@@ -95,6 +96,7 @@ public class PortfolioNameDialog extends AbstractDefaultDialog {
 	 */
 	public PortfolioNameDialog(Frame owner) {
 		super(owner);
+		init();
 	}
 
 	/**
@@ -105,10 +107,10 @@ public class PortfolioNameDialog extends AbstractDefaultDialog {
 	 */
 	public PortfolioNameDialog(Frame owner, boolean modal) {
 		super(owner, modal);
+		init();
 	}
 	
-	@Override
-	protected void init(){
+	private void init(){
 		titleLabel = createLabel(LANGUAGE.getString("name_dialog_title"), 
 				Fonts.LABEL_FONT);
 		
@@ -371,12 +373,6 @@ public class PortfolioNameDialog extends AbstractDefaultDialog {
 				PortfolioNameDialog.this.closeDialog();
 			}
 			else if(event.getActionCommand() == SAVE_PORTFOLIO_NAME_ACTION){
-				//TODO remove this from all dialog classes
-				//ActionEvent newEvent = new ActionEvent(
-						//PortfolioNameDialog.this,
-						//ActionEvent.ACTION_PERFORMED, 
-						//SAVE_PORTFOLIO_NAME_ACTION);
-				
 				//Pass the event to this class's actionPerformed method
 				//so that it is picked up on by external listeners.
 				PortfolioNameDialog.this.actionPerformed(event);

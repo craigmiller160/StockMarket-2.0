@@ -2,7 +2,6 @@ package stockmarket.gui.dialog;
 
 import java.awt.Font;
 import java.awt.Frame;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
@@ -37,6 +36,7 @@ import stockmarket.util.Language;
 @NotThreadSafe
 public class ExceptionDialog extends AbstractDefaultDialog {
 
+	//TODO remove this main method after testing is done
 	public static void main(String[] args){
 		ExceptionDialog dialog = new ExceptionDialog();
 		
@@ -116,6 +116,7 @@ public class ExceptionDialog extends AbstractDefaultDialog {
 	 */
 	public ExceptionDialog() {
 		super();
+		init();
 	}
 
 	/**
@@ -125,6 +126,7 @@ public class ExceptionDialog extends AbstractDefaultDialog {
 	 */
 	public ExceptionDialog(Frame owner) {
 		super(owner);
+		init();
 	}
 
 	/**
@@ -135,6 +137,7 @@ public class ExceptionDialog extends AbstractDefaultDialog {
 	 */
 	public ExceptionDialog(Frame owner, boolean modal) {
 		super(owner, modal);
+		init();
 	}
 
 	@Override
@@ -156,6 +159,9 @@ public class ExceptionDialog extends AbstractDefaultDialog {
 	 * information about.
 	 */
 	public void setThrowable(Throwable t){
+		expandButton.setVisible(true);
+		expandButton.setEnabled(true);
+		
 		setExceptionTitleAndText(t);
 		setStackTraceLabel(t);
 	}
@@ -231,8 +237,7 @@ public class ExceptionDialog extends AbstractDefaultDialog {
 		exceptionLabel.setText(builder.toString());
 	}
 
-	@Override
-	protected void init() {
+	private void init() {
 		exceptionLabel = createLabel("", Fonts.SMALL_FIELD_FONT);
 		exceptionTitleLabel = createLabel("", Fonts.LABEL_FONT);
 		stackTraceLabel = createLabel("", null);
@@ -241,16 +246,13 @@ public class ExceptionDialog extends AbstractDefaultDialog {
 				LANGUAGE.getString("ok_button_label"),
 				DISMISS_ACTION);
 		
-		ImageIcon plusIcon = new ImageIcon(
-				this.getClass().getClassLoader().getResource(
-						"15p/plus.png"));
-		
-		expandAction = createAction("", plusIcon, 
+		expandAction = createAction(LANGUAGE.getString("expand_button"), null, 
 				LANGUAGE.getString("expand_tooltip"), EXPAND_ACTION);
 		
 		expandButton = new JButton(expandAction);
 		expandButton.setFont(Fonts.SMALL_LABEL_FONT);
-		expandButton.setMargin(new Insets(1, 2, 1, 2));
+		expandButton.setVisible(false);
+		expandButton.setEnabled(false);
 		
 		configureInputActionMaps();
 	}
@@ -325,14 +327,14 @@ public class ExceptionDialog extends AbstractDefaultDialog {
 		
 		detailsPanel.add(exceptionLabel, "wrap");
 		
-		detailsPanel.add(expandButton, "align right, pushx, wrap");
+		//detailsPanel.add(expandButton, "align right, pushx, wrap");
 		
 		return detailsPanel;
 	}
 	
 	@Override
 	protected JButton[] addButtons() {
-		return new JButton[] {okButton};
+		return new JButton[] {expandButton, okButton};
 	}
 	
 	/**
@@ -441,12 +443,10 @@ public class ExceptionDialog extends AbstractDefaultDialog {
 				ExceptionDialog.this.closeDialog();
 			}
 			else if(event.getActionCommand() == EXPAND_ACTION){
-				//Change icon and action command
-				ImageIcon icon = new ImageIcon(
-						this.getClass().getClassLoader().getResource(
-								"15p/minus.png"));
-				setIcon(icon);
+				//Change action command, text, and tooltip
 				setActionCommand(HIDE_ACTION);
+				setText(LANGUAGE.getString("hide_button"));
+				setToolTipText(LANGUAGE.getString("hide_tooltip"));
 				
 				//Add stack trace label, repaint and re-pack.
 				detailsPanel.add(stackTraceLabel);
@@ -455,12 +455,10 @@ public class ExceptionDialog extends AbstractDefaultDialog {
 				dialog.pack();
 			}
 			else if(event.getActionCommand() == HIDE_ACTION){
-				//Change icon and action command.
-				ImageIcon icon = new ImageIcon(
-						this.getClass().getClassLoader().getResource(
-								"15p/plus.png"));
-				setIcon(icon);
+				//Change action command, text, and tooltip
 				setActionCommand(EXPAND_ACTION);
+				setText(LANGUAGE.getString("expand_button"));
+				setToolTipText(LANGUAGE.getString("expand_tooltip"));
 				
 				//Remove stack trace label, repaint and re-pack.
 				detailsPanel.remove(stackTraceLabel);
