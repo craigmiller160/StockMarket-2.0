@@ -198,7 +198,7 @@ public class DefaultStock extends AbstractStock {
 	}
 
 	@Override
-	public synchronized void setStockDetails(StockDownloader downloader, boolean fullDetails) 
+	public void setStockDetails(StockDownloader downloader, boolean fullDetails) 
 			throws InvalidStockException, UnknownHostException, IOException {
 		
 		String[] fields = null;
@@ -641,7 +641,7 @@ public class DefaultStock extends AbstractStock {
 	}
 	
 	@Override
-	protected synchronized Map<String,Object> getModifiableValueMap(boolean fullDetails){
+	protected Map<String,Object> getModifiableValueMap(boolean fullDetails){
 		Map<String,Object> stockValues = new HashMap<>();
 		stockValues.put(NAME, getCompanyName());
 		stockValues.put(CURRENT_PRICE, getCurrentPrice());

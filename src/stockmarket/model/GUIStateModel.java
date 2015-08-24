@@ -58,14 +58,17 @@ public class GUIStateModel extends AbstractPropertyModel {
 	 * 
 	 * @param guiState the current state of the GUI.
 	 */
-	public synchronized void setComponentsEnabled(Integer componentsEnabled){
+	public void setComponentsEnabled(Integer componentsEnabled){
 		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
 				"setComponentsEnabled", "Entering method", 
 				new Object[] {"Enable State: " + componentsEnabled});
 		
 		//No old value here, needs to be null so that even if the setting isn't actually
 		//being changed, it still registers so, in certain cases, the stock list gets cleared
-		this.componentsEnabled = componentsEnabled;
+		synchronized(this){
+			this.componentsEnabled = componentsEnabled;
+		}
+		
 		firePropertyChange(COMPONENTS_ENABLED_PROPERTY, null, componentsEnabled);
 	}
 	
@@ -87,13 +90,17 @@ public class GUIStateModel extends AbstractPropertyModel {
 	 * @param dialogConfig the configuration information for the dialog to
 	 * be displayed.
 	 */
-	public synchronized void setDialogDisplayed(Object[] dialogConfig){
+	public void setDialogDisplayed(Object[] dialogConfig){
 		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
 				"setDialogDisplayed", "Entering method", 
 				new Object[] {"Dialog Code" + dialogConfig[0], dialogConfig.toString()});
 		
-		Object[] oldValue = this.dialogConfig;
-		this.dialogConfig = dialogConfig;
+		Object[] oldValue = null;
+		synchronized(this){
+			oldValue = this.dialogConfig;
+			this.dialogConfig = dialogConfig;
+		}
+		
 		firePropertyChange(DIALOG_DISPLAYED_PROPERTY, oldValue, dialogConfig);
 	}
 	

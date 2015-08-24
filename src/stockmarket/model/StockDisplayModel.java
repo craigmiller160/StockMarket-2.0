@@ -70,13 +70,17 @@ public class StockDisplayModel extends AbstractPropertyModel {
 	 * 
 	 * @param selectedStock the currently selected and displayed stock.
 	 */
-	public synchronized void setSelectedStock(AbstractStock selectedStock){
+	public void setSelectedStock(AbstractStock selectedStock){
 		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
 				"setSelectedStock", "Entering method", 
 				new Object[] {"Selected Stock: " + selectedStock});
 		
-		AbstractStock oldValue = this.selectedStock;
-		this.selectedStock = selectedStock;
+		AbstractStock oldValue = null;
+		synchronized(this){
+			oldValue = this.selectedStock;
+			this.selectedStock = selectedStock;
+		}
+		
 		firePropertyChange(SELECTED_STOCK_PROPERTY, oldValue, selectedStock);
 	}
 	
@@ -87,13 +91,17 @@ public class StockDisplayModel extends AbstractPropertyModel {
 	 * 
 	 * @param selectedStockHistory the history of the selected and displayed stock.
 	 */
-	public synchronized void setSelectedStockHistory(List<HistoricalQuote> selectedStockHistory){
+	public void setSelectedStockHistory(List<HistoricalQuote> selectedStockHistory){
 		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
 				"setSelectedStockHistory", "Entering method", 
 				new Object[] {"Selected History: " + selectedStockHistory});
 		
-		List<HistoricalQuote> oldValue = this.selectedStockHistory;
-		this.selectedStockHistory = selectedStockHistory;
+		List<HistoricalQuote> oldValue = null;
+		synchronized(this){
+			oldValue = this.selectedStockHistory;
+			this.selectedStockHistory = selectedStockHistory;
+		}
+		
 		firePropertyChange(SELECTED_STOCK_HISTORY_PROPERTY, oldValue, selectedStockHistory);
 	}
 	

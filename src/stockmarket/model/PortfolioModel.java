@@ -106,13 +106,17 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 	 * care.
 	 */
 	@Override
-	public synchronized void setStockList(List<OwnedStock> stockList){
+	public void setStockList(List<OwnedStock> stockList){
 		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
 				"setStockList", "Entering method", 
 				new Object[] {"Stock List: " + stockList});
 		
-		List<OwnedStock> oldValue = this.stockList;
-		this.stockList = stockList;
+		List<OwnedStock> oldValue = null;
+		synchronized(this){
+			oldValue = this.stockList;
+			this.stockList = stockList;
+		}
+		
 		firePropertyChange(STOCK_LIST_PROPERTY, oldValue, stockList);
 	}
 	
@@ -122,13 +126,17 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 	 * changed.
 	 */
 	@Override
-	public synchronized void setPortfolioName(String portfolioName){
+	public void setPortfolioName(String portfolioName){
 		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
 				"setPortfolioName", "Entering method", 
 				new Object[] {"Name: " + portfolioName});
 		
-		String oldValue = this.portfolioName;
-		this.portfolioName = portfolioName;
+		String oldValue = null;
+		synchronized(this){
+			oldValue = this.portfolioName;
+			this.portfolioName = portfolioName;
+		}
+		
 		firePropertyChange(PORTFOLIO_NAME_PROPERTY, oldValue, portfolioName);
 	}
 	
@@ -139,13 +147,17 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 	 * 
 	 */
 	@Override
-	public synchronized void setTotalStockValue(BigDecimal portfolioValue){
+	public void setTotalStockValue(BigDecimal portfolioValue){
 		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
 				"setTotalStockValue", "Entering method", 
 				new Object[] {"Total Stock Value: " + portfolioValue});
 		
-		BigDecimal oldValue = this.totalStockValue;
-		this.totalStockValue = portfolioValue;
+		BigDecimal oldValue = null;
+		synchronized(this){
+			oldValue = this.totalStockValue;
+			this.totalStockValue = portfolioValue;
+		}
+		
 		firePropertyChange(TOTAL_STOCK_VALUE_PROPERTY, oldValue, portfolioValue);
 	}
 	
@@ -160,8 +172,12 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 				"setNetWorth", "Entering method", 
 				new Object[] {"Net Worth: " + netWorth});
 		
-		BigDecimal oldValue = this.netWorth;
-		this.netWorth = netWorth;
+		BigDecimal oldValue = null;
+		synchronized(this){
+			oldValue = this.netWorth;
+			this.netWorth = netWorth;
+		}
+		
 		firePropertyChange(NET_WORTH_PROPERTY, oldValue, netWorth);
 	}
 	
@@ -172,13 +188,17 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 	 * changed.
 	 */
 	@Override
-	public synchronized void setChangeInNetWorth(BigDecimal netWorthChange){
+	public void setChangeInNetWorth(BigDecimal netWorthChange){
 		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
 				"setChangeInNetWorth", "Entering method", 
 				new Object[] {"Net Worth Change: " + netWorthChange});
 		
-		BigDecimal oldValue = this.changeInNetWorth;
-		this.changeInNetWorth = netWorthChange;
+		BigDecimal oldValue = null;
+		synchronized(this){
+			oldValue = this.changeInNetWorth;
+			this.changeInNetWorth = netWorthChange;
+		}
+		
 		firePropertyChange(CHANGE_IN_NET_WORTH_PROPERTY, oldValue, netWorthChange);
 	}
 	
@@ -193,8 +213,12 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 				"setCashBalance", "Entering method", 
 				new Object[] {"Cash Balance: " + cashBalance});
 		
-		BigDecimal oldValue = this.cashBalance;
-		this.cashBalance = cashBalance;
+		BigDecimal oldValue = null;
+		synchronized(this){
+			oldValue = this.cashBalance;
+			this.cashBalance = cashBalance;
+		}
+		
 		firePropertyChange(CASH_BALANCE_PROPERTY, oldValue, cashBalance);
 	}
 	

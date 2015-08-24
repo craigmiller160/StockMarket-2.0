@@ -369,6 +369,12 @@ public class SQLPortfolioDAO implements
 					"Only SQLPortfolioModel objects can be saved");
 		}
 		
+		//TODO currently working on an overhaul of the PortfolioModel. Depending on how 
+		//the changes go, the first section here will need to be changed.
+		//List is no longer synchronized list, at minimum. Probably need to sycn on 
+		//model intrinsic lock while getting values. Probably still need to copy the list
+		//Just need to wait until model changes are done to figure this one out.
+		
 		SQLPortfolioModel portfolioModel = (SQLPortfolioModel) portfolio;
 		int userid = portfolioModel.getUserID();
 		String portfolioName = portfolioModel.getPortfolioName();

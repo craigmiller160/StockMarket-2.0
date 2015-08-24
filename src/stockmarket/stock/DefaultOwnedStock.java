@@ -45,6 +45,9 @@ import net.jcip.annotations.ThreadSafe;
 @ThreadSafe
 public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 
+	//TODO add documentation about the posibility of NumberFormatExceptions from the setters with
+	//String params
+	
 	/**
 	 * SerialVersionUID for serialization support.
 	 */
@@ -162,44 +165,63 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 	}
 	
 	@Override
-	public synchronized void increaseShares(int quantity){
-		BigDecimal valueToAdd = getCurrentPrice().multiply(new BigDecimal(quantity));
+	public void increaseShares(int quantity){
+		BigDecimal valueToAdd = null;
+		synchronized(this){
+			valueToAdd = getCurrentPrice().multiply(new BigDecimal(quantity));
+		}
+		
 		logger.logp(Level.FINEST, this.getClass().getName(), "increaseShares()", 
 				symbol + ": Added Quantity: " + quantity + " Value To Add: " 
 				+ moneyFormat.format(valueToAdd));
 		
-		quantityOfShares += quantity;
-		principle = principle.add(valueToAdd);
+		synchronized(this){
+			quantityOfShares += quantity;
+			principle = principle.add(valueToAdd);
+		}
+		
 		setTotalValueAndNet();
 	}
 	
 	//TODO consider using a custom exception if there aren't enough shares
 	@Override
-	public synchronized boolean decreaseShares(int quantity){
+	public boolean decreaseShares(int quantity){
 		boolean sharesRemaining = true;
 		
-		if(quantity > quantityOfShares){
-			throw new IllegalArgumentException(quantity 
-					+ " is more shares than are available");
+		BigDecimal valueToSubtractFromTotal = null;
+		BigDecimal valueToSubtractFromPrinciple = null;
+		synchronized(this){
+			if(quantity > quantityOfShares){
+				throw new IllegalArgumentException(quantity 
+						+ " is more shares than are available");
+			}
+			
+			valueToSubtractFromTotal = getCurrentPrice().multiply(new BigDecimal(quantity));
+			valueToSubtractFromPrinciple = principle.multiply(new BigDecimal(quantity / quantityOfShares));
 		}
-		
-		BigDecimal valueToSubtractFromTotal = getCurrentPrice().multiply(new BigDecimal(quantity));
-		BigDecimal valueToSubtractFromPrinciple = principle.multiply(new BigDecimal(quantity / quantityOfShares));
 		
 		logger.logp(Level.FINEST, this.getClass().getName(), "decreaseShares()", 
 				symbol + ": Subtracted Quantity: " + quantity + " Value to Subtract From Total: " 
 				+ moneyFormat.format(valueToSubtractFromTotal) + " Value to Subtract From Principle: " 
 				+ moneyFormat.format(valueToSubtractFromPrinciple));
 		
-		quantityOfShares -= quantity;
-		principle = principle.subtract(valueToSubtractFromPrinciple);
+		synchronized(this){
+			quantityOfShares -= quantity;
+			principle = principle.subtract(valueToSubtractFromPrinciple);
+		}
+		
 		setTotalValueAndNet();
 		
-		if(quantityOfShares > 0){
-			sharesRemaining = true;
-		}
-		else{
-			sharesRemaining = false;
+		//TODO ultimately remove this section below, it's not necessary in tandem with the exception
+		//thrown at the start of the method
+		
+		synchronized(this){
+			if(quantityOfShares > 0){
+				sharesRemaining = true;
+			}
+			else{
+				sharesRemaining = false;
+			}
 		}
 		
 		return sharesRemaining;
@@ -209,12 +231,22 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 	 * Set the totalValue and net fields. This method should be invoked only after the conclusion
 	 * of an increase/decrease operation.
 	 */
-	private synchronized void setTotalValueAndNet(){
-		totalValue = getCurrentPrice().multiply(new BigDecimal(quantityOfShares));
-		net = totalValue.subtract(principle);
+	private void setTotalValueAndNet(){
+		BigDecimal tempTotalValue = null;
+		int tempQuantity = 0;
+		BigDecimal tempNet = null;
+		synchronized(this){
+			totalValue = getCurrentPrice().multiply(new BigDecimal(quantityOfShares));
+			net = totalValue.subtract(principle);
+			
+			tempQuantity = quantityOfShares;
+			tempTotalValue = totalValue;
+			tempNet = net;
+		}
+		
 		logger.logp(Level.FINEST, this.getClass().getName(), "setTotalValueAndNet()", 
-				symbol + ": Quantity of Shares: " + quantityOfShares + " Total Value: " 
-				+ moneyFormat.format(totalValue) + " Net: " + moneyFormat.format(net));
+				symbol + ": Quantity of Shares: " + tempQuantity + " Total Value: " 
+				+ moneyFormat.format(tempTotalValue) + " Net: " + moneyFormat.format(tempNet));
 	}
 	
 	@Override
@@ -245,7 +277,7 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 	 * of the stock data.
 	 */
 	@Override
-	public synchronized void setStockDetails(StockDownloader downloader, boolean fullDetails)
+	public void setStockDetails(StockDownloader downloader, boolean fullDetails)
 			throws InvalidStockException, UnknownHostException, IOException {
 		super.setStockDetails(downloader, fullDetails);
 		if(downloader instanceof StockFileDownloader){
@@ -261,7 +293,7 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 	}
 	
 	@Override
-	protected synchronized Map<String, Object> getModifiableValueMap(boolean fullDetails){
+	protected Map<String, Object> getModifiableValueMap(boolean fullDetails){
 		Map<String,Object> valueMap = super.getModifiableValueMap(fullDetails);
 		valueMap.put(QUANTITY_OF_SHARES, getQuantityOfShares());
 		valueMap.put(TOTAL_VALUE, getTotalValue());

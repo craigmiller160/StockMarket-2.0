@@ -54,12 +54,14 @@ public class SQLPortfolioModel extends PortfolioModel{
 	 * 
 	 * @param userID the SQL userid for this portfolio.
 	 */
-	public synchronized void setUserID(int userID){
+	public void setUserID(int userID){
 		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
 				"setUserID", "Entering method", 
 				new Object[] {"UserID: " + userID});
 		
-		this.userID = userID;
+		synchronized(this){
+			this.userID = userID;
+		}
 	}
 	
 	/**
