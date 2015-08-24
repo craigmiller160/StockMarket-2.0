@@ -236,26 +236,29 @@ public class DefaultStock extends AbstractStock {
 		
 		Map<String,String> stockDataMap = downloader.downloadStockDetails(symbol, fields);
 		
-		setCompanyName(stockDataMap.get(NAME));
-		setCurrentPrice(stockDataMap.get(CURRENT_PRICE));
-		if(fullDetails){
-			setChangeToday(stockDataMap.get(CHANGE_TODAY));
-			setChangeTodayInPercent(stockDataMap.get(CHANGE_TODAY_PERCENT));
-			setFiftyDayAvg(stockDataMap.get(FIFTY_DAY_AVG));
-			setChange50DayAvg(stockDataMap.get(CHANGE_50_DAY_AVG));
-			setChange50DayAvgPercent(stockDataMap.get(CHANGE_50_DAY_AVG_PERCENT));
-			setTwoHundredDayAvg(stockDataMap.get(TWO_HUNDRED_DAY_AVG));
-			setChange200DayAvg(stockDataMap.get(CHANGE_200_DAY_AVG));
-			setChange200DayAvgPercent(stockDataMap.get(CHANGE_200_DAY_AVG_PERCENT));
-			setYearHigh(stockDataMap.get(YEAR_HIGH));
-			setChangeYearHigh(stockDataMap.get(CHANGE_YEAR_HIGH));
-			setChangeYearHighPercent(stockDataMap.get(CHANGE_YEAR_HIGH_PERCENT));
-			setYearLow(stockDataMap.get(YEAR_LOW));
-			setChangeYearLow(stockDataMap.get(CHANGE_YEAR_LOW));
-			setChangeYearLowPercent(stockDataMap.get(CHANGE_YEAR_LOW_PERCENT));
-			setLastTradeDate(stockDataMap.get(LAST_TRADE_DATE));
-			setLastTradeTime(stockDataMap.get(LAST_TRADE_TIME));
+		synchronized(this){
+			setCompanyName(stockDataMap.get(NAME));
+			setCurrentPrice(stockDataMap.get(CURRENT_PRICE));
+			if(fullDetails){
+				setChangeToday(stockDataMap.get(CHANGE_TODAY));
+				setChangeTodayInPercent(stockDataMap.get(CHANGE_TODAY_PERCENT));
+				setFiftyDayAvg(stockDataMap.get(FIFTY_DAY_AVG));
+				setChange50DayAvg(stockDataMap.get(CHANGE_50_DAY_AVG));
+				setChange50DayAvgPercent(stockDataMap.get(CHANGE_50_DAY_AVG_PERCENT));
+				setTwoHundredDayAvg(stockDataMap.get(TWO_HUNDRED_DAY_AVG));
+				setChange200DayAvg(stockDataMap.get(CHANGE_200_DAY_AVG));
+				setChange200DayAvgPercent(stockDataMap.get(CHANGE_200_DAY_AVG_PERCENT));
+				setYearHigh(stockDataMap.get(YEAR_HIGH));
+				setChangeYearHigh(stockDataMap.get(CHANGE_YEAR_HIGH));
+				setChangeYearHighPercent(stockDataMap.get(CHANGE_YEAR_HIGH_PERCENT));
+				setYearLow(stockDataMap.get(YEAR_LOW));
+				setChangeYearLow(stockDataMap.get(CHANGE_YEAR_LOW));
+				setChangeYearLowPercent(stockDataMap.get(CHANGE_YEAR_LOW_PERCENT));
+				setLastTradeDate(stockDataMap.get(LAST_TRADE_DATE));
+				setLastTradeTime(stockDataMap.get(LAST_TRADE_TIME));
+			}
 		}
+		
 	}
 	
 	@Override
@@ -281,10 +284,12 @@ public class DefaultStock extends AbstractStock {
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
 	 */
-	private synchronized void setChangeToday(String rawText){
-		double value = 0;
-		value = Double.parseDouble(rawText);
-		this.changeToday = new BigDecimal(value);
+	private void setChangeToday(String rawText){
+		double value = Double.parseDouble(rawText);
+		
+		synchronized(this){
+			this.changeToday = new BigDecimal(value);
+		}
 	}
 	
 	/**
@@ -292,10 +297,12 @@ public class DefaultStock extends AbstractStock {
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
 	 */
-	private synchronized void setChangeTodayInPercent(String rawText){
-		double value = 0;
-		value = Double.parseDouble(rawText);
-		this.changeTodayInPercent = new BigDecimal(value);
+	private void setChangeTodayInPercent(String rawText){
+		double value = Double.parseDouble(rawText);
+		
+		synchronized(this){
+			this.changeTodayInPercent = new BigDecimal(value);
+		}
 	}
 	
 	/**
@@ -303,10 +310,12 @@ public class DefaultStock extends AbstractStock {
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
 	 */
-	private synchronized void setFiftyDayAvg(String rawText){
-		double value = 0;
-		value = Double.parseDouble(rawText);
-		this.fiftyDayAvg = new BigDecimal(value);
+	private void setFiftyDayAvg(String rawText){
+		double value = Double.parseDouble(rawText);
+		
+		synchronized(this){
+			this.fiftyDayAvg = new BigDecimal(value);
+		}
 	}
 	
 	/**
@@ -314,10 +323,12 @@ public class DefaultStock extends AbstractStock {
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
 	 */
-	private synchronized void setChange50DayAvg(String rawText){
-		double value = 0;
-		value = Double.parseDouble(rawText);
-		this.change50DayAvg = new BigDecimal(value);
+	private void setChange50DayAvg(String rawText){
+		double value = Double.parseDouble(rawText);
+		
+		synchronized(this){
+			this.change50DayAvg = new BigDecimal(value);
+		}
 	}
 	
 	/**
@@ -325,7 +336,7 @@ public class DefaultStock extends AbstractStock {
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
 	 */
-	private synchronized void setChange50DayAvgPercent(String rawText){
+	private void setChange50DayAvgPercent(String rawText){
 		double value = 0;
 		value = Double.parseDouble(rawText);
 		this.change50DayAvgPercent = new BigDecimal(value);
@@ -336,10 +347,12 @@ public class DefaultStock extends AbstractStock {
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
 	 */
-	private synchronized void setTwoHundredDayAvg(String rawText){
-		double value = 0;
-		value = Double.parseDouble(rawText);
-		this.twoHundredDayAvg = new BigDecimal(value);
+	private void setTwoHundredDayAvg(String rawText){
+		double value = Double.parseDouble(rawText);
+		
+		synchronized(this){
+			this.twoHundredDayAvg = new BigDecimal(value);
+		}
 	}
 	
 	/**
@@ -347,10 +360,12 @@ public class DefaultStock extends AbstractStock {
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
 	 */
-	private synchronized void setChange200DayAvg(String rawText){
-		double value = 0;
-		value = Double.parseDouble(rawText);
-		this.change200DayAvg = new BigDecimal(value);
+	private void setChange200DayAvg(String rawText){
+		double value = Double.parseDouble(rawText);
+		
+		synchronized(this){
+			this.change200DayAvg = new BigDecimal(value);
+		}
 	}
 	
 	/**
@@ -358,10 +373,12 @@ public class DefaultStock extends AbstractStock {
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
 	 */
-	private synchronized void setChange200DayAvgPercent(String rawText){
-		double value = 0;
-		value = Double.parseDouble(rawText);
-		this.change200DayAvgPercent = new BigDecimal(value);
+	private void setChange200DayAvgPercent(String rawText){
+		double value = Double.parseDouble(rawText);
+		
+		synchronized(this){
+			this.change200DayAvgPercent = new BigDecimal(value);
+		}
 	}
 	
 	/**
@@ -369,10 +386,12 @@ public class DefaultStock extends AbstractStock {
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
 	 */
-	private synchronized void setYearHigh(String rawText){
-		double value = 0;
-		value = Double.parseDouble(rawText);
-		this.yearHigh = new BigDecimal(value);
+	private void setYearHigh(String rawText){
+		double value = Double.parseDouble(rawText);
+		
+		synchronized(this){
+			this.yearHigh = new BigDecimal(value);
+		}
 	}
 	
 	/**
@@ -380,10 +399,12 @@ public class DefaultStock extends AbstractStock {
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
 	 */
-	private synchronized void setChangeYearHigh(String rawText){
-		double value = 0;
-		value = Double.parseDouble(rawText);
-		this.changeYearHigh = new BigDecimal(value);
+	private void setChangeYearHigh(String rawText){
+		double value = Double.parseDouble(rawText);
+		
+		synchronized(this){
+			this.changeYearHigh = new BigDecimal(value);
+		}
 	}
 	
 	/**
@@ -391,10 +412,12 @@ public class DefaultStock extends AbstractStock {
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
 	 */
-	private synchronized void setChangeYearHighPercent(String rawText){
-		double value = 0;
-		value = Double.parseDouble(rawText);
-		this.changeYearHighPercent = new BigDecimal(value);
+	private void setChangeYearHighPercent(String rawText){
+		double value = Double.parseDouble(rawText);
+		
+		synchronized(this){
+			this.changeYearHighPercent = new BigDecimal(value);
+		}
 	}
 	
 	/**
@@ -402,10 +425,12 @@ public class DefaultStock extends AbstractStock {
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
 	 */
-	private synchronized void setYearLow(String rawText){
-		double value = 0;
-		value = Double.parseDouble(rawText);
-		this.yearLow = new BigDecimal(value);
+	private void setYearLow(String rawText){
+		double value = Double.parseDouble(rawText);
+		
+		synchronized(this){
+			this.yearLow = new BigDecimal(value);
+		}
 	}
 	
 	/**
@@ -413,10 +438,12 @@ public class DefaultStock extends AbstractStock {
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
 	 */
-	private synchronized void setChangeYearLow(String rawText){
-		double value = 0;
-		value = Double.parseDouble(rawText);
-		this.changeYearLow = new BigDecimal(value);
+	private void setChangeYearLow(String rawText){
+		double value = Double.parseDouble(rawText);
+		
+		synchronized(this){
+			this.changeYearLow = new BigDecimal(value);
+		}
 	}
 	
 	/**
@@ -424,10 +451,12 @@ public class DefaultStock extends AbstractStock {
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
 	 */
-	private synchronized void setChangeYearLowPercent(String rawText){
-		double value = 0;
-		value = Double.parseDouble(rawText);
-		this.changeYearLowPercent = new BigDecimal(value);
+	private void setChangeYearLowPercent(String rawText){
+		double value = Double.parseDouble(rawText);
+		
+		synchronized(this){
+			this.changeYearLowPercent = new BigDecimal(value);
+		}
 	}
 	
 	/**
@@ -435,9 +464,12 @@ public class DefaultStock extends AbstractStock {
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
 	 */
-	private synchronized void setCurrentPrice(String rawText){
+	private void setCurrentPrice(String rawText){
 		double value = Double.parseDouble(rawText);
-		this.currentPrice = new BigDecimal(value);
+		
+		synchronized(this){
+			this.currentPrice = new BigDecimal(value);
+		}
 	}
 	
 	/**
@@ -445,12 +477,15 @@ public class DefaultStock extends AbstractStock {
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
 	 */
-	private synchronized void setLastTradeDate(String rawText){
+	private void setLastTradeDate(String rawText){
 		String[] dateArr = rawText.split("/");
 		int month = Integer.parseInt(dateArr[0]) - 1;
 		int day = Integer.parseInt(dateArr[1]);
 		int year = Integer.parseInt(dateArr[2]);
-		this.lastTradeDate = new GregorianCalendar(year, month, day);
+		
+		synchronized(this){
+			this.lastTradeDate = new GregorianCalendar(year, month, day);
+		}
 	}
 	
 	/**
@@ -458,7 +493,7 @@ public class DefaultStock extends AbstractStock {
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
 	 */
-	private synchronized void setLastTradeTime(String rawText){
+	private void setLastTradeTime(String rawText){
 		int hours = 12, minutes = 0;
 		String amPM = rawText.substring(rawText.length() - 2, rawText.length());
 		String[] timeArr = rawText.substring(0, rawText.length() - 2).split(":");
@@ -469,7 +504,10 @@ public class DefaultStock extends AbstractStock {
 			hours = Integer.parseInt(timeArr[0]);
 		}
 		minutes = Integer.parseInt(timeArr[1]);
-		this.lastTradeTime = new GregorianCalendar(1970, 0, 1, hours, minutes);
+		
+		synchronized(this){
+			this.lastTradeTime = new GregorianCalendar(1970, 0, 1, hours, minutes);
+		}
 	}
 	
 	/**
@@ -643,26 +681,29 @@ public class DefaultStock extends AbstractStock {
 	@Override
 	protected Map<String,Object> getModifiableValueMap(boolean fullDetails){
 		Map<String,Object> stockValues = new HashMap<>();
-		stockValues.put(NAME, getCompanyName());
-		stockValues.put(CURRENT_PRICE, getCurrentPrice());
-		stockValues.put(SYMBOL, getSymbol());
-		if(fullDetails){
-			stockValues.put(CHANGE_TODAY, getChangeToday());
-			stockValues.put(CHANGE_TODAY_PERCENT, getChangeTodayInPercent());
-			stockValues.put(FIFTY_DAY_AVG, getFiftyDayAvg());
-			stockValues.put(CHANGE_50_DAY_AVG, getChange50DayAvg());
-			stockValues.put(CHANGE_50_DAY_AVG_PERCENT, getChange50DayAvgPercent());
-			stockValues.put(TWO_HUNDRED_DAY_AVG, getTwoHundredDayAvg());
-			stockValues.put(CHANGE_200_DAY_AVG, getChange200DayAvg());
-			stockValues.put(CHANGE_200_DAY_AVG_PERCENT, getChange200DayAvgPercent());
-			stockValues.put(YEAR_HIGH, getYearHigh());
-			stockValues.put(CHANGE_YEAR_HIGH, getChangeYearHigh());
-			stockValues.put(CHANGE_YEAR_HIGH_PERCENT, getChangeYearHighPercent());
-			stockValues.put(YEAR_LOW, getYearLow());
-			stockValues.put(CHANGE_YEAR_LOW, getChangeYearLow());
-			stockValues.put(CHANGE_YEAR_LOW_PERCENT, getChangeYearLowPercent());
-			stockValues.put(LAST_TRADE_DATE, getLastTradeDate());
-			stockValues.put(LAST_TRADE_TIME, getLastTradeTime());
+		
+		synchronized(this){
+			stockValues.put(NAME, getCompanyName());
+			stockValues.put(CURRENT_PRICE, getCurrentPrice());
+			stockValues.put(SYMBOL, getSymbol());
+			if(fullDetails){
+				stockValues.put(CHANGE_TODAY, getChangeToday());
+				stockValues.put(CHANGE_TODAY_PERCENT, getChangeTodayInPercent());
+				stockValues.put(FIFTY_DAY_AVG, getFiftyDayAvg());
+				stockValues.put(CHANGE_50_DAY_AVG, getChange50DayAvg());
+				stockValues.put(CHANGE_50_DAY_AVG_PERCENT, getChange50DayAvgPercent());
+				stockValues.put(TWO_HUNDRED_DAY_AVG, getTwoHundredDayAvg());
+				stockValues.put(CHANGE_200_DAY_AVG, getChange200DayAvg());
+				stockValues.put(CHANGE_200_DAY_AVG_PERCENT, getChange200DayAvgPercent());
+				stockValues.put(YEAR_HIGH, getYearHigh());
+				stockValues.put(CHANGE_YEAR_HIGH, getChangeYearHigh());
+				stockValues.put(CHANGE_YEAR_HIGH_PERCENT, getChangeYearHighPercent());
+				stockValues.put(YEAR_LOW, getYearLow());
+				stockValues.put(CHANGE_YEAR_LOW, getChangeYearLow());
+				stockValues.put(CHANGE_YEAR_LOW_PERCENT, getChangeYearLowPercent());
+				stockValues.put(LAST_TRADE_DATE, getLastTradeDate());
+				stockValues.put(LAST_TRADE_TIME, getLastTradeTime());
+			}
 		}
 		
 		return stockValues;

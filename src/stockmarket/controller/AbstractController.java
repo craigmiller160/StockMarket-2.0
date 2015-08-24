@@ -226,6 +226,10 @@ implements PropertyChangeListener{
 							}
 						}
 						
+						//TODO for the first part of the param check, to use multiple params
+						//traditional for loop, arrays of both paramList and newValueList,
+						//check each one, match by index
+						
 						//If assignable is true, add this model to the list
 						if(assignable){
 							modelsWithMethod.add(model);
@@ -239,6 +243,9 @@ implements PropertyChangeListener{
 		Class<?> typeClass = newValue.getClass();
 		//boolean value to record if there was a successful method invocation
 		boolean success = false;
+		
+		//TODO multiple param note: the tricky part is here. Can't just try every combination
+		//of param types...
 		
 		//Try and invoke the method on each model, while adjusting the parameter type
 		for(AbstractPropertyModel model : modelsWithMethod){
@@ -309,97 +316,6 @@ implements PropertyChangeListener{
 					+ "(" + newValue.getClass().getName() + ")");
 		}
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	/*protected final void setModelProperty(String propertyName, Object newValue) 
-			throws NoSuchMethodException, Exception{
-		//TODO this currently only works with single parameter methods. Work on
-		//getting flexibility with multiple parameter methods.
-		
-		//Find models with matching method signature
-		String methodSig = "set" + propertyName;
-		List<AbstractPropertyModel> modelsWithMethod = new ArrayList<>();
-		synchronized(modelList){
-			for(AbstractPropertyModel model : modelList){
-				//Get all methods for the model
-				Method[] methods = model.getClass().getMethods();
-				//Loop through methods and check if the signature matches
-				for(Method m : methods){
-					if(m.getName().equals(methodSig)){
-						//If the signature matches, now check the method's parameter types
-						//Confirm that the newValue param can be assigned to the method
-						Class<?>[] paramList = m.getParameterTypes();
-						boolean assignable = false;
-						for(Class<?> param : paramList){
-							//If the param is assignable, set assignable to true
-							if(param.isAssignableFrom(newValue.getClass())){
-								assignable = true;
-							}
-						}
-						
-						//If assignable is true, add this model to the list
-						if(assignable){
-							modelsWithMethod.add(model);
-						}
-					}
-				}
-			}
-		}
-		
-		//Get the current type class of the newValue parameter
-		Class<?> typeClass = newValue.getClass();
-		//boolean value to record if there was a successful method invocation
-		boolean success = false;
-		
-		//Try and invoke the method on each model, while adjusting the parameter type
-		for(AbstractPropertyModel model : modelsWithMethod){
-			//Run this loop until typeClass == null.
-			//Each time, typeClass is reassigned to be its own superclass
-			//This allows for polymorphism, methods can be invoked that have
-			//a param that's a superclass of newValue
-			while(typeClass != null){
-				try {
-					Method m = model.getClass().getMethod(methodSig, typeClass);
-					m.invoke(model, newValue);
-					success = true;
-					break;
-				}
-				catch(IllegalAccessException ex){
-					//TODO this exception doesn't matter, since no method
-					//that's not public can be found by Class.getMethods()
-				}
-				catch(NoSuchMethodException ex){
-					//TODO this exception doesn't matter. It'll happen
-					//several times, but ultimately it should be caught
-					//and ignored to the loop can keep going.
-				}
-				catch(InvocationTargetException ex){
-					Throwable t = ex.getCause();
-					launderThrowable(t);
-				}
-				
-				//typeClass is now its superclass
-				typeClass = typeClass.getSuperclass();
-			}
-		}
-		
-		//If there is no successful invocation, throw the NoSuchMethodException
-		if(!success){
-			throw new NoSuchMethodException("set" + propertyName 
-					+ "(" + newValue.getClass().getName() + ")");
-		}
-		
-	}*/
 	
 	/**
 	 * Parses an array of objects and returns an array of the <tt>Class</tt>

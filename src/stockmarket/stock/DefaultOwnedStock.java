@@ -120,7 +120,7 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 	}
 	
 	@Override
-	public synchronized BigDecimal getCurrentPrice(){
+	public BigDecimal getCurrentPrice(){
 		return super.getCurrentPrice();
 	}
 	
@@ -166,10 +166,7 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 	
 	@Override
 	public void increaseShares(int quantity){
-		BigDecimal valueToAdd = null;
-		synchronized(this){
-			valueToAdd = getCurrentPrice().multiply(new BigDecimal(quantity));
-		}
+		BigDecimal valueToAdd = getCurrentPrice().multiply(new BigDecimal(quantity));
 		
 		logger.logp(Level.FINEST, this.getClass().getName(), "increaseShares()", 
 				symbol + ": Added Quantity: " + quantity + " Value To Add: " 
@@ -188,7 +185,6 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 	public boolean decreaseShares(int quantity){
 		boolean sharesRemaining = true;
 		
-		BigDecimal valueToSubtractFromTotal = null;
 		BigDecimal valueToSubtractFromPrinciple = null;
 		synchronized(this){
 			if(quantity > quantityOfShares){
@@ -196,9 +192,10 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 						+ " is more shares than are available");
 			}
 			
-			valueToSubtractFromTotal = getCurrentPrice().multiply(new BigDecimal(quantity));
 			valueToSubtractFromPrinciple = principle.multiply(new BigDecimal(quantity / quantityOfShares));
 		}
+		
+		BigDecimal valueToSubtractFromTotal = getCurrentPrice().multiply(new BigDecimal(quantity));
 		
 		logger.logp(Level.FINEST, this.getClass().getName(), "decreaseShares()", 
 				symbol + ": Subtracted Quantity: " + quantity + " Value to Subtract From Total: " 
@@ -235,8 +232,9 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 		BigDecimal tempTotalValue = null;
 		int tempQuantity = 0;
 		BigDecimal tempNet = null;
+		BigDecimal currentPrice = getCurrentPrice();
 		synchronized(this){
-			totalValue = getCurrentPrice().multiply(new BigDecimal(quantityOfShares));
+			totalValue = currentPrice.multiply(new BigDecimal(quantityOfShares));
 			net = totalValue.subtract(principle);
 			
 			tempQuantity = quantityOfShares;
@@ -282,10 +280,14 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 		super.setStockDetails(downloader, fullDetails);
 		if(downloader instanceof StockFileDownloader){
 			Map<String,String> valueMap = downloader.downloadStockDetails(symbol, null);
-			setQuantity(valueMap.get(QUANTITY_OF_SHARES));
-			setPrinciple(valueMap.get(PRINCIPLE));
-			setTotalValue(valueMap.get(TOTAL_VALUE));
-			setNet(valueMap.get(NET));
+			
+			synchronized(this){
+				setQuantity(valueMap.get(QUANTITY_OF_SHARES));
+				setPrinciple(valueMap.get(PRINCIPLE));
+				setTotalValue(valueMap.get(TOTAL_VALUE));
+				setNet(valueMap.get(NET));
+			}
+			
 		}
 		else{
 			setTotalValueAndNet();
@@ -295,10 +297,13 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 	@Override
 	protected Map<String, Object> getModifiableValueMap(boolean fullDetails){
 		Map<String,Object> valueMap = super.getModifiableValueMap(fullDetails);
-		valueMap.put(QUANTITY_OF_SHARES, getQuantityOfShares());
-		valueMap.put(TOTAL_VALUE, getTotalValue());
-		valueMap.put(NET, getNet());
-		valueMap.put(PRINCIPLE, getPrinciple());
+		
+		synchronized(this){
+			valueMap.put(QUANTITY_OF_SHARES, getQuantityOfShares());
+			valueMap.put(TOTAL_VALUE, getTotalValue());
+			valueMap.put(NET, getNet());
+			valueMap.put(PRINCIPLE, getPrinciple());
+		}
 		
 		return valueMap;
 	}
