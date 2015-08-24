@@ -348,11 +348,6 @@ public class OpenPortfolioDialog extends AbstractDefaultDialog {
 					//TODO show dialog warning that you must select a portfolio to open one.
 				}
 				else{
-					//ActionEvent newEvent = new ActionEvent(
-							//OpenPortfolioDialog.this,
-							//ActionEvent.ACTION_PERFORMED, 
-							//OPEN_SELECTED_PORTFOLIO_ACTION);
-					
 					//Pass the event to this class's actionPerformed method
 					//so that it is picked up on by external listeners.
 					OpenPortfolioDialog.this.actionPerformed(event);
