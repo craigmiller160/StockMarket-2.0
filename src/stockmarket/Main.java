@@ -52,6 +52,8 @@ import stockmarket.util.LoggerCSVFormat;
 @NotThreadSafe
 public class Main {
 	
+	//TODO making a conflicting commit with different branches
+	
 	//TODO when everything else is done, create a splash image
 	
 	//TODO the early error dialogs, redo them to fit the new dialog API
