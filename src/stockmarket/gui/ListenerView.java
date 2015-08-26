@@ -25,9 +25,9 @@ import java.awt.event.ActionListener;
  * @author craig
  * @version 2.0
  */
-public interface ListenerView extends ActionListener, PropertyChangeView{
+public interface ListenerView extends ActionListener{
 
-	//TODO document how this extends ActionListener and PropertyChangeView
+	//TODO document how this extends ActionListener
 	
 	
 	/**

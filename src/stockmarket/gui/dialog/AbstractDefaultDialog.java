@@ -93,8 +93,13 @@ import net.miginfocom.swing.MigLayout;
  * @version 2.0
  */
 public abstract class AbstractDefaultDialog 
-implements ActionListener, ListenerDialog {
+implements ListenerDialog {
 
+	//TODO split this class, create a superclass with just the listener methods, which is
+	//extended by this class with the dialog framework.
+	
+	//TODO this class doesn't implement ActionListener, only ListenerDialog
+	
 	/**
 	 * List of listeners/controllers assigned to this class.
 	 */

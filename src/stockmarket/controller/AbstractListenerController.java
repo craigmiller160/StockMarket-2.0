@@ -3,7 +3,7 @@ package stockmarket.controller;
 import java.awt.event.ActionListener;
 
 import net.jcip.annotations.ThreadSafe;
-import stockmarket.gui.AbstractListenerView;
+import stockmarket.gui.ListenerView;
 import stockmarket.gui.PropertyChangeView;
 
 /**
@@ -49,8 +49,8 @@ implements ActionListener{
 	 */
 	@Override
 	public void addView(PropertyChangeView view){
-		if(view instanceof AbstractListenerView){
-			((AbstractListenerView) view).addActionListener(this);
+		if(view instanceof ListenerView){
+			((ListenerView) view).addActionListener(this);
 		}
 		super.addView(view);
 	}
@@ -63,8 +63,8 @@ implements ActionListener{
 	 */
 	@Override
 	public void removeView(PropertyChangeView view){
-		if(view instanceof AbstractListenerView){
-			((AbstractListenerView) view).removeActionListener(this);
+		if(view instanceof ListenerView){
+			((ListenerView) view).removeActionListener(this);
 		}
 		super.removeView(view);
 	}
