@@ -174,6 +174,8 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 		setThreadFactory(new EventThreadFactory());
 	}
 
+	//TODO check methods, if theyre invoked by multiple threads will there be issues???
+	
 	@Override
 	protected void processEvent(ActionEvent event, Object valueFromView) {
 		if(event.getActionCommand() == EDIT_PORTFOLIO_NAME_ACTION){

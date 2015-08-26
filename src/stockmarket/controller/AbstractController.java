@@ -2,12 +2,15 @@ package stockmarket.controller;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
 import stockmarket.gui.PropertyChangeView;
 import stockmarket.model.AbstractPropertyModel;
@@ -42,6 +45,11 @@ import stockmarket.model.AbstractPropertyModel;
 public abstract class AbstractController 
 implements PropertyChangeListener{
 
+	//TODO documentation here needs to change to reflect method changes.
+	
+	//TODO the StockMarketController will need its catch blocks changed to reflect
+	//the changes in the throws statement in this class.
+	
 	/**
 	 * A list of <tt>JavaBean</tt> bound property models that
 	 * this controller manages.
@@ -118,66 +126,269 @@ implements PropertyChangeListener{
 	}
 	
 	/**
-	 * Retrieves the value of a property from a model this controller owns.
-	 * It does this by using  Reflection to try calling a getter method for 
-	 * the requested property on all models until either it gets the value
-	 * or throws an <tt>Exception</tt>.
+	 * Invokes the getter method for the named property on one of the models 
+	 * assigned to this controller. This method is invoked through reflection
+	 * using the provided parameters. If the property name submitted is not
+	 * a property contained by the models assigned to this controller, an
+	 * exception will be thrown. If the getter invoked throws an exception,
+	 * or if the reflective method is unable to successfully invoke the 
+	 * method, the appropriate exception will be thrown.
 	 * <p>
-	 * <b>NOTE:</b> As of Version 2.0, this method only works with single-parameter
-	 * setter methods. Multiple parameters will need to explicitly be passed in
-	 * the form of an array.
+	 * This method is capable of reflectively invoking ANY method provided to it, 
+	 * so long as that method is public and matches the types of the parameters
+	 * submitted here. However, if multiple methods that would invoke successfully 
+	 * are provided in the list, this method will only end up invoking one of them. 
+	 * Multiple invocations risk interfering with the consistency of the return 
+	 * type, and therefore this method ends after the first successful invocation
+	 * even if there are other methods remaining to test.
+	 * <p>
+	 * The order of the methods is affected by the order models were added
+	 * to this controller, but ultimately the order they are tested in cannot
+	 * be completely guaranteed. As such, it is highly recommended to keep 
+	 * method names across all the models added to this controller unique,
+	 * thus avoiding this issue. 
 	 * 
-	 * @param propertyName the name of the property to be retrieved.
-	 * @return the value of the property to be retrieved.
-	 * @throws NoSuchMethodException if no model has the requested getter method.
-	 * @throws IllegalAccessException if a matching getter method is found, but 
-	 * the access modifier won't permit invocation.
-	 * @throws Exception if an <tt>InvocationTargetException</tt> occurs because
-	 * of a checked exception.
-	 * @throws RuntimeException if an <tt>InvocationTargetException</tt> occurs because
-	 * of an unchecked exception.
-	 * @throws Error if an <tt>InvocationTargetException</tt> occurs because
-	 * of an error.
+	 * @param propertyName the name of the property to invoke the setter of.
+	 * @param newParams the parameters to pass to the getter method. These are optional,
+	 * and the method will still run if no parameters are passed if the getter can accept
+	 * a no-argument invocation.
+	 * @throws NoSuchMethodException if no matching getter method can be found.
+	 * if the application does not have access to invoke the method.
+	 * @throws IllegalAccessException if the application does not have access to invoke the method.
+	 * @throws IllegalArgumentException if any or all of the parameters submitted do not match
+	 * what is required for any of the potential methods.
+	 * @throws ReflectiveOperationException if an unknown problem prevents this reflective
+	 * operation from completing successfully.
+	 * @throws Exception if a checked exception is thrown when a matching method is successfully
+	 * invoked. 
+	 * @throws RuntimeException if an unchecked exception is thrown when a matching method is
+	 * successfully invoked.
+	 * @throws Error if an error is thrown when a matching method is successfully invoked.
 	 */
-	protected final Object getModelProperty(String propertyName) 
-			throws IllegalAccessException, NoSuchMethodException, Exception{
-		boolean success = false;
-		boolean illegalAccess = false;
-		//For the moment, allowing invocationtargetexception to fly
-		//It'll only get thrown if the method is located, and it throws
-		//an exception, so it's fine if the loop stops.
-		Object result = null;
+	protected final Object getModelProperty(String propertyName, Object...newParams) 
+			throws NoSuchMethodException, IllegalAccessException, ReflectiveOperationException, Exception{
+		//Create method name, adding "get" to the propertyName
+		String methodName = "get" + propertyName;
+		
+		//Search for matching methods and creating a list of 
+		//ModelMethod objects to store them
+		List<ModelMethod> matchingMethods = new ArrayList<>();
 		synchronized(modelList){
 			for(AbstractPropertyModel model : modelList){
-				try{
-					Method method = model.getClass().getMethod(
-							"get" + propertyName);
-					result = method.invoke(model);
-					success = true;
-				}
-				catch(IllegalAccessException ex){
-					//Access modifier doesn't allow invocation from this class
-					illegalAccess = true;
-				}
-				catch(NoSuchMethodException ex){
-					//Method doesn't exist
-					//gets rethrown if this loop fails to succeed
-				}
-				catch(InvocationTargetException ex){
-					Throwable t = ex.getCause();
-					launderThrowable(t);
-				}
+				matchingMethods.addAll(getMatchingSignatureMethods(methodName, model));
 			}
 		}
 		
+		//If no matches have been found, throw exception
+		if(matchingMethods.size() == 0){
+			throw new NoSuchMethodException(methodName + " " + newParams);
+		}
+		
+		//Run the reflectMethod to invoke the setter method
+		return reflectMethod(matchingMethods, newParams);
+	}
+	
+	
+	/**
+	 * Invokes the setter method for the named property on one of the models 
+	 * assigned to this controller. This method is invoked through reflection
+	 * using the provided parameters. If the property name submitted is not
+	 * a property contained by the models assigned to this controller, an
+	 * exception will be thrown. If the setter invoked throws an exception,
+	 * or if the reflective method is unable to successfully invoke the 
+	 * method, the appropriate exception will be thrown.
+	 * <p>
+	 * This method is capable of reflectively invoking ANY method provided to it, 
+	 * so long as that method is public and matches the types of the parameters
+	 * submitted here. However, if multiple methods that would invoke successfully 
+	 * are provided in the list, this method will only end up invoking one of them. 
+	 * Multiple invocations risk interfering with the consistency of the operation,
+	 * and therefore this method ends after the first successful invocation
+	 * even if there are other methods remaining to test.
+	 * <p>
+	 * The order of the methods is affected by the order models were added
+	 * to this controller, but ultimately the order they are tested in cannot
+	 * be completely guaranteed. As such, it is highly recommended to keep 
+	 * method names across all the models added to this controller unique,
+	 * thus avoiding this issue. 
+	 * 
+	 * @param propertyName the name of the property to invoke the setter of.
+	 * @param newParams the parameters to pass to the setter method. These are optional,
+	 * and the method will still run if no parameters are passed if the setter can accept
+	 * a no-argument invocation.
+	 * @throws NoSuchMethodException if no matching setter method can be found.
+	 * if the application does not have access to invoke the method.
+	 * @throws IllegalAccessException if the application does not have access to invoke the method.
+	 * @throws IllegalArgumentException if any or all of the parameters submitted do not match
+	 * what is required for any of the potential methods.
+	 * @throws ReflectiveOperationException if an unknown problem prevents this reflective
+	 * operation from completing successfully.
+	 * @throws Exception if a checked exception is thrown when a matching method is successfully
+	 * invoked. 
+	 * @throws RuntimeException if an unchecked exception is thrown when a matching method is
+	 * successfully invoked.
+	 * @throws Error if an error is thrown when a matching method is successfully invoked.
+	 */
+	protected final void setModelProperty(String propertyName, Object... newParams) 
+			throws NoSuchMethodException, IllegalAccessException, ReflectiveOperationException, Exception{
+		//Create method name, adding "set" to the propertyName
+		String methodName = "set" + propertyName;
+		
+		//Search for matching methods and creating a list of 
+		//ModelMethod objects to store them
+		List<ModelMethod> matchingMethods = new ArrayList<>();
+		synchronized(modelList){
+			for(AbstractPropertyModel model : modelList){
+				matchingMethods.addAll(getMatchingSignatureMethods(methodName, model));
+			}
+		}
+		
+		//If no matches have been found, throw exception
+		if(matchingMethods.size() == 0){
+			throw new NoSuchMethodException(methodName + " " + newParams);
+		}
+		
+		//Run the reflectMethod to invoke the setter method
+		reflectMethod(matchingMethods, newParams);
+		
+	}
+	
+	/**
+	 * Parses the list of potentially matching methods, and attempts to invoke
+	 * them through reflection with the provided parameters. If the method invoked
+	 * returns a value, it is returned by this method. If not, then <tt>null</tt>
+	 * is returned. If invoking the method throws an exception, or not method is
+	 * successfully invoked, the appropriate exception will be thrown.
+	 * <p>
+	 * This method is capable of reflectively invoking ANY method provided to it, 
+	 * so long as the parameters provided match what the method requires. However,
+	 * if multiple methods that would invoke successfully are provided in the list,
+	 * this method will only end up invoking one of them. Multiple invocations risk
+	 * interfering with the consistency of the return type, and therefore this method
+	 * ends after the first successful invocation even if there are other methods
+	 * remaining to test.
+	 * <p>
+	 * The order methods will be invoked is determined by the list passed to this 
+	 * method, and this method can make no other guarantees about the order. It
+	 * is highly recommended to avoid situations where multiple matching methods
+	 * could be passed to this method.
+	 * 
+	 * @param matchingMethods list of <tt>ModelMethod</tt> containers with potentially
+	 * matching methods.
+	 * @param newParams the parameters submitted for invocation on a matching method. These are optional,
+	 * and the method will still run if no parameters are passed if the method can accept
+	 * a no-argument invocation.
+	 * @return the return value of the method invoked. If no return value, then <tt>null</tt>
+	 * is returned.
+	 * @throws IllegalAccessException if the application does not have access to invoke the method.
+	 * @throws IllegalArgumentException if any or all of the parameters submitted do not match
+	 * what is required for any of the potential methods.
+	 * @throws ReflectiveOperationException if an unknown problem prevents this reflective
+	 * operation from completing successfully.
+	 * @throws Exception if a checked exception is thrown when a matching method is successfully
+	 * invoked. 
+	 * @throws RuntimeException if an unchecked exception is thrown when a matching method is
+	 * successfully invoked.
+	 * @throws Error if an error is thrown when a matching method is successfully invoked.
+	 */
+	protected Object reflectMethod(List<ModelMethod> matchingMethods, Object...newParams) 
+			throws IllegalAccessException, ReflectiveOperationException, Exception{
+		boolean success = false; //Set to true if the operation succeeds
+		Exception exceptionToThrow = null; //Stores caught exceptions so the last one can be thrown if failure...
+		Object result = null; //The result of this operation, if there is one
+		
+		try{
+			//Parses the potential matches, checking their parameters prior
+			//to attempting invocation.
+			for(ModelMethod mm : matchingMethods){
+				try{
+					//Get the class types of the method's parameters
+					Class<?>[] methodParamTypes = mm.getParamTypes(); 
+					//If parameters were submitted to this reflective method
+					if(newParams.length > 0){
+						//If more parameters were submitted than the method has,
+						//It must be varargs or it will have too many args and an exception is thrown.
+						if(newParams.length > mm.getMethod().getParameterCount()){
+							if(mm.getMethod().isVarArgs()){
+								newParams = getParamsWithVarargs(mm, newParams); //Throws IllegalArgumentException
+							}
+							else{
+								throw new IllegalArgumentException("Wrong parameters for this method");
+							}
+						}
+						//If the number of parameters submitted is equal to the number of parameters
+						//the method has, adjust for varargs if necessary but proceed regardless
+						else if(newParams.length == mm.getMethod().getParameterCount()){
+							if(mm.getMethod().isVarArgs()){
+								newParams = getParamsWithVarargs(mm, newParams); //Throws IllegalArgumentException
+							}
+						}
+						//If the number of parameters submitted is one less than the method's parameter count,
+						//then it must be a varargs method with optional params being ignored, or else exception is thrown
+						//Create varargs array with a length of 0 for attempting invocation
+						else if(newParams.length == mm.getMethod().getParameterCount() - 1){
+							if(mm.getMethod().isVarArgs()){
+								newParams = getParamsWithEmptyVarargs(mm, newParams);
+							}
+							else{
+								throw new IllegalArgumentException("Wrong parameters for this method");
+							}
+						}
+						//If the code gets here, then at least one parameter was submitted, but not enough
+						//parameters were submitted to successfully invoke the method
+						else{
+							throw new IllegalArgumentException("Wrong parameters for this method");
+						}
+						
+						//Attempt invocation, and if successful, end the loop
+						result = mm.getMethod().invoke(mm.getModel(), newParams);
+						success = true;
+						break;
+						
+					}
+					//If no parameters were submitted, then the method being searched for is one that
+					//does not require parameters.
+					else{
+						//The method is indeed a no-parameter method. Attempt invocatin and end loop if successful.
+						if(methodParamTypes.length == 0){
+							result = mm.getMethod().invoke(mm.getModel());
+							success = true;
+							break;
+						}
+						//The method has a single parameter, meaning its a varargs method, but this invocation
+						//isn't using the optional parameter. Attempt invocation with an emtpy varargs array
+						//If successful, end the loop
+						else if(methodParamTypes.length == 1 && mm.getMethod().isVarArgs()){
+							newParams = getParamsWithEmptyVarargs(mm, newParams);
+							result = mm.getMethod().invoke(mm.getModel(), newParams);
+							success = true;
+							break;
+						}
+						//If the code reaches here, then the method being checked is not either a 0-parameter
+						//or a 1-vararg-parameter method, and therefore cannot be invoked.
+						else{
+							throw new IllegalArgumentException("Wrong parameters for this method");
+						}
+					}
+				}
+				catch(IllegalArgumentException ex){
+					exceptionToThrow = ex;
+				}
+			}
+		}
+		catch(InvocationTargetException ex){
+			launderThrowable(ex);
+		}
+		
+		//If none of the attempted invocations succeeded, throw the appropriate
+		//exception
 		if(!success){
-			if(illegalAccess == true){
-				//Will rarely happen, because NoSuchMethod will be triggered
-				//by the earlier method.
-				throw new IllegalAccessException("set" + propertyName);
+			if(exceptionToThrow instanceof IllegalAccessException){
+				throw (IllegalAccessException) exceptionToThrow;
 			}
 			else{
-				throw new NoSuchMethodException("set" + propertyName);
+				throw new ReflectiveOperationException(
+						"An unknown failure has occurred during this reflective operation");
 			}
 		}
 		
@@ -185,153 +396,96 @@ implements PropertyChangeListener{
 	}
 	
 	/**
-	 * Sets the value of a property from a model this controller owns.
-	 * It does this by using  Reflection to try calling a setter method for 
-	 * the requested property on all models until either it sets the value
-	 * or throws an <tt>Exception</tt>.
+	 * Returns an altered version of the new parameter array, adjusted to fit
+	 * with a varargs method where the vararg argument is not being used.
+	 * This is accomplished by creating a new array one index larger than
+	 * the new parameter array, with all of the new parameter array's contents.
+	 * An array of the varargs argument type with a length of 0 is then added as the final
+	 * parameter, so that the method can be invoked successfully.
 	 * 
-	 * @param propertyName the name of the property to be retrieved.
-	 * @param newValue the value to assign to the property.
-	 * @throws NoSuchMethodException if no model has the requested getter method.
-	 * @throws Exception if an <tt>InvocationTargetException</tt> occurs because
-	 * of a checked exception.
-	 * @throws RuntimeException if an <tt>InvocationTargetException</tt> occurs because
-	 * of an unchecked exception.
-	 * @throws Error if an <tt>InvocationTargetException</tt> occurs because
-	 * of an error.
+	 * @param mmthe <tt>ModelMethod</tt> container with the method the parameters are being
+	 * prepared for.
+	 * @param newParams the array of submitted parameters to the reflective method.
+	 * @return a new array of all the submitted parameters, with an empty array with a 
+	 * length of 0 added as a new final element.
 	 */
-	protected final void setModelProperty(String propertyName, Object newValue) 
-			throws NoSuchMethodException, Exception{
-		//TODO this currently only works with single parameter methods. Work on
-		//getting flexibility with multiple parameter methods.
+	public Object[] getParamsWithEmptyVarargs(ModelMethod mm, Object... newParams){
+		int varargsIndex = mm.getMethod().getParameterCount() - 1;
+		Class<?> varargsComponentType = mm.getParamTypes()[varargsIndex].getComponentType();
 		
-		//Find models with matching method signature
-		String methodSig = "set" + propertyName;
-		List<AbstractPropertyModel> modelsWithMethod = new ArrayList<>();
-		synchronized(modelList){
-			for(AbstractPropertyModel model : modelList){
-				//Get all methods for the model
-				Method[] methods = model.getClass().getMethods();
-				//Loop through methods and check if the signature matches
-				for(Method m : methods){
-					if(m.getName().equals(methodSig)){
-						//If the signature matches, now check the method's parameter types
-						//Confirm that the newValue param can be assigned to the method
-						Class<?>[] paramList = m.getParameterTypes();
-						boolean assignable = false;
-						for(Class<?> param : paramList){
-							//If the param is assignable, set assignable to true
-							if(param.isAssignableFrom(newValue.getClass())){
-								assignable = true;
-							}
-						}
-						
-						//TODO for the first part of the param check, to use multiple params
-						//traditional for loop, arrays of both paramList and newValueList,
-						//check each one, match by index
-						
-						//If assignable is true, add this model to the list
-						if(assignable){
-							modelsWithMethod.add(model);
-						}
-					}
-				}
-			}
-		}
+		newParams = Arrays.copyOf(newParams, newParams.length + 1);
+		newParams[newParams.length - 1] = Array.newInstance(varargsComponentType, 0);
 		
-		//Get the current type class of the newValue parameter
-		Class<?> typeClass = newValue.getClass();
-		//boolean value to record if there was a successful method invocation
-		boolean success = false;
-		
-		//TODO multiple param note: the tricky part is here. Can't just try every combination
-		//of param types...
-		
-		//Try and invoke the method on each model, while adjusting the parameter type
-		for(AbstractPropertyModel model : modelsWithMethod){
-			//Run this loop until typeClass == null.
-			//Each time, typeClass is reassigned to be its own superclass
-			//This allows for polymorphism, methods can be invoked that have
-			//a param that's a superclass of newValue
-			while(typeClass != null){
-				try {
-					Method m = model.getClass().getMethod(methodSig, typeClass);
-					m.invoke(model, newValue);
-					success = true;
-					break;
-				}
-				catch(IllegalAccessException ex){
-					//TODO this exception doesn't matter, since no method
-					//that's not public can be found by Class.getMethods()
-				}
-				catch(NoSuchMethodException ex){
-					//TODO this exception doesn't matter. It'll happen
-					//several times, but ultimately it should be caught
-					//and ignored to the loop can keep going.
-				}
-				catch(InvocationTargetException ex){
-					Throwable t = ex.getCause();
-					launderThrowable(t);
-				}
-				
-				//If the code reaches this, a NoSuchMethodException occurred on the first attempt
-				//Now we attempt to try any interfaces as a parameter.
-				Class<?>[] interfaces = typeClass.getInterfaces();
-				for(Class<?> c : interfaces){
-					try{
-						Method m = model.getClass().getMethod(methodSig, c);
-						m.invoke(model, newValue);
-						success = true;
-						break;
-					}
-					catch(IllegalAccessException ex){
-						//TODO this exception doesn't matter, since no method
-						//that's not public can be found by Class.getMethods()
-					}
-					catch(NoSuchMethodException ex){
-						//TODO this exception doesn't matter. It'll happen
-						//several times, but ultimately it should be caught
-						//and ignored to the loop can keep going.
-					}
-					catch(InvocationTargetException ex){
-						Throwable t = ex.getCause();
-						launderThrowable(t);
-					}
-					
-				}
-				
-				//If an interface succeeded, end the main loop
-				if(success){
-					break;
-				}
-				
-				//If after all that, no success, typeClass becomes its immediate superclass
-				typeClass = typeClass.getSuperclass();
-			}
-		}
-		
-		//If there is no successful invocation, throw the NoSuchMethodException
-		if(!success){
-			throw new NoSuchMethodException("set" + propertyName 
-					+ "(" + newValue.getClass().getName() + ")");
-		}
+		return newParams;
 	}
 	
 	/**
-	 * Parses an array of objects and returns an array of the <tt>Class</tt>
-	 * types of those objects.
+	 * Returns an altered version of the new parameters array, adjusted to fit
+	 * with a varargs method. This is accomplished by enclosing all the submitted 
+	 * parameters that should be a part of the varargs argument in a separate
+	 * array, and having that array be the final parameter of a new array
+	 * that has the same number of elements as the method's parameter count.
+	 * <p>
+	 * This method makes the assumption that the parameters submitted are
+	 * appropriate for this method's varargs argument. If that is not the
+	 * case, an exception is thrown. 
 	 * 
-	 * @param obArr the array to parse.
-	 * @return an array of <tt>Class</tt> types.
-	 * @throws ClassNotFoundException if the class of an object cannot be found.
+	 * @param mm the <tt>ModelMethod</tt> container with the method the parameters are being
+	 * prepared for.
+	 * @param newParams the array of submitted parameters to the reflective method.
+	 * @return a new array of all the submitted parameters, with the varargs parameters in
+	 * a separate array at the last index of the enclosing array.
+	 * @throws IllegalArgumentException if the parameters that should be a part of the 
+	 * varargs argument are not of a compatible type.
 	 */
-	/*private Class<?>[] getArrayElementClasses(Object[] obArr) throws ClassNotFoundException{
-		Class<?>[] classArr = new Class<?>[obArr.length];
-		for(int i = 0; i < classArr.length; i++){
-			classArr[i] = Class.forName(obArr[i].getClass().getName());
+	public Object[] getParamsWithVarargs(ModelMethod mm, Object... newParams){
+		int varargsIndex = mm.getMethod().getParameterCount() - 1;
+		Class<?> varargsComponentType = mm.getParamTypes()[varargsIndex].getComponentType();
+		
+		Object[] varargsArray = (Object[]) Array.newInstance(
+				varargsComponentType, newParams.length - varargsIndex);
+		
+		try{
+			for(int i = 0; i < newParams.length - varargsIndex; i++){
+				varargsArray[i] = newParams[varargsIndex + i];
+			}
 		}
-		return classArr;
-	}*/
+		catch(ArrayStoreException ex){
+			throw new IllegalArgumentException("Wrong parameters for this method");
+		}
+		
+		//Create the finalParams array, with all regular parameters + the varargsArray 
+		//as the final element
+		Object[] finalParams = new Object[mm.getMethod().getParameterCount()];
+		for(int i = 0; i < mm.getMethod().getParameterCount() - 1; i++){
+			finalParams[i] = newParams[i];
+		}
+		finalParams[finalParams.length - 1] = varargsArray;
+		
+		return finalParams;
+	}
+	
+	/**
+	 * Checks an object for methods matching the given signature, and
+	 * returns a list of <tt>ModelMethod</tt> containers with any matches 
+	 * that are found. If no matches are found, an empty list is returned.
+	 * 
+	 * @param signature the signature of the method being searched for.
+	 * @param obj the object that is being searched for the method.
+	 * @return a list of <tt>ModelMethod</tt> containers with any matches. 
+	 * An empty list if nothing is found.
+	 */
+	public List<ModelMethod> getMatchingSignatureMethods(String signature, Object obj){
+		List<ModelMethod> matches = new ArrayList<>();
+		Method[] methods = obj.getClass().getMethods();
+		for(Method m : methods){
+			if(m.getName().equals(signature)){
+				matches.add(new ModelMethod(obj, m));
+			}
+		}
+		
+		return matches;
+	}
 	
 	/**
 	 * Parses a throwable that's a cause from an <tt>InvocationTargetException</tt>
@@ -352,6 +506,73 @@ implements PropertyChangeListener{
 		else{
 			throw (Exception) t;
 		}
+	}
+	
+	/**
+	 * Immutable container object to hold a potentially matching method and the 
+	 * model it comes from for the reflective getter and setter methods
+	 * of this class.
+	 * 
+	 * @author craig
+	 * @version 2.0
+	 */
+	@Immutable
+	private class ModelMethod{
+		
+		/**
+		 * The object that is the source of the method.
+		 */
+		private final Object obj;
+		
+		/**
+		 * The potentially matching method.
+		 */
+		private final Method m;
+		
+		/**
+		 * The parameter types of the potentially matching method.
+		 */
+		private final Class<?>[] paramTypes;
+		
+		/**
+		 * Create this container object.
+		 * 
+		 * @param obj the object that is the source of the method.
+		 * @param m the potentially matching method.
+		 */
+		public ModelMethod(Object obj, Method m){
+			this.obj = obj;
+			this.m = m;
+			this.paramTypes = m.getParameterTypes();
+		}
+		
+		/**
+		 * Get the object that is the source of the method.
+		 * 
+		 * @return the object that is the source of the method.
+		 */
+		public Object getModel(){
+			return obj;
+		}
+		
+		/**
+		 * Get the potentially matching method.
+		 * 
+		 * @return the potentially matching method.
+		 */
+		public Method getMethod(){
+			return m;
+		}
+		
+		/**
+		 * Get the parameter types of the potentially matching method.
+		 * 
+		 * @return the parameter types of the potentially matching method.
+		 */
+		public Class<?>[] getParamTypes(){
+			return paramTypes;
+		}
+		
 	}
 	
 }

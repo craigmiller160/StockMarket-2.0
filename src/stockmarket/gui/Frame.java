@@ -43,6 +43,9 @@ import stockmarket.util.Language;
 @NotThreadSafe
 public class Frame extends AbstractListenerView {
 
+	//TODO work on frame split pane, need to make sure the divider resizes properly when portfolio
+	//panel contents change
+	
 	/**
 	 * Shared logger for the program.
 	 */

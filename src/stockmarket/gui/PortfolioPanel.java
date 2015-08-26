@@ -261,19 +261,19 @@ public class PortfolioPanel extends AbstractListenerView {
 		summaryPanel.setBackground(Color.WHITE);
 		summaryPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
 		
-		summaryPanel.add(portfolioSummaryLabel, "span 2, dock north");
+		summaryPanel.add(portfolioSummaryLabel, "span 2, center, pushx, growx, dock north");
 		
-		summaryPanel.add(cashBalanceLabel, "split 2, growx, gap 10 0 10");
-		summaryPanel.add(cashBalanceValue, "align right, gap 0 10, pushx, wrap");
+		summaryPanel.add(cashBalanceLabel, "gap 10 0 10");
+		summaryPanel.add(cashBalanceValue, "align right, gap 0 10, wrap");
 		
-		summaryPanel.add(totalStockValueLabel, "split 2, growx, gap 10 0 10");
-		summaryPanel.add(totalStockValue, "align right, gap 0 10, pushx, wrap");
+		summaryPanel.add(totalStockValueLabel, "gap 10 0 10");
+		summaryPanel.add(totalStockValue, "align right, gap 0 10, wrap");
 		
-		summaryPanel.add(netWorthLabel, "split 2, growx, gap 10 0 10");
-		summaryPanel.add(netWorthValue, "align right, pushx, wrap, gap 0 10");
+		summaryPanel.add(netWorthLabel, "gap 10 0 10");
+		summaryPanel.add(netWorthValue, "align right, wrap, gap 0 10");
 		
-		summaryPanel.add(changeInNetWorthLabel, "split 2, growx, gap 10 0 10 10");
-		summaryPanel.add(changeInNetWorthValue, "align right, wrap, pushx, gap 0 10");
+		summaryPanel.add(changeInNetWorthLabel, "gap 10 0 10 10");
+		summaryPanel.add(changeInNetWorthValue, "align right, wrap, gap 0 10");
 	}
 	
 	/**

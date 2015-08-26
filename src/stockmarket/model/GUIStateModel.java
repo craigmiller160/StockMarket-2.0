@@ -1,6 +1,7 @@
 package stockmarket.model;
 
-import static stockmarket.controller.StockMarketController.*;
+import static stockmarket.controller.StockMarketController.COMPONENTS_ENABLED_PROPERTY;
+import static stockmarket.controller.StockMarketController.DIALOG_DISPLAYED_PROPERTY;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -87,21 +88,28 @@ public class GUIStateModel extends AbstractPropertyModel {
 	 * Configuration information for the dialog is passed along as part of
 	 * the parameter array.
 	 * 
-	 * @param dialogConfig the configuration information for the dialog to
-	 * be displayed.
+	 * @param dialogCode the code for which dialog to display.
+	 * @param dialogConfig optional configuration information for displaying
+	 * the dialog.
 	 */
-	public void setDialogDisplayed(Object[] dialogConfig){
+	public void setDialogDisplayed(Integer dialogCode, Object... dialogConfig){
 		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
 				"setDialogDisplayed", "Entering method", 
 				new Object[] {"Dialog Code" + dialogConfig[0], dialogConfig.toString()});
 		
+		Object[] fullConfig = new Object[dialogConfig.length + 1];
+		fullConfig[0] = dialogCode;
+		for(int i = 0; i < dialogConfig.length; i++){
+			fullConfig[i + 1] = dialogConfig[i];
+		}
+		
 		Object[] oldValue = null;
 		synchronized(this){
 			oldValue = this.dialogConfig;
-			this.dialogConfig = dialogConfig;
+			this.dialogConfig = fullConfig;
 		}
 		
-		firePropertyChange(DIALOG_DISPLAYED_PROPERTY, oldValue, dialogConfig);
+		firePropertyChange(DIALOG_DISPLAYED_PROPERTY, oldValue, fullConfig);
 	}
 	
 	/**
