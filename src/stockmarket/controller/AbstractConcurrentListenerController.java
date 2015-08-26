@@ -14,7 +14,7 @@ import javax.swing.SwingUtilities;
 
 import net.jcip.annotations.ThreadSafe;
 import stockmarket.gui.ListenerView;
-import stockmarket.gui.ProperyChangeView;
+import stockmarket.gui.PropertyChangeView;
 
 /**
  * 
@@ -127,7 +127,7 @@ extends AbstractListenerController{
 	//by putting it on EDT
 	public void propertyChange(final PropertyChangeEvent event){
 		synchronized(viewList){
-			for(final ProperyChangeView view : viewList){
+			for(final PropertyChangeView view : viewList){
 				SwingUtilities.invokeLater(new Runnable(){
 					@Override
 					public void run() {

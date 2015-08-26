@@ -4,7 +4,7 @@ import java.awt.event.ActionListener;
 
 import net.jcip.annotations.ThreadSafe;
 import stockmarket.gui.AbstractListenerView;
-import stockmarket.gui.ProperyChangeView;
+import stockmarket.gui.PropertyChangeView;
 
 /**
  * Expanded version of <tt>AbstractController</tt> with the controller
@@ -48,7 +48,7 @@ implements ActionListener{
 	 * @param view the view to be managed by this controller.
 	 */
 	@Override
-	public void addView(ProperyChangeView view){
+	public void addView(PropertyChangeView view){
 		if(view instanceof AbstractListenerView){
 			((AbstractListenerView) view).addActionListener(this);
 		}
@@ -62,7 +62,7 @@ implements ActionListener{
 	 * @param view the view to be removed from this controller.
 	 */
 	@Override
-	public void removeView(ProperyChangeView view){
+	public void removeView(PropertyChangeView view){
 		if(view instanceof AbstractListenerView){
 			((AbstractListenerView) view).removeActionListener(this);
 		}

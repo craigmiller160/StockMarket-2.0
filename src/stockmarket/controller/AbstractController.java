@@ -9,7 +9,7 @@ import java.util.Collections;
 import java.util.List;
 
 import net.jcip.annotations.ThreadSafe;
-import stockmarket.gui.ProperyChangeView;
+import stockmarket.gui.PropertyChangeView;
 import stockmarket.model.AbstractPropertyModel;
 
 /**
@@ -35,7 +35,7 @@ import stockmarket.model.AbstractPropertyModel;
  * 
  * @author Craig
  * @version 2.0
- * @see stockmarket.gui.ProperyChangeView PropertyChangeView
+ * @see stockmarket.gui.PropertyChangeView PropertyChangeView
  * @see stockmarket.model.AbstractPropertyModel AbstractPropertyModel
  */
 @ThreadSafe
@@ -52,7 +52,7 @@ implements PropertyChangeListener{
 	 * A list of GUI classes implementing the <tt>PropertyChangeView</tt>
 	 * interface that this controller manages.
 	 */
-	protected List<ProperyChangeView> viewList;
+	protected List<PropertyChangeView> viewList;
 	
 	/**
 	 * Create the controller.
@@ -97,7 +97,7 @@ implements PropertyChangeListener{
 	 * 
 	 * @param view the view to be added to this controller.
 	 */
-	public void addView(ProperyChangeView view){
+	public void addView(PropertyChangeView view){
 		viewList.add(view);
 	}
 	
@@ -106,13 +106,13 @@ implements PropertyChangeListener{
 	 * 
 	 * @param view the view to be removed from this controller.
 	 */
-	public void removeView(ProperyChangeView view){
+	public void removeView(PropertyChangeView view){
 		viewList.remove(view);
 	}
 
 	@Override
 	public void propertyChange(PropertyChangeEvent evt){
-		for(ProperyChangeView view : viewList){
+		for(PropertyChangeView view : viewList){
 			view.changeProperty(evt);
 		}
 	}

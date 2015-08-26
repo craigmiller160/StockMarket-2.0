@@ -31,7 +31,7 @@ import net.jcip.annotations.NotThreadSafe;
  *
  */
 @NotThreadSafe
-public interface ProperyChangeView {
+public interface PropertyChangeView {
 
 	/**
 	 * Passes a <tt>PropertyChangeEvent</tt> to this view to

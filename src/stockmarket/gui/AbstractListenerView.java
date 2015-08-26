@@ -59,7 +59,10 @@ import net.jcip.annotations.NotThreadSafe;
  */
 @NotThreadSafe
 public abstract class AbstractListenerView 
-implements ActionListener, ProperyChangeView, ListenerView{
+implements ListenerView{
+	
+	//TODO change documentation, because this now just implements ListenerView,
+	//and ListenerView implements ActionListener and PropertyChangeListener
 	
 	/**
 	 * List of listeners/controllers assigned to this class.

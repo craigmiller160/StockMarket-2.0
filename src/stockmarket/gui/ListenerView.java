@@ -25,8 +25,11 @@ import java.awt.event.ActionListener;
  * @author craig
  * @version 2.0
  */
-public interface ListenerView{
+public interface ListenerView extends ActionListener, PropertyChangeView{
 
+	//TODO document how this extends ActionListener and PropertyChangeView
+	
+	
 	/**
 	 * Returns a specified value from the view. The value returned 
 	 * will correspond to the property name parameter. If the parameter

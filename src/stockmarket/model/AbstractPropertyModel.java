@@ -43,13 +43,16 @@ import net.jcip.annotations.ThreadSafe;
  * 
  * @author Craig
  * @version 2.0
- * @see stockmarket.gui.ProperyChangeView ControllableView
+ * @see stockmarket.gui.PropertyChangeView ControllableView
  * @see stockmarket.controller.AbstractController AbstractController
  */
 @ThreadSafe
 public abstract class AbstractPropertyModel 
 implements Serializable{
 
+	//TODO document how firePropertyEvent should never be invoked in a synchronized
+	//block or method
+	
 	/**
 	 * SerialVersionUID for implementing Serialization.
 	 */
