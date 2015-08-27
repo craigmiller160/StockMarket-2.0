@@ -38,6 +38,9 @@ import stockmarket.util.Language;
 
 public class StockMarketController extends AbstractConcurrentListenerController {
 
+	//TODO the StockMarketController will need its catch blocks changed to reflect
+		//the changes in the throws statement in this class.
+	
 	public static final String STOCK_LIST_PROPERTY = "StockList";
 	
 	public static final String PORTFOLIO_NAME_PROPERTY = "PortfolioName";

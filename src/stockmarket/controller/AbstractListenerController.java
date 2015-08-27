@@ -7,17 +7,31 @@ import stockmarket.gui.ListenerView;
 import stockmarket.gui.PropertyChangeView;
 
 /**
- * Expanded version of <tt>AbstractController</tt> with the controller
- * functioning as an <tt>ActionListener</tt>. This design allows for
- * a more complete off-loading of all business logic from the view to
- * the controller, increasing the abstractness of their interactions
- * and reducing class coupling.
+ * Expanded version of <tt>AbstractController</tt>. Like its superclass,
+ * this class is capable of updating a range of models and views
+ * registered with it, so long as they conform to this MVP framework.
+ * Consult the documentation for this class's superclass for more
+ * details.
  * <p>
- * Any views added to this class that support the function will add
- * this class as an <tt>ActionListener</tt>. Events fired by the view
- * will be handled in the <tt>actionPerformed()</tt> method, giving the
- * controller nearly complete control over the implementation of view
- * actions.
+ * The main new functionality of this class comes from the fact that
+ * it implements the <tt>ActionListener</tt> interface. This allows
+ * it to function as listener for events that occur in the views
+ * that are added to it. The add/remove view methods of this class
+ * have been overriden to check the views being added to see if
+ * they are an instance of <tt>ListenerView</tt>. If they are, 
+ * this class is added to it as a listener.
+ * <p>
+ * Subclasses will need to implement the <tt>actionPerformed(ActionEvent)</tt>
+ * method, which will receive all events from the views so that any
+ * model updates that are necessary can be performed. Classes implementing
+ * <tt>ListenerView</tt> also have the <tt>getValueForAction(String)</tt>
+ * method, which provides a great abstract tool for acquiring values
+ * from the view that are needed to perform the required action.
+ * Consult the documentation for <tt>ListenerView</tt> for more details.
+ * <p>
+ * Lastly, the listener structure of this MVP framework functions best
+ * when the action commands of all <tt>ActionEvent</tt>s passed between
+ * views and this controller are constants.
  * <p>
  * <b>THREAD SAFETY:</b> This class is thread safe because its super class
  * is thread safe. While this class adds methods, it doesn't add any state
@@ -26,7 +40,7 @@ import stockmarket.gui.PropertyChangeView;
  * 
  * @author Craig
  * @version 2.0
- * @see stockmarket.gui.AbstractListenerView AbstractView
+ * @see stockmarket.gui.ListenerView ListenerView
  * @see stockmarket.model.AbstractPropertyModel AbstractPropertyModel
  */
 @ThreadSafe

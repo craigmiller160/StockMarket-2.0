@@ -96,7 +96,7 @@ public class SellDialog extends TransactionDialog {
 	}
 
 	@Override
-	public Object getValue(String valueToGet) {
+	public Object getValueForAction(String valueToGet) {
 		Object result = null;
 		if(valueToGet == SELL_STOCK_ACTION){
 			LOGGER.logp(Level.FINEST, this.getClass().getName(), "getValue", 

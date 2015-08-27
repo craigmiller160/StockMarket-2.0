@@ -118,7 +118,7 @@ public class OpenPortfolioDialog extends AbstractDefaultDialog {
 	}
 
 	@Override
-	public Object getValue(String valueToGet) {
+	public Object getValueForAction(String valueToGet) {
 		Object result = null;
 		if(valueToGet == OPEN_SELECTED_PORTFOLIO_ACTION){
 			LOGGER.logp(Level.FINEST, this.getClass().getName(), 

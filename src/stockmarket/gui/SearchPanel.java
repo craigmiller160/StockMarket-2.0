@@ -317,7 +317,7 @@ public class SearchPanel extends AbstractListenerView {
 	}
 
 	@Override
-	public Object getValue(String valueToGet) {
+	public Object getValueForAction(String valueToGet) {
 		Object result = null;
 		if(valueToGet == STOCK_SEARCH_ACTION){
 			LOGGER.logp(Level.FINEST, this.getClass().getName(), "getValue", 

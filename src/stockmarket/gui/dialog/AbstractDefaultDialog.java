@@ -1,10 +1,6 @@
 package stockmarket.gui.dialog;
 
 import java.awt.Frame;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -15,36 +11,32 @@ import javax.swing.JPanel;
 import net.miginfocom.swing.MigLayout;
 
 /**
- * An abstract implementation of the <tt>ListenerDialog</tt>
- * interface, which creates a dialog that can pass events to and
- * be abstractly interacted with by one or more listening controllers
- * added to this class. This class also defines an API for a uniform design
- * for all dialogs in this program.
+ * An default design of a dialog for this program. This class
+ * extends <tt>AbstractListenerDialog</tt> and its ability to
+ * pass events to external listening controllers. Subclasses
+ * will also have to implement the abstract superclass method,
+ * <tt>getValueForAction(String)</tt>. The documentation from
+ * the superclass should be consulted for how best to handle
+ * its methods.
  * <p>
- * This class also implements the <tt>ActionListener</tt> interface
- * to facilitate the passing of <tt>ActionEvent</tt>s from actionable
- * components to external controllers. Any actionable components should
- * add <tt>this</tt> as their <tt>ActionListener</tt>, and this class's
- * <tt>actionPerformed()</tt> method will pass the event to any listening
- * controllers.
+ * In addition, this class implements all abstract dialog-specific methods from
+ * its parent class and wraps around an inner <tt>JDialog</tt>
+ * object that this class constructs. As the <tt>ListenerDialog</tt> interface specifies, the
+ * dialog created by this class will not become visible until
+ * the <tt>showDialog()</tt> method is invoked. This allows for
+ * the dialog to be configured in additional ways prior to it
+ * being displayed. One example of this would be adding listeners,
+ * but there is no limit to what subclasses could offer.
  * <p>
- * This design does not forbid the use of other listeners of any
- * type in subclasses. However, those listeners should only be used
- * for minor events. Anything that impacts the state of the program
- * should utilize the external listening controller to perform the action.
+ * The primary purpose of this class, however, is to define
+ * an API for a uniform style of dialog to be used by this
+ * program. Any class that properly extends this one will
+ * create a dialog with the same basic appearance and structure.
+ * Even with that framework, this class offers an incredibly
+ * flexible design that still allows for the creation of a
+ * wide range of unique dialogs.
  * <p>
- * Implementing this abstract class requires implementing six abstract methods.
- * <p>
- * The <tt>getValue()</tt> method, inherited from the <tt>ListenerView</tt>,
- * interface, allows for the external controller to acquire values from this
- * class without needing any direct knowledge of it. Any values that a 
- * controller could need to respond to an action from this view should be made
- * available from that method.
- * <p>
- * The six new abstract methods provided are for the design of the dialog itself.
- * Implementing them defines the nature of specific elemenets of the dialog's GUI,
- * and those elements are then placed in pre-defined locations in the dialog.
- * The format of the dialog is as follows:
+ * The dialog that is ultimately created will have the following structure:
  * <pre>
  * ________________________
  * |Title_Bar______________|
@@ -59,32 +51,43 @@ import net.miginfocom.swing.MigLayout;
  * |________|______Buttons||
  * </pre>
  * 
- * The methods to create this are:
+ * To accomplish this, five abstract methods are provided for 
+ * each of the five regions of this dialog. Each one allows
+ * returns another element of the dialog, all of which are 
+ * ultimately assembled when the <tt>showDialog()</tt> method
+ * is invoked. The methods are:
  * <p>
- * <tt>createTitleBarText()</tt> returns a <tt>String and assigns the 
- * text for the title bar.
+ * <tt>createTitleBarText()</tt> should be implemented to return a 
+ * <tt>String</tt> that will appear as the text in the dialog's 
+ * title bar.
  * <p>
- * <tt>createIcon()</tt> returns an <tt>ImageIcon</tt> that is placed
- * in the upper left of the dialog. A smaller version of the icon is 
- * also assigned as the icon in the title bar.
+ * <tt>createIcon()</tt> should be implemented to return an 
+ * <tt>ImageIcon</tt> to be displayed in the upper left of the
+ * dialog. In addition, a shrunk-down version of the icon will
+ * be displayed in the title bar, to the left of the title bar
+ * text. For added consistency, all subclasses should use icons
+ * that are the same size.
  * <p>
- * <tt>createTitlePanel()</tt> returns a <tt>JPanel</tt> which contains
- * the big title for the dialog.
+ * <tt>createTitlePanel()</tt> should be implemented to create
+ * and return a <tt>JPanel</tt> containing a large title for
+ * the dialog. It will be placed at the top of the main part 
+ * of the dialog (everything to the right of the big icon).
  * <p>
- * <tt>createDetailsPanel()</tt> returns a <tt>JPanel</tt> which
- * contains the details for the dialog. This could be text information,
- * text fields for input, buttons, or any number of other UI components.
+ * <tt>createDetailsPanel()</tt> should be implemented to
+ * create and return a <tt>JPanel</tt> this is the dialog's
+ * details panel, the largest and most flexible part of the 
+ * dialog. Any number of components can be placed in this panel
+ * to perform whatever functions the dialog needs. It will
+ * be located in the center of the main part of the dialog
+ * (everything to the right of the big icon).
  * <p>
- * <tt>addButtons()</tt> returns a <tt>JButton</tt> array and adds
- * buttons to the bottom right of the dialog. These buttons should
- * be the final actions buttons of the dialog, the ones that close 
- * the dialog and either commit or discard any data changes the dialog
- * may or may not have made.
- * <p>
- * One final method, <tt>init()</tt>, is provided as an optional method 
- * to initialize any components or elements that need to be initialized
- * for this dialog. If this method is not needed by a subclass, its 
- * implementation can be left blank.
+ * <tt>addButtons()</tt> should be implemented to return an
+ * array of <tt>JButton</tt>s to be added to this dialog. 
+ * These should be the main action buttons that complete
+ * the task of the dialog (eg, "Ok", "Cancel", etc).
+ * They will be added to the bottom of the dialog, right-aligned.
+ * They will be ordered from left-to-right in order of
+ * their index position in the array.
  * <p>
  * <b>THREAD SAFETY:</b> Swing is NOT thread safe. All
  * methods in this class MUST be invoked on the <tt>EventDispatchThread</tt>.
@@ -93,18 +96,8 @@ import net.miginfocom.swing.MigLayout;
  * @version 2.0
  */
 public abstract class AbstractDefaultDialog 
-implements ListenerDialog {
+extends AbstractListenerDialog {
 
-	//TODO split this class, create a superclass with just the listener methods, which is
-	//extended by this class with the dialog framework.
-	
-	//TODO this class doesn't implement ActionListener, only ListenerDialog
-	
-	/**
-	 * List of listeners/controllers assigned to this class.
-	 */
-	private final List<ActionListener> listeners;
-	
 	/**
 	 * <tt>JDialog</tt> object created by this class.
 	 */
@@ -141,7 +134,6 @@ implements ListenerDialog {
 	 */
 	protected AbstractDefaultDialog(Frame owner, boolean modal){
 		super();
-		listeners = new ArrayList<>();
 		this.owner = owner;
 		dialog = createDialog(owner, modal);
 	}
@@ -198,29 +190,13 @@ implements ListenerDialog {
 	}
 	
 	@Override
-	public void addActionListener(ActionListener listener) {
-		listeners.add(listener);
+	public void setModal(boolean modal){
+		dialog.setModal(modal);
 	}
 	
 	@Override
-	public void removeActionListener(ActionListener listener) {
-		listeners.add(listener);
-	}
-	
-	/**
-	 * Passes an event from an actionable component in the GUI to the
-	 * listeners assigned to this dialog.
-	 * 
-	 * @param event the event that needs to be executed.
-	 */
-	@Override
-	public final void actionPerformed(ActionEvent event){
-		ActionEvent newEvent = new ActionEvent(
-				this, ActionEvent.ACTION_PERFORMED, event.getActionCommand());
-		
-		for(ActionListener l : listeners){
-			l.actionPerformed(newEvent);
-		}
+	public boolean getModal(){
+		return dialog.isModal();
 	}
 	
 	/**
@@ -256,7 +232,9 @@ implements ListenerDialog {
 	
 	/**
 	 * Create and return the icon to be used as the large icon image
-	 * in the dialog and the small icon in the title bar.
+	 * in the dialog and the small icon in the title bar. The icons
+	 * returned by all subclasses in this program should be the same
+	 * size to ensure consistency.
 	 * 
 	 * @return the icon to be used in the dialog.
 	 */

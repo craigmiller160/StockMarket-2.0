@@ -415,7 +415,7 @@ public class Main {
 		GUIStateModel guiStateModel = new GUIStateModel();
 		StockDisplayModel stockDisplayModel = new StockDisplayModel();
 		
-		stockMarketController.setThreadPoolProperties(6, 20, 60L, 
+		stockMarketController.setThreadPoolProperties(5, 20, 60L, 
 				TimeUnit.MILLISECONDS);
 		
 		stockMarketController.addPropertyModel(guiStateModel);
@@ -469,6 +469,7 @@ public class Main {
 		exceptionDialog.showDialog();
 	}
 	
+	//TODO document this
 	private static class GUIUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler{
 
 		@Override

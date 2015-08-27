@@ -324,7 +324,7 @@ public class MenuBar extends AbstractListenerView {
 	}
 
 	@Override
-	public Object getValue(String valueToGet) {
+	public Object getValueForAction(String valueToGet) {
 		//LOGGER.logp(Level.FINEST, this.getClass().getName(), "getValue", 
 				//"Entering method", new Object[] {"Command: " + valueToGet});
 		

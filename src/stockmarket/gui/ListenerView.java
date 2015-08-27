@@ -10,41 +10,48 @@ import java.awt.event.ActionListener;
  * through the <tt>ActionListener</tt> interface without needing
  * direct knowledge of each other.
  * <p>
- * In addition to the methods to add and remove an <tt>ActionListener</tt>,
- * another method, <tt>getValue()</tt>, is provided. Many times a listener
- * will need values from the UI to perform its function (such as user input).
- * This method provides an abstract way for a separate listener class to retrieve
- * any needed values. Any values needed to perform any action from this class should be
- * set up to be returned by this method.
+ * In addition to providing methods to add and remove external
+ * <tt>ActionListener</tt>s, this interface extends the <tt>ActionListener</tt>
+ * interface itself. This allows implementing classes to simply assign
+ * <tt>this</tt> as the listener for all actionable components, 
+ * easily funneling all events to an external listener without the
+ * components needing any knowledge of the listener's existence.
  * <p>
- * Listeners should invoke <tt>getSource()</tt> on any <tt>ActionEvent</tt> 
- * received, and if the source is an instance of this interface, call the
- * <tt>getValue()</tt> method. A constant value should be passed to 
- * <tt>getValue()</tt> as its parameter, to ensure consistency across classes.
+ * Lastly, the <tt>getValueForAction(String)</tt> method is provided as a tool
+ * to allow the external listeners to perform the proper action. 
+ * Many times, the action that needs to be done will require a value
+ * inputed by the user. This method provides an abstract way to acquire
+ * the necessary value(s) based on the <tt>actionCommand</tt> parameter
+ * passed to the method. <b>NOTE:</b> This works best when action command
+ * values are set as constants.
+ * <p>
+ * <b>THREAD SAFETY:</b> Swing is NOT thread safe. Since this interface
+ * is intended to be used with Swing classes, its methods should
+ * only be accessed on the <tt>EventDispatchThread</tt>.
  * 
  * @author craig
  * @version 2.0
  */
-public interface ListenerView extends ActionListener{
+public interface ListenerView 
+extends ActionListener{
 
-	//TODO document how this extends ActionListener
-	
-	
 	/**
-	 * Returns a specified value from the view. The value returned 
-	 * will correspond to the property name parameter. If the parameter
-	 * doesn't match any value that this class is meant to return, this method
-	 * should return null.
+	 * Returns a value from the view that is needed to perform
+	 * a given action. The <tt>actionCommand</tt> parameter passed
+	 * here determines which, if any, value will be returned. If
+	 * no value is needed for a particular action, simply return
+	 * <tt>null</tt>.
 	 * <p>
 	 * <b>THREAD SAFETY:</b> Again, this is a Swing class. Controllers that
 	 * off-load their tasks to other threads need to make sure that they only
 	 * call on this method on the <tt>EventDispatchThread</tt>.
 	 * 
-	 * @param valueToGet the name of the value to be retrieved. This should
-	 * be a constant value and determined by the implementation.
-	 * @return the value of the requested property.
+	 * @param actionCommand the action command for the action being performed,
+	 * to determine which, if any, values are needed from this view.
+	 * @return the value needed for the specified action, or <tt>null</tt> if
+	 * no value is needed.
 	 */
-	Object getValue(String valueToGet);
+	Object getValueForAction(String actionCommand);
 	
 	/**
 	 * Adds an <tt>ActionListener</tt> to the list of listeners in this view. 

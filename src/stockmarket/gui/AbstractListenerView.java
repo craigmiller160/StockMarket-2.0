@@ -9,40 +9,31 @@ import stockmarket.gui.dialog.ListenerDialog;
 import net.jcip.annotations.NotThreadSafe;
 
 /**
- * An abstract implementation of the <tt>ListenerView</tt> interface.
- * This implementation sets up a <tt>List</tt> to store any external
- * listeners added to this class. In addition, it implements the
- * <tt>ActionListener</tt> interface, with an implemented and final
- * <tt>actionPerformed()</tt> method that merely iterates through
- * the list of listeners and passes the <tt>ActionEvent</tt> to them.
+ * An abstract implementation of the <tt>ListenerView</tt> and
+ * <tt>PropertyChangeView</tt> interfaces. <tt>PropertyChangeView</tt>'s
+ * sole method is inherited in abstract form and will need to be 
+ * implemented by a subclass of this, but most of <tt>ListenerView</tt>'s
+ * methods have an implementation here.
  * <p>
- * To extend this class, two abstract methods must be implemented.
+ * This class has been implemented to accept multiple external 
+ * <tt>ActionListener</tt>s and store them in a list. This class
+ * also implements <tt>actionPerformed(ActionEvent)</tt> inherited
+ * from <tt>ActionListener</tt> as a final method. This implementation
+ * simply creates a new <tt>ActionEvent</tt> with the same action command
+ * as the one that was passed to it, but with this class as the event's
+ * source. This allows for the external listening controller(s) to 
+ * abstractly access this class, and the <tt>getValueForAction(String)</tt>
+ * method specifically. (<b>NOTE:</b> If the event comes from an instance
+ * of <tt>ListenerDialog</tt>, the source is not reassigned. This allows
+ * events from the dialogs in this framework to convey their source to
+ * the external listening controller(s), for the same reasons already
+ * stated).
  * <p>
- * <tt>getValue()</tt>, from <tt>ListenerView</tt>, provides an
- * abstract tool for an external listener that needs to retrieve
- * a value from this class. The <tt>String</tt> parameter passed to it
- * should be a constant across the entire program, to ensure consistency.
- * Any values needed to perform any action from this class should be
- * set up to be returned by this method.
- * <p>
- * This class also implements the <tt>PropertyChangeView</tt> interface.
- * The abstract method <tt>propertyChange()</tt> needs to be implemented,
- * to provide an abstract way for the external listening controller to
- * pass updates back to this view.
- * <p>
- * This design is meant to facilitate the passing of events from
- * actionable components in this GUI class to external listeners.
- * By functioning as an <tt>ActionListener</tt> itself, this class
- * can be added as a listener to any components that need one.
- * Thus subclasses will need no knowledge of what, if any, external
- * listeners have been added, they merely need to add <tt>this</tt>
- * as their <tt>ActionListener</tt>s, and if external listeners
- * exist they will be called upon.
- * <p>
- * This design does not forbid the use of other listeners of any
- * type in subclasses. However, those listeners should only be used
- * for minor events. Anything that impacts the state of the program
- * should utilize the external listening controller to perform the action.
+ * In addition to the <tt>changeProperty(PropertyChangeEvent)</tt> method 
+ * inherited from <tt>PropertyChangeView</tt>, subclasses will need
+ * to implement <tt>getValueForAction(String)</tt> from <tt>ListenerView</tt>
+ * in order to extend this class. The documentation for these interfaces
+ * should be consulted for the proper way to implement these methods.
  * <p>
  * <b>NOTE:</b> A view extending this class cannot also extend a GUI component class,
  * so views using this API will have to rely on composition (wrapping around
@@ -56,13 +47,11 @@ import net.jcip.annotations.NotThreadSafe;
  * @version 2.0
  * @see stockmarket.controller.AbstractListenerController AbstractListenerController
  * @see stockmarket.model.AbstractPropertyModel AbstractPropertyModel
+ * @see stockmarket.gui.ListenerDialog ListenerDialog
  */
 @NotThreadSafe
 public abstract class AbstractListenerView 
 implements ListenerView, PropertyChangeView{
-	
-	//TODO change documentation, because this now just implements ListenerView,
-	//and ListenerView implements ActionListener and PropertyChangeListener
 	
 	/**
 	 * List of listeners/controllers assigned to this class.

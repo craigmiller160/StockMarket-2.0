@@ -6,20 +6,17 @@ import net.jcip.annotations.NotThreadSafe;
 
 /**
  * A basic interface for a simple API for making GUI classes that can
- * be updated abstractly in a Model-View-Controller design pattern.
- * Its single method, <tt>changeProperty()</tt>, allows any controller 
+ * be updated abstractly in a Model-View-Presenter design pattern.
+ * Its single method, <tt>changeProperty(PropertyChangeEvent)</tt>, allows any controller 
  * looking to update it to pass <tt>PropertyChangeEvent</tt>s to
- * the class. The GUI class then handles the event without the controller
+ * the class via this interface using dependency inversion. The GUI 
+ * class then handles the event without the controller
  * needing any knowledge of the view's implementation. The <tt>PropertyChangeEvent</tt>
  * passed to the method can be acted on or ignored, depending on the event's
  * attributes.
  * <p>
  * Property name values should be constants stored in a single class.
  * This ensures consistency and avoids errors.
- * <p>
- * This API is intended for the "presenter" form of of the MVC pattern,
- * where the views and models are completely de-coupled and the controller
- * passes information between them.
  * <p>
  * <b>THREAD SAFETY:</b> Swing is NOT thread safe. All
  * methods in this class MUST be invoked on the <tt>EventDispatchThread</tt>.

@@ -10,31 +10,52 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import net.jcip.annotations.GuardedBy;
 import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
 import stockmarket.gui.PropertyChangeView;
 import stockmarket.model.AbstractPropertyModel;
 
 /**
- * Base controller API for building a program based on the Model-View-Controller
- * design pattern. It provides methods to abstractly handle as many models and views
- * as it needs to, storing them in synchronized lists until they are needed.
+ * Abstract controller class with the basic structure for managing
+ * a program following the Model-View-Presenter design pattern.
+ * It provides methods to add/remove models that extend the 
+ * <tt>AbstractPropertyModel</tt> class  and views that implement the
+ * <tt>PropertyChangeView</tt> interface. It is not meant to 
+ * be used with other view/model classes that do not apply
+ * this MVP framework.
  * <p>
- * <b>IMPLEMENTATION NOTES:</b>
+ * In addition to maintaining lists of registered models and views,
+ * this class has powerful reflective getter and setter methods to
+ * modify the models it is assigned. <tt>setModelProperty(String,Object...)</tt>
+ * and <tt>getModelProperty(String,Object...)</tt> are designed to 
+ * call upon any public "get" or "set" method in any model class, so long 
+ * as the property name is synonymous with the method name. This 
+ * allows subclasses to modify the models assigned to this controller
+ * without needing any direct knowledge of their implementation.
  * <p>
- * <b>1)</b> Controller classes should access and modify model properties through
- * the protected <tt>setModelProperty()</tt> and <tt>getModelProperty()</tt> methods,
- * which use reflection to invoke the corresponding methods in the model.
+ * The only restriction on these two methods is they will only
+ * successfully invoke a method that matches the name and parameters
+ * provided once. If more than one matching method exists across the instances
+ * of the models added to this controller, only the first one found
+ * will be invoked. This is to ensure a consistent ability to return
+ * a value, if necessary. Because of this, it is highly recommended
+ * to keep all property names unique, and not to add multiple instances
+ * of the same model to this controller.
  * <p>
- * <b>THREAD SAFETY:</b> Thread safety is delegated to the synchronized list 
- * collection. The lists of models and views contained in this class are both
- * synchronized lists, so any add/remove/set operations will be thread-safe.
- * However, subclasses should be careful about implementing any iteration of
- * these lists, as that will require additional client-side locking. 
+ * Lastly, this controller functions as a <tt>PropertyChangeListener</tt>.
+ * All models added to this class have this controller added as a
+ * listener for any <tt>PropertyChangeEvent</tt>s they fire.
+ * Any events received will be passed to all the views registered
+ * with this controller. The individual views will be responsible
+ * for determining if they need to respond to the event or not.
  * <p>
- * <b>NOTE:</b> As of Version 2.0, the <tt>setModelProperty(String,Object)</tt> 
- * method will only work with model setter methods that accept a single parameter.
- * Multiple-parameter methods will fail at this time.
+ * <b>THREAD SAFETY:</b> This class is completely thread safe. The lists
+ * containing the registered models and views are both synchronized 
+ * lists, and thread safety is delegated to them. Iteration of 
+ * those lists in this class is synchronized on the intrinsic lock
+ * of the lists. Any iteration of those lists by subclasses needs 
+ * to do the same.
  * 
  * @author Craig
  * @version 2.0
@@ -45,21 +66,18 @@ import stockmarket.model.AbstractPropertyModel;
 public abstract class AbstractController 
 implements PropertyChangeListener{
 
-	//TODO documentation here needs to change to reflect method changes.
-	
-	//TODO the StockMarketController will need its catch blocks changed to reflect
-	//the changes in the throws statement in this class.
-	
 	/**
 	 * A list of <tt>JavaBean</tt> bound property models that
 	 * this controller manages.
 	 */
+	@GuardedBy("modelList")
 	protected List<AbstractPropertyModel> modelList;
 	
 	/**
 	 * A list of GUI classes implementing the <tt>PropertyChangeView</tt>
 	 * interface that this controller manages.
 	 */
+	@GuardedBy("viewList")
 	protected List<PropertyChangeView> viewList;
 	
 	/**
@@ -101,7 +119,7 @@ implements PropertyChangeListener{
 	}
 	
 	/**
-	 * Add a view.
+	 * Add a view to this controller.
 	 * 
 	 * @param view the view to be added to this controller.
 	 */
@@ -110,7 +128,7 @@ implements PropertyChangeListener{
 	}
 	
 	/**
-	 * Remove a view.
+	 * Remove a view from this controller.
 	 * 
 	 * @param view the view to be removed from this controller.
 	 */
@@ -120,8 +138,10 @@ implements PropertyChangeListener{
 
 	@Override
 	public void propertyChange(PropertyChangeEvent evt){
-		for(PropertyChangeView view : viewList){
-			view.changeProperty(evt);
+		synchronized(viewList){
+			for(PropertyChangeView view : viewList){
+				view.changeProperty(evt);
+			}
 		}
 	}
 	
@@ -409,7 +429,7 @@ implements PropertyChangeListener{
 	 * @return a new array of all the submitted parameters, with an empty array with a 
 	 * length of 0 added as a new final element.
 	 */
-	public Object[] getParamsWithEmptyVarargs(ModelMethod mm, Object... newParams){
+	private Object[] getParamsWithEmptyVarargs(ModelMethod mm, Object... newParams){
 		int varargsIndex = mm.getMethod().getParameterCount() - 1;
 		Class<?> varargsComponentType = mm.getParamTypes()[varargsIndex].getComponentType();
 		
@@ -438,7 +458,7 @@ implements PropertyChangeListener{
 	 * @throws IllegalArgumentException if the parameters that should be a part of the 
 	 * varargs argument are not of a compatible type.
 	 */
-	public Object[] getParamsWithVarargs(ModelMethod mm, Object... newParams){
+	private Object[] getParamsWithVarargs(ModelMethod mm, Object... newParams){
 		int varargsIndex = mm.getMethod().getParameterCount() - 1;
 		Class<?> varargsComponentType = mm.getParamTypes()[varargsIndex].getComponentType();
 		
@@ -475,7 +495,7 @@ implements PropertyChangeListener{
 	 * @return a list of <tt>ModelMethod</tt> containers with any matches. 
 	 * An empty list if nothing is found.
 	 */
-	public List<ModelMethod> getMatchingSignatureMethods(String signature, Object obj){
+	private List<ModelMethod> getMatchingSignatureMethods(String signature, Object obj){
 		List<ModelMethod> matches = new ArrayList<>();
 		Method[] methods = obj.getClass().getMethods();
 		for(Method m : methods){

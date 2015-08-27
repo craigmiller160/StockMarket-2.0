@@ -257,7 +257,7 @@ public class PortfolioNameDialog extends AbstractDefaultDialog {
 	}
 
 	@Override
-	public Object getValue(String valueToGet) {
+	public Object getValueForAction(String valueToGet) {
 		if(valueToGet == SAVE_PORTFOLIO_NAME_ACTION){
 			LOGGER.logp(Level.FINEST, this.getClass().getName(), "getValue", 
 					"Entering method", new Object[] {"Command: " + valueToGet});

@@ -3,26 +3,35 @@ package stockmarket.gui.dialog;
 import stockmarket.gui.ListenerView;
 
 /**
- * Interface defining the API for a <tt>ListenerDialog</tt>,
- * an object very similar to the <ttListenerView</tt> API that
- * it inherits. The primary difference is that a <tt>ListenerDialog</tt>
- * is a temporary dialog created by in a GUI, whereas <tt>ListenerView</tt>
- * is intended for the larger GUI classes.
+ * Interface extending the <tt>ListenerView</tt> interface and
+ * adding methods specifically intended for dialog implementations.
+ * The main purpose of this interface is to allow dialogs to best
+ * utilize the <ttListenerView</tt> API, and so the documentations
+ * for that super-interface should be consulted before implementing
+ * this interface.
  * <p>
- * In addition to inheriting the methods from <tt>ListenerView</tt>,
- * <tt>ListenerDialog</tt> has two additional utility methods to
- * manage the dialogs created. They are <tt>showDialog()</tt> and
- * <tt>closeDialog()</tt>, which display and dispose of the dialog
- * respectively.
+ * In addition to the <tt>ListenerView</tt> methods, this interface
+ * provides four dialog-specific methods that will need to be 
+ * implemented. <tt>showDialog()</tt> and <tt>hideDialog()</tt>
+ * display and dispose of the dialog window respectively.
+ * <tt>setModal(boolean)</tt> and <tt>getModal()</tt> deal
+ * with the modality of the dialog, and allow it to be
+ * determined and changed if necessary.
+ * <p>
+ * <b>THREAD SAFETY:</b> Swing is NOT thread safe, and all operations
+ * on the dialogs inheriting this interface must be done from the
+ * <tt>EventDispatchThread</tt>
  * 
  * @author craig
  * @version 2.0
- * @see stockmarket.gui.dialog.DialogFactory DialogFactory
  */
 public interface ListenerDialog extends ListenerView {
 
 	/**
-	 * Display the dialog in the GUI.
+	 * Display the dialog in the GUI. The dialog should not
+	 * be visible prior to invoking this method, as this
+	 * provides time for the dialog to be configured prior
+	 * to it being displayed.
 	 */
 	void showDialog();
 	
@@ -30,5 +39,19 @@ public interface ListenerDialog extends ListenerView {
 	 * Close the dialog when it is no longer needed.
 	 */
 	void closeDialog();
+	
+	/**
+	 * Get whether or not this dialog is modal.
+	 * 
+	 * @return true if this dialog is modal.
+	 */
+	boolean getModal();
+	
+	/**
+	 * Set the modality of this dialog.
+	 * 
+	 * @param modal whether or not this dialog is modal.
+	 */
+	void setModal(boolean modal);
 	
 }
