@@ -72,7 +72,7 @@ public class Language{
 	 * @param language the language of the <tt>Locale</tt>.
 	 * @param country the country of the <tt>Locale</tt>.
 	 */
-	public synchronized void setLocale(String language, String country){
+	public void setLocale(String language, String country){
 		Locale locale = new Locale(language, country);
 		setLocale(locale);
 	}
@@ -85,8 +85,11 @@ public class Language{
 	 * 
 	 * @param locale the new <tt>Locale</tt> to be set.
 	 */
-	public synchronized void setLocale(Locale locale){
-		localeText = ResourceBundle.getBundle("LocaleText", locale);
+	public void setLocale(Locale locale){
+		synchronized(this){
+			localeText = ResourceBundle.getBundle("LocaleText", locale);
+		}
+		
 		LOGGER.logp(Level.INFO, this.getClass().getName(),
 				"setLocale()", "Language set as: " + locale.getLanguage(), 
 				new Object[]{"Locale: " + locale});

@@ -186,6 +186,7 @@ extends AbstractListenerDialog {
 	
 	@Override
 	public void closeDialog(){
+		
 		dialog.dispose();
 	}
 	
