@@ -176,19 +176,14 @@ public class StockDetailsPanel extends AbstractListenerView {
 	private JLabel netValue;
 	
 	/**
-	 * The last trade date label.
+	 * The last trade label.
 	 */
-	private JLabel lastTradeDateLabel;
+	private JLabel lastTradeLabel;
 	
 	/**
 	 * The last trade date value.
 	 */
 	private JLabel lastTradeDateValue;
-	
-	/**
-	 * The last trade time label.
-	 */
-	private JLabel lastTradeTimeLabel;
 	
 	/**
 	 * The last trade time value.
@@ -323,9 +318,6 @@ public class StockDetailsPanel extends AbstractListenerView {
 		return scrollPane;
 	}
 	
-	//TODO consider changing the change labels to "Change" instead of "Change From"
-	//doesn't look right
-	
 	/** 
 	 * Create the <tt>JScrollPane</tt> for the panel created by this class
 	 * to reside in.
@@ -333,16 +325,14 @@ public class StockDetailsPanel extends AbstractListenerView {
 	 * @return the created <tt>JScrollPane</tt>.
 	 */
 	private void initComponents(){
-		//TODO remove all the text from the labels/fields here
-		//after testing
-		symbolLabel = createLabel("", Fonts.GIANT_LABEL_FONT, 
-				LANGUAGE.getString("stock_symbol_tooltip")); //TODO remove text
-		nameLabel = createLabel("", Fonts.GIANT_LABEL_FONT, 
-				LANGUAGE.getString("stock_name_tooltip")); //TODO remove text
+		symbolLabel = createLabel("", Fonts.BIG_LABEL_FONT, 
+				LANGUAGE.getString("stock_symbol_tooltip")); 
+		nameLabel = createLabel("", Fonts.BIG_LABEL_FONT, 
+				LANGUAGE.getString("stock_name_tooltip")); 
 		currentPriceLabel = createLabel(LANGUAGE.getString("current_price_label") + ": ",
-				Fonts.BIG_LABEL_FONT, LANGUAGE.getString("current_price_tooltip"));
-		currentPriceValue = createLabel("$0.00", Fonts.BIG_FIELD_FONT, 
-				LANGUAGE.getString("current_price_tooltip")); //TODO remove text
+				Fonts.LABEL_FONT, LANGUAGE.getString("current_price_tooltip"));
+		currentPriceValue = createLabel("$0.00", Fonts.FIELD_FONT, 
+				LANGUAGE.getString("current_price_tooltip")); 
 		
 		notOwnedPanel = new JPanel();
 		notOwnedPanel.setLayout(new MigLayout());
@@ -357,91 +347,88 @@ public class StockDetailsPanel extends AbstractListenerView {
 		ownershipSwitchPanel.setLayout(ownershipSwitchLayout);
 		
 		notOwnedLabel = createLabel(LANGUAGE.getString("not_owned_label"), 
-				Fonts.BIG_LABEL_FONT, null);
+				Fonts.LABEL_FONT, null);
 		
 		shareQuantityLabel = createLabel(LANGUAGE.getString("share_quantity_label") + ": ", 
-				Fonts.BIG_LABEL_FONT, LANGUAGE.getString("share_quantity_tooltip"));
+				Fonts.LABEL_FONT, LANGUAGE.getString("share_quantity_tooltip"));
 		
-		shareQuantityValue = createLabel("", Fonts.BIG_FIELD_FONT, 
-				LANGUAGE.getString("share_quantity_tooltip")); //TODO remove text
+		shareQuantityValue = createLabel("", Fonts.FIELD_FONT, 
+				LANGUAGE.getString("share_quantity_tooltip"));
 		
 		totalValueLabel = createLabel(LANGUAGE.getString("stock_value_label") + ": ", 
-				Fonts.BIG_LABEL_FONT, LANGUAGE.getString("stock_value_tooltip"));
+				Fonts.LABEL_FONT, LANGUAGE.getString("stock_value_tooltip"));
 		
-		totalValue = createLabel("", Fonts.BIG_FIELD_FONT, 
-				LANGUAGE.getString("stock_value_tooltip")); //TODO remove text
+		totalValue = createLabel("", Fonts.FIELD_FONT, 
+				LANGUAGE.getString("stock_value_tooltip"));
 		
 		netLabel = createLabel(LANGUAGE.getString("stock_net_label") + ": ", 
-				Fonts.BIG_LABEL_FONT, LANGUAGE.getString("stock_net_tooltip"));
+				Fonts.LABEL_FONT, LANGUAGE.getString("stock_net_tooltip"));
 		
-		netValue = createLabel("", Fonts.BIG_FIELD_FONT, 
-				LANGUAGE.getString("stock_net_tooltip")); //TODO remove text
+		netValue = createLabel("", Fonts.FIELD_FONT, 
+				LANGUAGE.getString("stock_net_tooltip"));
 		
-		lastTradeDateLabel = createLabel(LANGUAGE.getString("last_trade_date_label") + ": ", 
-				Fonts.BIG_LABEL_FONT, LANGUAGE.getString("last_trade_date_tooltip"));
+		lastTradeLabel = createLabel(LANGUAGE.getString("last_trade_label") + ": ", 
+				Fonts.LABEL_FONT, LANGUAGE.getString("last_trade_tooltip"));
 		
-		lastTradeDateValue = createLabel("", Fonts.BIG_FIELD_FONT, 
-				LANGUAGE.getString("last_trade_date_tooltip")); //TODO remove text
+		lastTradeDateValue = createLabel("", Fonts.FIELD_FONT, 
+				LANGUAGE.getString("last_trade_date_tooltip"));
 		
-		lastTradeTimeLabel = createLabel(LANGUAGE.getString("last_trade_time_label") + ": ", 
-				Fonts.BIG_LABEL_FONT, LANGUAGE.getString("last_trade_time_tooltip"));
+		lastTradeTimeValue = createLabel("", Fonts.FIELD_FONT, 
+				LANGUAGE.getString("last_trade_time_tooltip"));
 		
-		lastTradeTimeValue = createLabel("", Fonts.BIG_FIELD_FONT, 
-				LANGUAGE.getString("last_trade_time_tooltip")); //TODO remove text
+		dayChangeLabel = createLabel(LANGUAGE.getString("change_from_label") + ": ", 
+				Fonts.LABEL_FONT, LANGUAGE.getString("day_change_tooltip"));
 		
-		dayChangeLabel = createLabel(LANGUAGE.getString("day_change_label") + ": ", 
-				Fonts.BIG_LABEL_FONT, LANGUAGE.getString("day_change_tooltip"));
-		
-		dayChangeValue = createLabel("", Fonts.BIG_FIELD_FONT, 
-				LANGUAGE.getString("day_change_tooltip")); //TODO remove text
+		dayChangeValue = createLabel("", Fonts.FIELD_FONT, 
+				LANGUAGE.getString("day_change_tooltip"));
 		
 		yearHighLabel = createLabel(LANGUAGE.getString("year_high_label") + ": ", 
-				Fonts.BIG_LABEL_FONT, LANGUAGE.getString("year_high_tooltip"));
+				Fonts.LABEL_FONT, LANGUAGE.getString("year_high_tooltip"));
 		
-		yearHighValue = createLabel("", Fonts.BIG_FIELD_FONT, 
-				LANGUAGE.getString("year_high_tooltip")); //TODO remove text
+		yearHighValue = createLabel("", Fonts.FIELD_FONT, 
+				LANGUAGE.getString("year_high_tooltip"));
 		
 		changeYearHighLabel = createLabel(LANGUAGE.getString("change_from_label") + ": ", 
-				Fonts.BIG_LABEL_FONT, LANGUAGE.getString("change_year_high_tooltip"));
+				Fonts.LABEL_FONT, LANGUAGE.getString("change_year_high_tooltip"));
 		
-		changeYearHighValue = createLabel("", Fonts.BIG_FIELD_FONT, 
-				LANGUAGE.getString("change_year_high_tooltip")); //TODO remove text
+		changeYearHighValue = createLabel("", Fonts.FIELD_FONT, 
+				LANGUAGE.getString("change_year_high_tooltip")); 
 		
 		yearLowLabel = createLabel(LANGUAGE.getString("year_low_label") + ": ", 
-				Fonts.BIG_LABEL_FONT, LANGUAGE.getString("year_low_tooltip"));
+				Fonts.LABEL_FONT, LANGUAGE.getString("year_low_tooltip"));
 		
-		yearLowValue = createLabel("", Fonts.BIG_FIELD_FONT, 
-				LANGUAGE.getString("year_low_tooltip")); //TODO remove text
+		yearLowValue = createLabel("", Fonts.FIELD_FONT, 
+				LANGUAGE.getString("year_low_tooltip"));
 		
 		changeYearLowLabel = createLabel(LANGUAGE.getString("change_from_label") + ": ", 
-				Fonts.BIG_LABEL_FONT, LANGUAGE.getString("change_year_low_tooltip"));
+				Fonts.LABEL_FONT, LANGUAGE.getString("change_year_low_tooltip"));
 		
-		changeYearLowValue = createLabel("", Fonts.BIG_FIELD_FONT, 
-				LANGUAGE.getString("change_year_low_tooltip")); //TODO remove text
+		changeYearLowValue = createLabel("", Fonts.FIELD_FONT, 
+				LANGUAGE.getString("change_year_low_tooltip")); 
 		
 		fiftyDayAvgLabel = createLabel(LANGUAGE.getString("fifty_day_avg_label") + ": ", 
-				Fonts.BIG_LABEL_FONT, LANGUAGE.getString("fifty_day_avg_tooltip"));
+				Fonts.LABEL_FONT, LANGUAGE.getString("fifty_day_avg_tooltip"));
 		
-		fiftyDayAvgValue = createLabel("", Fonts.BIG_FIELD_FONT, 
-				LANGUAGE.getString("fifty_day_avg_tooltip")); //TODO remove text
+		fiftyDayAvgValue = createLabel("", Fonts.FIELD_FONT, 
+				LANGUAGE.getString("fifty_day_avg_tooltip")); 
 		
 		change50DayAvgLabel = createLabel(LANGUAGE.getString("change_from_label") + ": ", 
-				Fonts.BIG_LABEL_FONT, LANGUAGE.getString("change_50_avg_tooltip"));
+				Fonts.LABEL_FONT, LANGUAGE.getString("change_50_avg_tooltip"));
 		
-		change50DayAvgValue = createLabel("", Fonts.BIG_FIELD_FONT,
-				LANGUAGE.getString("change_50_avg_tooltip")); //TODO remove text
+		change50DayAvgValue = createLabel("", Fonts.FIELD_FONT,
+				LANGUAGE.getString("change_50_avg_tooltip"));
 		
 		twoHundredDayAvgLabel = createLabel(LANGUAGE.getString("two_hundred_day_avg_label") + ": ",
-				Fonts.BIG_LABEL_FONT, LANGUAGE.getString("two_hundred_day_avg_tooltip"));
+				Fonts.LABEL_FONT, LANGUAGE.getString("two_hundred_day_avg_tooltip"));
 		
-		twoHundredDayAvgValue = createLabel("", Fonts.BIG_FIELD_FONT, 
-				LANGUAGE.getString("two_hundred_day_avg_tooltip")); //TODO remove text
+		twoHundredDayAvgValue = createLabel("", Fonts.FIELD_FONT, 
+				LANGUAGE.getString("two_hundred_day_avg_tooltip"));
 		
 		change200DayAvgLabel = createLabel(LANGUAGE.getString("change_from_label") + ": ",
-				Fonts.BIG_LABEL_FONT, LANGUAGE.getString("change_200_avg_tooltip"));
+				Fonts.LABEL_FONT, LANGUAGE.getString("change_200_avg_tooltip"));
 		
-		change200DayAvgValue = createLabel("", Fonts.BIG_FIELD_FONT, 
-				LANGUAGE.getString("change_200_avg_tooltip")); //TODO remove text
+		change200DayAvgValue = createLabel("", Fonts.FIELD_FONT, 
+				LANGUAGE.getString("change_200_avg_tooltip"));
 	}
 	
 	/**
@@ -461,11 +448,14 @@ public class StockDetailsPanel extends AbstractListenerView {
 		return label;
 	}
 	
+	/**
+	 * Assemble the stock details panel.
+	 */
 	private void assembleStockDetailsPanel(){
-		stockDetailsPanel.add(symbolLabel, "center, split 2, gap 0 0 20, pushx");
-		stockDetailsPanel.add(nameLabel, "gap 0 0 20, pushx, wrap");
-		stockDetailsPanel.add(currentPriceLabel, "center, split 2, gap 0 0 20, pushx");
-		stockDetailsPanel.add(currentPriceValue, "pushx, wrap");
+		stockDetailsPanel.add(symbolLabel, "center, split 2, span 2, gap 0 0 20");
+		stockDetailsPanel.add(nameLabel, "gap 0 0 20, wrap");
+		stockDetailsPanel.add(currentPriceLabel, "center, split 2, span 2, gap 0 0 20");
+		stockDetailsPanel.add(currentPriceValue, "wrap");
 		
 		notOwnedPanel.add(notOwnedLabel, "center, pushx");
 		ownershipSwitchPanel.add(notOwnedPanel, NOT_OWNED_PANEL);
@@ -478,35 +468,35 @@ public class StockDetailsPanel extends AbstractListenerView {
 		ownedPanel.add(netValue, "");
 		ownershipSwitchPanel.add(ownedPanel, OWNED_PANEL);
 		
-		stockDetailsPanel.add(ownershipSwitchPanel, "center, pushx, gap 0 0 20, span 2, wrap");
+		stockDetailsPanel.add(ownershipSwitchPanel, "center, span 2, gap 0 0 20, wrap");
 		
-		stockDetailsPanel.add(lastTradeDateLabel, "center, split 4, pushx");
-		stockDetailsPanel.add(lastTradeDateValue, "center, pushx");
-		stockDetailsPanel.add(lastTradeTimeLabel, "center, pushx, gap 20 0 20");
-		stockDetailsPanel.add(lastTradeTimeValue, "pushx, center, wrap");
+		stockDetailsPanel.add(lastTradeLabel, "split 2");
+		stockDetailsPanel.add(lastTradeDateValue, "");
 		
-		stockDetailsPanel.add(dayChangeLabel, "center, split 2, pushx, gap 20 0 20");
-		stockDetailsPanel.add(dayChangeValue, "center, pushx, wrap");
+		stockDetailsPanel.add(dayChangeLabel, "split 2, gap 30 0 20");
+		stockDetailsPanel.add(dayChangeValue, "wrap");
 		
-		stockDetailsPanel.add(yearHighLabel, "center, split 4, pushx, gap 0 0 20");
-		stockDetailsPanel.add(yearHighValue, "center, pushx");
-		stockDetailsPanel.add(changeYearHighLabel, "center, pushx, gap 20 0 20");
-		stockDetailsPanel.add(changeYearHighValue, "center, pushx, wrap");
+		stockDetailsPanel.add(lastTradeTimeValue, "align right, wrap");
 		
-		stockDetailsPanel.add(yearLowLabel, "center, split 4, pushx, gap 0 0 20");
-		stockDetailsPanel.add(yearLowValue, "center, pushx");
-		stockDetailsPanel.add(changeYearLowLabel, "center, pushx, gap 20 0 20");
-		stockDetailsPanel.add(changeYearLowValue, "center, pushx, wrap");
+		stockDetailsPanel.add(yearHighLabel, "split 2, gap 0 0 20");
+		stockDetailsPanel.add(yearHighValue, "");
+		stockDetailsPanel.add(changeYearHighLabel, "split 2, gap 30 0 20");
+		stockDetailsPanel.add(changeYearHighValue, "wrap");
 		
-		stockDetailsPanel.add(fiftyDayAvgLabel, "center, split 4, pushx, gap 0 0 20");
-		stockDetailsPanel.add(fiftyDayAvgValue, "center, pushx");
-		stockDetailsPanel.add(change50DayAvgLabel, "center, pushx, gap 20 0 20");
-		stockDetailsPanel.add(change50DayAvgValue, "center, pushx, wrap");
+		stockDetailsPanel.add(yearLowLabel, "split 2, gap 0 0 20");
+		stockDetailsPanel.add(yearLowValue, "");
+		stockDetailsPanel.add(changeYearLowLabel, "split 2, gap 30 0 20");
+		stockDetailsPanel.add(changeYearLowValue, "wrap");
 		
-		stockDetailsPanel.add(twoHundredDayAvgLabel, "center, split 4, pushx, gap 0 0 20");
-		stockDetailsPanel.add(twoHundredDayAvgValue, "center, pushx");
-		stockDetailsPanel.add(change200DayAvgLabel, "center, pushx, gap 20 0 20");
-		stockDetailsPanel.add(change200DayAvgValue, "center, pushx, wrap");
+		stockDetailsPanel.add(fiftyDayAvgLabel, "split 2, gap 0 0 20");
+		stockDetailsPanel.add(fiftyDayAvgValue, "");
+		stockDetailsPanel.add(change50DayAvgLabel, "split 2, gap 30 0 20");
+		stockDetailsPanel.add(change50DayAvgValue, "wrap");
+		
+		stockDetailsPanel.add(twoHundredDayAvgLabel, "split 2, gap 0 0 20");
+		stockDetailsPanel.add(twoHundredDayAvgValue, "");
+		stockDetailsPanel.add(change200DayAvgLabel, "split 2, gap 30 0 20");
+		stockDetailsPanel.add(change200DayAvgValue, "wrap");
 	}
 	
 	/**
@@ -534,6 +524,11 @@ public class StockDetailsPanel extends AbstractListenerView {
 		}
 	}
 	
+	/**
+	 * Display the details of the specified stock in the panel.
+	 * 
+	 * @param stock the stock to display.
+	 */
 	public void displayStockDetails(Stock stock){
 		boolean owned = stock instanceof OwnedStock ? true : false;
 		
@@ -542,7 +537,10 @@ public class StockDetailsPanel extends AbstractListenerView {
 				new Object[] {"Stock: " + stock});
 		
 		
-		//TODO special response needed for OwnedStock
+		//TODO special response needed for OwnedStock once the purchasing
+		//mechanism has been finalized.
+		
+		//TODO make sure that +/- or up/down icon is displayed for added decoration
 		
 		Map<String,Object> valueMap = stock.getValueMap(true);
 		
@@ -616,7 +614,7 @@ public class StockDetailsPanel extends AbstractListenerView {
 	}
 	
 	public void setChangeToday(BigDecimal changeToday, BigDecimal changeTodayPercent){
-		//TODO make sure that +/- or icon is displayed
+		
 		
 		dayChangeValue.setText(
 				moneyFormat.format(changeToday)
@@ -628,8 +626,6 @@ public class StockDetailsPanel extends AbstractListenerView {
 	}
 	
 	public void setChangeYearHigh(BigDecimal changeYearHigh, BigDecimal changeYearHighPercent){
-		//TODO make sure that +/- or icon is displayed
-		
 		changeYearHighValue.setText(
 				moneyFormat.format(changeYearHigh)
 				+ " (" + percentFormat.format(changeYearHighPercent.divide(new BigDecimal(100))) + ")");
@@ -640,8 +636,6 @@ public class StockDetailsPanel extends AbstractListenerView {
 	}
 	
 	public void setChangeYearLow(BigDecimal changeYearLow, BigDecimal changeYearLowPercent){
-		//TODO make sure that +/- or icon is displayed
-		
 		changeYearLowValue.setText(
 				moneyFormat.format(changeYearLow)
 				+ " (" + percentFormat.format(changeYearLowPercent.divide(new BigDecimal(100))) + ")");
@@ -652,8 +646,6 @@ public class StockDetailsPanel extends AbstractListenerView {
 	}
 	
 	public void setChange50DayAvg(BigDecimal change50DayAvg, BigDecimal change50DayAvgPercent){
-		//TODO make sure that +/- or icon is displayed
-		
 		change50DayAvgValue.setText(
 				moneyFormat.format(change50DayAvg)
 				+ " (" + percentFormat.format(change50DayAvgPercent.divide(new BigDecimal(100))) + ")");
@@ -664,8 +656,6 @@ public class StockDetailsPanel extends AbstractListenerView {
 	}
 	
 	public void setChange200DayAvg(BigDecimal change200DayAvg, BigDecimal change200DayAvgPercent){
-		//TODO make sure that +/- or icon is displayed
-		
 		change200DayAvgValue.setText(
 				moneyFormat.format(change200DayAvg)
 				+ " (" + percentFormat.format(change200DayAvgPercent.divide(new BigDecimal(100))) + ")");

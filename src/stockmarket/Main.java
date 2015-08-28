@@ -472,4 +472,8 @@ public class Main {
 		
 	}
 	
+	//TODO the exception catching/logging system is great for tracking issues, but
+		//it appears to be working a bit too well. Critical exceptions that should crash the program
+		//are leaving background processes running. Go through, identify, and eliminate them.
+	
 }
