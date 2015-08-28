@@ -11,8 +11,6 @@ import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
@@ -55,8 +53,6 @@ public class Main {
 	
 	//TODO when everything else is done, create a splash image
 	
-	//TODO the early error dialogs, redo them to fit the new dialog API
-	
 	/**
 	 * The logger for this program. With the exception of the default
 	 * root logger, this is the top of the logger hierarchy. It needs
@@ -82,9 +78,6 @@ public class Main {
 	private static final Language LANGUAGE = Language.getInstance();
 	
 	
-	//TODO remove these constants from this class and store them in
-	//an I/O utility class
-	
 	/**
 	 * Constant value for the file path of the program directory.
 	 */
@@ -103,7 +96,9 @@ public class Main {
 	 */
 	private static final String PROPERTIES_DIRECTORY = PROGRAM_DIRECTORY + "/Properties";
 	
-	//TODO document this
+	/**
+	 * The controller that manages this program.
+	 */
 	private static final StockMarketController stockMarketController = new StockMarketController();
 	
 	/**
@@ -118,9 +113,13 @@ public class Main {
 		//Check and set up the program's save directory
 		boolean saveLocationExists = verifyDirectory();
 		if(!saveLocationExists){
+			//The error message here is hard-coded and not locale-based because
+			//it occurs before the language module has a chance to load.
+			String errorText = "StockMarket was unable to properly read "
+					+ "your filesystem and was unable to initialize. "
+					+ "Please contact the developer at <u>craigmiller160@gmail.com";
 			
-			filesystemConnectionFailPopup();
-			
+			displayExceptionDialog("Critical Error!", errorText);
 		}
 		
 		//Configure the program's logger
@@ -166,8 +165,6 @@ public class Main {
 	 * the hosts filesystem. 
 	 */
 	private static boolean verifyDirectory(){
-		//TODO gotta get these directories in sync with
-		//the properties file
 		File logDirectory = new File(LOG_DIRECTORY);
 		File propertiesDirectory = new File(PROPERTIES_DIRECTORY);
 		
@@ -188,36 +185,6 @@ public class Main {
 	}
 	
 	/**
-	 * This method is only invoked in the extremely rare case that the 
-	 * program fails to set up a save location on the file system. It
-	 * creates a popup window with an error message to inform the user
-	 * that such a serious issue has occurred and the program will now
-	 * terminate.<br><br>
-	 * 
-	 * Because this message can appear so early in the program, it is
-	 * locked as English-Only because the user will not have had an 
-	 * opportunity to set an alternate language yet.
-	 */
-	private static void filesystemConnectionFailPopup(){
-		SwingUtilities.invokeLater(new Runnable(){
-			@Override
-			public void run() {
-				JLabel errorText = new JLabel(
-						"<html>StockMarket was unable to properly read your filesystem "
-						+ "and was unable to initialize.<br><br>Please contact the developer "
-						+ "at <u>craigmiller160@gmail.com</u>");
-				
-				JOptionPane.showMessageDialog(null, 
-						errorText, 
-						"Program Failed to Initialize!",
-						JOptionPane.ERROR_MESSAGE);
-				
-				System.exit(1);
-			}
-		});
-	}
-	
-	/**
 	 * Configure the properties of the main logger. Because the logger
 	 * in the <tt>Main</tt> class will be at the root of the hierarchy, 
 	 * all logging events will ultimately be passed to it. The settings
@@ -225,7 +192,8 @@ public class Main {
 	 * entire program.
 	 */
 	private static void configureLogger(){
-		//TODO set level to INFO as the default setting
+		//TODO set level to INFO as the default setting after
+		//development is done.
 		LOGGER.setLevel(Level.FINEST);
 		
 		try{
@@ -238,35 +206,11 @@ public class Main {
 			LOGGER.setUseParentHandlers(false);
 		}
 		catch(IOException ex){
-			loggingWontSavePopup();
+			ex = new IOException(ex.getMessage() 
+					+ ": logger and debugging mode will not work.", 
+					ex.getCause());
+			displayExceptionDialog(ex);
 		}
-	}
-	
-	/**
-	 * If the logger's <tt>FileHandler</tt> fails to properly initialize
-	 * (most likely due to an <tt>IOException</tt>), this popup appears to 
-	 * warn the user that Debugging Mode will not work.<br><br>
-	 * 
-	 * Because this message can appear so early in the program, it is
-	 * locked as English-Only because the user will not have had an 
-	 * opportunity to set an alternate language yet.
-	 */
-	private static void loggingWontSavePopup(){
-		SwingUtilities.invokeLater(new Runnable(){
-			@Override
-			public void run() {
-				JLabel errorText = new JLabel(
-						"<html>StockMarket was unable to properly configure "
-						+ "the program's logger. Debugging Mode will not work.<br>"
-						+ "If this problem persists, please contact the developer at "
-						+ "<u>craigmiller160@gmail.com</u>.");
-				
-				JOptionPane.showMessageDialog(null, 
-						errorText, 
-						"Program Failed to Initialize!",
-						JOptionPane.ERROR_MESSAGE);
-			}
-		});
 	}
 	
 	/**
@@ -279,24 +223,12 @@ public class Main {
 		defaultProperties = new Properties();
 		
 		try {
-			//TODO find out if you need to use a finally block to kill
-			//this stream after loading it
 			defaultProperties.load(
 					Main.class.getClassLoader().getResourceAsStream(
 							"default.properties"));
 			
 			if(defaultProperties.size() == 0){
-				//TODO come up with better way to convey this exception.
-				//TODO change this to throwing an IOException so it just
-				//gets caught in the catch block below.
-				NullPointerException exception = new NullPointerException(
-						"Default Properties file didn't load properly");
-				
-				LOGGER.logp(Level.SEVERE, Main.class.getName(), 
-						"loadDefaultProperties()",
-						"Default Properties file has no contents",
-						exception);
-				throw exception;
+				throw new IOException();
 			}
 			
 			LOGGER.logp(Level.INFO, Main.class.getName(),
@@ -305,13 +237,20 @@ public class Main {
 			
 		}
 		catch (IOException ex){
+			String message = "Default properties failed to load";
+			ex = new IOException(ex.getMessage() + ": " + message, ex.getCause());
+			displayExceptionDialog(ex);
+			
 			LOGGER.logp(Level.SEVERE, Main.class.getName(), 
 					"loadDefaultProperties()", 
-					"Failed to load Default Properties", ex);
+					"Exception", ex);
 		}
 	}
 	
-	//TODO document this
+	/**
+	 * Load the user-set properties for the program, which are saved
+	 * so they can persist between program runs.
+	 */
 	private static void loadUserProperties(){
 		if(defaultProperties != null){
 			userProperties = new Properties(defaultProperties);
@@ -330,8 +269,11 @@ public class Main {
 						"User properties loaded from file");
 			}
 			catch(IOException ex){
+				String message = "User properties failed to load";
+				ex = new IOException(ex.getMessage() + ": " + message, ex.getCause());
+				displayExceptionDialog(ex);
 				LOGGER.logp(Level.SEVERE, Main.class.getName(), "loadUserProperties()",
-						"User properties file failed to load", ex);
+						"Exception", ex);
 			}
 			
 		}
@@ -366,8 +308,11 @@ public class Main {
 						"New user properties file saved successfully");
 			}
 			catch(IOException ex){
+				String message = "User properties failed to load";
+				ex = new IOException(ex.getMessage() + ": " + message, ex.getCause());
+				displayExceptionDialog(ex);
 				LOGGER.logp(Level.SEVERE, Main.class.getName(), "saveUserProperties()",
-						"User properties file failed to save", ex);
+						"Exception", ex);
 			}
 		}
 	}
@@ -406,11 +351,14 @@ public class Main {
     		}
     	}catch(Exception ex){
     		LOGGER.logp(Level.SEVERE, Main.class.getName(), 
-    				"setLookAndFeel()", "Look and Feel was not set", ex);
+    				"setLookAndFeel()", "Exception", ex);
     	}
 	}
 	
-	//TODO document this
+	/**
+	 * Initialize key components of this program that it needs
+	 * to run.
+	 */
 	private static void init(){
 		GUIStateModel guiStateModel = new GUIStateModel();
 		StockDisplayModel stockDisplayModel = new StockDisplayModel();
@@ -419,11 +367,12 @@ public class Main {
 				TimeUnit.MILLISECONDS);
 		
 		stockMarketController.addPropertyModel(guiStateModel);
-		//stockMarketController.addPropertyModel(portfolioModel);
 		stockMarketController.addPropertyModel(stockDisplayModel);
 	}
 	
-	//TODO document this
+	/**
+	 * Initialize the program's GUI.
+	 */
 	private static void initGUI(){
 		SwingUtilities.invokeLater(new Runnable(){
 			@Override
@@ -462,29 +411,60 @@ public class Main {
 		});
 	}
 	
-	//TODO document this stuff below
 	
+	/**
+	 * Display the appropriate exception dialog for any exceptions
+	 * that occur.
+	 * 
+	 * @param t the exception that occurred.
+	 */
 	private static void displayExceptionDialog(final Throwable t){
-		ListenerDialog exceptionDialog = DialogFactory.createExceptionDialog(null, t);
-		exceptionDialog.showDialog();
+		//Check if on EDT before displaying the dialog.
+		if(SwingUtilities.isEventDispatchThread()){
+			ListenerDialog exceptionDialog = DialogFactory.createExceptionDialog(null, t);
+			exceptionDialog.showDialog();
+		}
+		else{
+			SwingUtilities.invokeLater(new Runnable(){
+				@Override
+				public void run() {
+					ListenerDialog exceptionDialog = DialogFactory.createExceptionDialog(null, t);
+					exceptionDialog.showDialog();
+				}
+			});
+		}
 	}
 	
-	//TODO document this
+	private static void displayExceptionDialog(final String title, final String text){
+		//Check if on EDT before displaying the dialog.
+		if(SwingUtilities.isEventDispatchThread()){
+			ListenerDialog exceptionDialog = DialogFactory.createExceptionDialog(null, title, text);
+			exceptionDialog.showDialog();
+		}
+		else{
+			SwingUtilities.invokeLater(new Runnable(){
+				@Override
+				public void run() {
+					ListenerDialog exceptionDialog = DialogFactory.createExceptionDialog(null, title, text);
+					exceptionDialog.showDialog();
+				}
+			});
+		}
+	}
+	
+	/**
+	 * The uncaught exception handler for the GUI. This class is added
+	 * to the <tt>EventDispatchThread</tt> so that any exceptions that 
+	 * occur on that thread are properly logged at runtime.
+	 * 
+	 * @author craig
+	 * @version 2.0
+	 */
 	private static class GUIUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler{
 
 		@Override
 		public void uncaughtException(Thread thread, Throwable throwable) {
-			if(SwingUtilities.isEventDispatchThread()){
-				displayExceptionDialog(throwable);
-			}
-			else{
-				SwingUtilities.invokeLater(new Runnable(){
-					@Override
-					public void run() {
-						displayExceptionDialog(throwable);
-					}
-				});
-			}
+			displayExceptionDialog(throwable);
 			
 			LOGGER.logp(Level.SEVERE, this.getClass().getName(), "uncaughtException()", 
 					"Uncaught Exception: " + thread.getName() + "." + thread.getId(), throwable);

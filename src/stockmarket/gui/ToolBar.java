@@ -234,6 +234,11 @@ public class ToolBar extends AbstractListenerView {
 		return button;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @throws IllegalArgumentException if the new value from the event is not
+	 * the expected type to perform the operation.
+	 */
 	@Override
 	public void changeProperty(PropertyChangeEvent event) {
 		if(event.getPropertyName() == COMPONENTS_ENABLED_PROPERTY){
@@ -291,12 +296,12 @@ public class ToolBar extends AbstractListenerView {
 	}
 
 	@Override
-	public Object getValueForAction(String valueToGet) {
+	public Object getValueForAction(String actionCommand) {
 		//LOGGER.logp(Level.FINEST, this.getClass().getName(), "getValue", 
 				//"Entering method", new Object[] {"Command: " + valueToGet});
 		
 		
-		// TODO Auto-generated method stub
+		// TODO Will be filled out if values are needed from this view
 		return null;
 	}
 

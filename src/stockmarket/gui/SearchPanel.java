@@ -316,13 +316,20 @@ public class SearchPanel extends AbstractListenerView {
 	public void setSearchFieldText(String text){
 		searchField.setText(text);
 	}
+	
+	/**
+	 * Set the focus on the search field.
+	 */
+	private void setSearchFieldFocus(){
+		searchField.grabFocus();
+	}
 
 	@Override
-	public Object getValueForAction(String valueToGet) {
+	public Object getValueForAction(String actionCommand) {
 		Object result = null;
-		if(valueToGet == STOCK_SEARCH_ACTION){
+		if(actionCommand == STOCK_SEARCH_ACTION){
 			LOGGER.logp(Level.FINEST, this.getClass().getName(), "getValue", 
-					"Entering method", new Object[] {"Command: " + valueToGet});
+					"Entering method", new Object[] {"Command: " + actionCommand});
 			
 			result = getSearchFieldText();
 			setSearchFieldText("");
@@ -404,8 +411,7 @@ public class SearchPanel extends AbstractListenerView {
 		public void actionPerformed(ActionEvent event) {
 			if(event.getActionCommand() == SHOW_SEARCH_FIELD_ACTION){
 				searchPanelLayout.show(searchPanel, FIELD_PANEL);
-				//TODO unsafe access from inner class, revise to fix this
-				searchField.grabFocus();
+				setSearchFieldFocus();
 			}
 			else if(event.getActionCommand() == HIDE_SEARCH_FIELD_ACTION){
 				searchPanelLayout.show(searchPanel, BUTTON_PANEL);

@@ -60,12 +60,10 @@ import stockmarket.util.Language;
 @NotThreadSafe
 public class PortfolioPanel extends AbstractListenerView {
 	
-	//TODO think about the two scroll panes and how they'll interact with
-	//each other
-	
-	//TODO add a mouse listener for a double click action on the portfolio list.
-	
-	//TODO sort stocks in list by symbol
+	/*
+	 * TODO once adding/removing stocks from the list function is
+	 * complete, add a mouse listener for double click actions
+	 */
 	
 	/**
 	 * Shared <tt>Language</tt> module for locale-specific text.
@@ -162,7 +160,9 @@ public class PortfolioPanel extends AbstractListenerView {
 	 */
 	private JLabel changeInNetWorthValue;
 	
-	//TODO document this... or maybe remove it... might not be needed anymore
+	/**
+	 * Format for amounts of money to be displayed in the GUI.
+	 */
 	private NumberFormat moneyFormat = new DecimalFormat("$###,###,###,##0.00");
 	
 	/**
@@ -203,8 +203,6 @@ public class PortfolioPanel extends AbstractListenerView {
 		detailsButton.setEnabled(false);
 		
 		
-		//TODO summary panel stuff below
-		
 		portfolioSummaryLabel = createLabel(LANGUAGE.getString("portfolio_summary_label"), 
 				Fonts.BIG_LABEL_FONT, null);
 		portfolioSummaryLabel.setHorizontalAlignment(JLabel.CENTER);
@@ -221,16 +219,16 @@ public class PortfolioPanel extends AbstractListenerView {
 		changeInNetWorthLabel = createLabel(LANGUAGE.getString("net_worth_change_label") + ": ", 
 				Fonts.LABEL_FONT, LANGUAGE.getString("net_worth_change_tooltip"));
 		
-		cashBalanceValue = createLabel("", Fonts.FIELD_FONT, //TODO remove text 
+		cashBalanceValue = createLabel("", Fonts.FIELD_FONT, 
 				LANGUAGE.getString("cash_balance_tooltip"));
 		
-		totalStockValue = createLabel("", Fonts.FIELD_FONT, //TODO remove text
+		totalStockValue = createLabel("", Fonts.FIELD_FONT,
 				LANGUAGE.getString("total_stock_value_tooltip"));
 		
-		netWorthValue = createLabel("", Fonts.FIELD_FONT, //TODO remove text 
+		netWorthValue = createLabel("", Fonts.FIELD_FONT,
 				LANGUAGE.getString("net_worth_tooltip"));
 		
-		changeInNetWorthValue = createLabel("", Fonts.FIELD_FONT, //TODO remove text
+		changeInNetWorthValue = createLabel("", Fonts.FIELD_FONT,
 				LANGUAGE.getString("net_worth_change_tooltip"));
 		
 		summaryPanel = new JPanel();
@@ -247,7 +245,6 @@ public class PortfolioPanel extends AbstractListenerView {
 		portfolioPanel.add(detailsButton, "split 2, growx");
 		portfolioPanel.add(refreshButton, "wrap, growx");
 		
-		//TODO this really doesn't need a parameter I don't think
 		assembleSummaryPanel(summaryPanel);
 		
 		portfolioPanel.add(summaryPanel, "growx");
@@ -265,16 +262,16 @@ public class PortfolioPanel extends AbstractListenerView {
 		summaryPanel.add(portfolioSummaryLabel, "span 2, center, pushx, growx, dock north");
 		
 		summaryPanel.add(cashBalanceLabel, "gap 10 0 10");
-		summaryPanel.add(cashBalanceValue, "align right, gap 0 10, wrap");
+		summaryPanel.add(cashBalanceValue, "align right, pushx, gap 0 10, wrap");
 		
 		summaryPanel.add(totalStockValueLabel, "gap 10 0 10");
-		summaryPanel.add(totalStockValue, "align right, gap 0 10, wrap");
+		summaryPanel.add(totalStockValue, "align right, pushx, gap 0 10, wrap");
 		
 		summaryPanel.add(netWorthLabel, "gap 10 0 10");
-		summaryPanel.add(netWorthValue, "align right, wrap, gap 0 10");
+		summaryPanel.add(netWorthValue, "align right, pushx, wrap, gap 0 10");
 		
 		summaryPanel.add(changeInNetWorthLabel, "gap 10 0 10 10");
-		summaryPanel.add(changeInNetWorthValue, "align right, wrap, gap 0 10");
+		summaryPanel.add(changeInNetWorthValue, "align right, pushx, wrap, gap 0 10");
 	}
 	
 	/**
@@ -356,8 +353,13 @@ public class PortfolioPanel extends AbstractListenerView {
 		return portfolioPanelScrollPane;
 	}
 	
-	//TODO document this
-	@SuppressWarnings("serial")
+	/**
+	 * Sets a list of stocks to be displayed in the portfolio <tt>JList</tt>
+	 * object.
+	 * 
+	 * @param stockList the list of stocks to be displayed.
+	 */
+	@SuppressWarnings("serial") //This anonymous ListModel doesn't need a serialVersionUID.
 	public void setPortfolioContents(final List<OwnedStock> stockList){
 		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
 				"setPortfolioContents", "Entering method", 
@@ -376,15 +378,14 @@ public class PortfolioPanel extends AbstractListenerView {
 		});
 	}
 
-	//TODO document how an illegal argument exception is thrown if the param
-	//is not valid for the cast operation
+	/**
+	 * {@inheritDoc}
+	 * @throws IllegalArgumentException if the new value from the event is not
+	 * the expected type to perform the operation.
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public void changeProperty(PropertyChangeEvent event) {
-		//Logger methods should stay in if/else statement, since this
-		//method gets invoked frequently when the event is not one this
-		//class needs to react to
-		
 		if(event.getPropertyName() == COMPONENTS_ENABLED_PROPERTY){
 			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
 					"changeProperty", "Changing Property", 
@@ -435,9 +436,15 @@ public class PortfolioPanel extends AbstractListenerView {
 			setChangeInNetWorthValue((BigDecimal) event.getNewValue());
 		}
 		
-		//TODO add +/- and/or icons for increase/decrease in value
+		//TODO add +/- or fancy up/down icons to the labels after the value
+		//is added.
 	}
 	
+	/**
+	 * Sets the label for the change in net worth value.
+	 * 
+	 * @param value the change in net worth.
+	 */
 	public void setChangeInNetWorthValue(BigDecimal value){
 		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
 				"setChangeInNetWorthValue", "Entering method", 
@@ -447,6 +454,11 @@ public class PortfolioPanel extends AbstractListenerView {
 		changeInNetWorthValue.setText(text);
 	}
 	
+	/**
+	 * Sets the label for the net worth value.
+	 * 
+	 * @param value the net worth value.
+	 */
 	public void setNetWorthValue(BigDecimal value){
 		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
 				"setChangeInNetWorthValue", "Entering method", 
@@ -456,6 +468,11 @@ public class PortfolioPanel extends AbstractListenerView {
 		netWorthValue.setText(text);
 	}
 	
+	/**
+	 * Sets the label for the total stock value label.
+	 * 
+	 * @param value the total stock value label.
+	 */
 	public void setTotalStockValue(BigDecimal value){
 		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
 				"setTotalStockValue", "Entering method", 
@@ -465,6 +482,11 @@ public class PortfolioPanel extends AbstractListenerView {
 		totalStockValue.setText(text);
 	}
 	
+	/**
+	 * Sets the label for the cash balance value.
+	 * 
+	 * @param value the cash balance value.
+	 */
 	public void setCashBalanceValue(BigDecimal value){
 		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
 				"setCashBalanceValue", "Entering method", 
@@ -493,26 +515,35 @@ public class PortfolioPanel extends AbstractListenerView {
 		else if(componentsEnabledState == ENABLE_NO_STOCK_LOADED){
 			detailsButton.setEnabled(true);
 			refreshButton.setEnabled(true);
-			setPortfolioContents(new ArrayList<>());
 		}
 		else if(componentsEnabledState == ENABLE_LOOKUP_STOCK_LOADED){
-			
+			detailsButton.setEnabled(true);
+			refreshButton.setEnabled(true);
 		}
 		else if(componentsEnabledState == ENABLE_OWNED_STOCK_LOADED){
-			
+			detailsButton.setEnabled(true);
+			refreshButton.setEnabled(true);
 		}
 	}
 
 	@Override
-	public Object getValueForAction(String valueToGet) {
+	public Object getValueForAction(String actionCommand) {
 		//LOGGER.logp(Level.FINEST, this.getClass().getName(), "getValue", 
 				//"Entering method", new Object[] {"Command: " + valueToGet});
 		
 		
-		// TODO Auto-generated method stub
+		// TODO Will be filled out if any values are ultimately needed
+		//from this class.
 		return null;
 	}
 	
+	/**
+	 * The cell renderer for the list displaying the stocks owned
+	 * in the user's portfolio.
+	 * 
+	 * @author craig
+	 * @version 2.0
+	 */
 	private class PortfolioListCellRenderer implements ListCellRenderer<OwnedStock>{
 
 		@Override
@@ -537,7 +568,7 @@ public class PortfolioPanel extends AbstractListenerView {
 					Fonts.SMALL_FIELD_FONT);
 			
 			BigDecimal currentPrice = (BigDecimal) stockValueMap.get(Stock.CURRENT_PRICE);
-			JLabel priceLabel = createLabel(LANGUAGE.getString("current_price_label") + ": ", 
+			JLabel priceLabel = createLabel(LANGUAGE.getString("share_price") + ": ", 
 					Fonts.SMALL_LABEL_FONT);
 			JLabel priceValue = createLabel(moneyFormat.format(currentPrice), Fonts.SMALL_FIELD_FONT);
 			
@@ -548,7 +579,7 @@ public class PortfolioPanel extends AbstractListenerView {
 					Fonts.SMALL_FIELD_FONT);
 			
 			BigDecimal total = (BigDecimal) stockValueMap.get(OwnedStock.TOTAL_VALUE);
-			JLabel totalValueLabel = createLabel(LANGUAGE.getString("stock_value_label") + ": ", 
+			JLabel totalValueLabel = createLabel(LANGUAGE.getString("value_label") + ": ", 
 					Fonts.SMALL_LABEL_FONT);
 			JLabel totalValue = createLabel(moneyFormat.format(total), 
 					Fonts.SMALL_FIELD_FONT);
@@ -558,6 +589,7 @@ public class PortfolioPanel extends AbstractListenerView {
 					Fonts.SMALL_LABEL_FONT);
 			JLabel netValue = createLabel(moneyFormat.format(net), 
 					Fonts.SMALL_FIELD_FONT);
+			
 			//TODO add +/- and/or icon for increase/decrease in value.
 			
 			//Assemble the cell
@@ -584,6 +616,13 @@ public class PortfolioPanel extends AbstractListenerView {
 			return cellPanel;
 		}
 		
+		/**
+		 * Utility class for creating a <tt>JLabel</tt>.
+		 * 
+		 * @param text the label's text.
+		 * @param font the label's font.
+		 * @return the created label.
+		 */
 		private JLabel createLabel(String text, Font font){
 			JLabel label = new JLabel(text);
 			label.setFont(font);

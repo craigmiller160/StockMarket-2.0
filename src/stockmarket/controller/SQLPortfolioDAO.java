@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -25,10 +26,10 @@ import java.util.regex.Pattern;
 import net.jcip.annotations.NotThreadSafe;
 import stockmarket.model.PortfolioModel;
 import stockmarket.model.SQLPortfolioModel;
-import stockmarket.stock.AbstractStock;
 import stockmarket.stock.DefaultOwnedStock;
 import stockmarket.stock.DefaultStock;
 import stockmarket.stock.OwnedStock;
+import stockmarket.stock.Stock;
 import stockmarket.stock.StockFileDownloader;
 
 /**
@@ -71,7 +72,7 @@ import stockmarket.stock.StockFileDownloader;
  * @see stockmarket.stock.OwnedStock OwnedStock
  * @see stockmarket.stock.DefaultStock Stock
  */
-@NotThreadSafe //TODO work on thread safety here, or change docs to clarify lack of thread safety
+@NotThreadSafe
 public class SQLPortfolioDAO implements
 		PortfolioDAO, PropertyChangeListener {
 
@@ -153,9 +154,6 @@ public class SQLPortfolioDAO implements
 		listeners.remove(listener);
 	}
 
-	//TODO if this new property change system works, need to adjust all methods to utilize 
-	//it. Listener must be added and removed from portfolio at start and end of methods.
-	
 	/**
 	 * {@inheritDoc}
 	 * @throws SQLException if there is an error attempting to access the database.
@@ -164,6 +162,10 @@ public class SQLPortfolioDAO implements
 	@Override
 	public PortfolioModel createNewPortfolio(String portfolioName, 
 			BigDecimal startingCashBalance) throws InterruptedException, SQLException{
+		String query = "select * from portfolio;";
+		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
+				"createNewPortfolio()", "SQL: Portfolio List Query: " + query);
+		
 		SQLPortfolioModel portfolio = new SQLPortfolioModel();
 		portfolio.addPropertyChangeListener(this);
 		
@@ -173,12 +175,10 @@ public class SQLPortfolioDAO implements
 		portfolio.setChangeInNetWorth(new BigDecimal(0.00));
 		portfolio.setTotalStockValue(new BigDecimal(0.00));
 		
+		int userid = 0;
 		semaphore.acquire();
 		try(Statement statement = getConnection().createStatement(
 				ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)){
-			String query = "select * from portfolio;";
-			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-					"createNewPortfolio()", "SQL: Portfolio List Query: " + query);
 			ResultSet resultSet = statement.executeQuery(query);
 			
 			resultSet.moveToInsertRow();
@@ -194,10 +194,14 @@ public class SQLPortfolioDAO implements
 			
 			resultSet.last();
 			portfolio.setUserID(resultSet.getInt(1));
-			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-					"createNewPortfolio()", "New userid: " + resultSet.getInt(1));
+			
+			userid = resultSet.getInt(1);
 		}
 		semaphore.release();
+		
+		LOGGER.logp(Level.INFO, this.getClass().getName(), 
+				"createNewPortfolio()", "New Portfolio userid: " + userid);
+		
 		portfolio.removePropertyChangeListener(this);
 		
 		return portfolio;
@@ -210,12 +214,13 @@ public class SQLPortfolioDAO implements
 	 */
 	@Override
 	public List<String> getSavedPortfolios() throws InterruptedException, SQLException{
+		String query = "select * from portfolio;";
+		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
+				"loadPortfolioList()", "SQL: Portfolio List Query: " + query);
+		
 		List<String> portfolioNames = new ArrayList<>();
 		semaphore.acquire();
 		try(Statement statement = getConnection().createStatement()){
-			String query = "select * from portfolio;";
-			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-					"loadPortfolioList()", "SQL: Portfolio List Query: " + query);
 			ResultSet resultSet = statement.executeQuery(query);
 			
 			NumberFormat moneyFormat = new DecimalFormat("$###,###,###,##0.00");
@@ -233,7 +238,8 @@ public class SQLPortfolioDAO implements
 			}
 		}
 		semaphore.release();
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
+		
+		LOGGER.logp(Level.INFO, this.getClass().getName(), 
 				"loadPortfolioList()", "Successfully loaded list of saved portfolios");
 		
 		return portfolioNames;
@@ -277,16 +283,21 @@ public class SQLPortfolioDAO implements
 	 * access.
 	 */
 	public PortfolioModel getPortfolio(int userid) throws InterruptedException, SQLException{
+		String portfolioQuery = "select * from portfolio where userid=" + userid + ";";
+		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
+				"loadPortfolio()", "SQL: Load Portfolio Query: " + portfolioQuery);
+		String stocksQuery = "select * from stocks where userid=" + userid + ";";
+		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
+				"loadStocks()", "SQL: Load Stocks Query: " + stocksQuery);
+		
 		SQLPortfolioModel portfolio = new SQLPortfolioModel();
 		portfolio.addPropertyChangeListener(this);
 		portfolio.setUserID(userid);
 		
 		semaphore.acquire();
-		try(Statement statement = getConnection().createStatement()){
-			String portfolioQuery = "select * from portfolio where userid=" + userid + ";";
-			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-					"loadPortfolio()", "SQL: Load Portfolio Query: " + portfolioQuery);
-			ResultSet resultSet = statement.executeQuery(portfolioQuery);
+		try(Statement portfolioStatement = getConnection().createStatement(); 
+				PreparedStatement stockStatement = getConnection().prepareStatement(stocksQuery)){
+			ResultSet resultSet = portfolioStatement.executeQuery(portfolioQuery);
 			
 			while(resultSet.next()){
 				portfolio.setPortfolioName(resultSet.getString(2)); //portfolio_name
@@ -296,10 +307,13 @@ public class SQLPortfolioDAO implements
 				portfolio.setTotalStockValue(resultSet.getBigDecimal(6)); //total_stock_value
 			}
 			
-			portfolio.setStockList(getStocks(statement, userid));
+			portfolio.setStockList(getStocks(stockStatement, userid));
 		}
 		semaphore.release();
 		portfolio.removePropertyChangeListener(this);
+		
+		LOGGER.logp(Level.INFO, this.getClass().getName(), 
+				"getPortfolio()", "Portfolio loaded successfully");
 		
 		return portfolio;
 	}
@@ -307,16 +321,13 @@ public class SQLPortfolioDAO implements
 	/**
 	 * Loads the saved stocks from the database for the portfolio.
 	 * 
-	 * @param statement the <tt>Statement</tt> object to execute the query for the stock list.
+	 * @param statement the <tt>PreparedStatement</tt> object to execute the query for the stock list.
 	 * @param userid the userid to specify which stocks to retrieve.
 	 * @return a list of saved stocks owned by the specified userid.
 	 * @throws SQLException if an error occurs while trying to access the database.
 	 */
-	private List<OwnedStock> getStocks(Statement statement, int userid) throws SQLException{
-		String stocksQuery = "select * from stocks where userid=" + userid + ";";
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"loadStocks()", "SQL: Load Stocks Query: " + stocksQuery);
-		ResultSet resultSet = statement.executeQuery(stocksQuery);
+	private List<OwnedStock> getStocks(PreparedStatement statement, int userid) throws SQLException{
+		ResultSet resultSet = statement.executeQuery();
 		
 		List<OwnedStock> stockList = new ArrayList<>(10);
 		StockFileDownloader downloader = new StockFileDownloader();
@@ -363,14 +374,9 @@ public class SQLPortfolioDAO implements
 	public void savePortfolio(PortfolioModel portfolio) throws InterruptedException, SQLException {
 		if(! (portfolio instanceof SQLPortfolioModel)){
 			throw new IllegalArgumentException(
-					"Only SQLPortfolioModel objects can be saved");
+					"SQL Database only accepts SQLPortfolioModels: " 
+					+ portfolio.getClass().getName());
 		}
-		
-		//TODO currently working on an overhaul of the PortfolioModel. Depending on how 
-		//the changes go, the first section here will need to be changed.
-		//List is no longer synchronized list, at minimum. Probably need to sycn on 
-		//model intrinsic lock while getting values. Probably still need to copy the list
-		//Just need to wait until model changes are done to figure this one out.
 		
 		SQLPortfolioModel portfolioModel = (SQLPortfolioModel) portfolio;
 		int userid = portfolioModel.getUserID();
@@ -380,19 +386,25 @@ public class SQLPortfolioDAO implements
 		BigDecimal netChange = portfolioModel.getChangeInNetWorth();
 		BigDecimal totalStockValue = portfolioModel.getTotalStockValue();
 		
-		List<OwnedStock> stockList = null;
-		List<OwnedStock> syncStockList = portfolioModel.getStockList();
-		synchronized(syncStockList){
-			stockList = new ArrayList<>(syncStockList);
-		}
+		//Shallow copy of list, avoids interfering with model list consistency
+		//but still has shared references to contents. 
+		List<OwnedStock> stockList = new ArrayList<>(portfolioModel.getStockList());
+		
+		String portfolioQuery = "select * from portfolio where userid=" + userid + ";";
+		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
+				"savePortfolio()", "SQL: Save Portfolio Query: " + portfolioQuery);
+		String stocksQuery = "select * from stocks where userid=" + userid + ";";
+		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
+				"saveStocks()", "SQL: Save Stocks Query: " + stocksQuery);
 		
 		semaphore.acquire();
-		try(Statement statement = getConnection().createStatement(
-				ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)){
-			String portfolioQuery = "select * from portfolio where userid=" + userid + ";";
-			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-					"savePortfolio()", "SQL: Save Portfolio Query: " + portfolioQuery);
-			ResultSet resultSet = statement.executeQuery(portfolioQuery);
+		try(Statement portfolioStatement = getConnection().createStatement(
+				ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE); 
+				PreparedStatement stockStatement = getConnection().prepareStatement(
+						stocksQuery, ResultSet.TYPE_SCROLL_INSENSITIVE, 
+						ResultSet.CONCUR_UPDATABLE)){
+			
+			ResultSet resultSet = portfolioStatement.executeQuery(portfolioQuery);
 			
 			while(resultSet.next()){
 				resultSet.updateString(2, portfolioName); //portfolio_name
@@ -408,7 +420,7 @@ public class SQLPortfolioDAO implements
 				resultSet.updateRow();
 			}
 			
-			saveStocks(statement, stockList, userid);
+			saveStocks(stockStatement, portfolioStatement, stockList, userid);
 		}
 		semaphore.release();
 		LOGGER.logp(Level.FINEST, this.getClass().getName(), "savePortfolio()",
@@ -419,18 +431,18 @@ public class SQLPortfolioDAO implements
 	/**
 	 * Saves the list of stocks to the database.
 	 * 
-	 * @param statement the statement to execute the query to save the stocks
+	 * @param stockStatement the statement to execute the query to save the stocks
 	 * to the database.
+	 * @param deleteStatement the statement used to execute the query to delete stocks
+	 * from the database.
 	 * @param stockList the list of stocks to save.
 	 * @param userid the userid key for the table.
 	 * @throws SQLException if the data is unable to be saved.
 	 */
-	private void saveStocks(Statement statement, List<OwnedStock> stockList, int userid) 
-			throws SQLException{
-		String stocksQuery = "select * from stocks where userid=" + userid + ";";
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"saveStocks()", "SQL: Save Stocks Query: " + stocksQuery);
-		ResultSet stocksResultSet = statement.executeQuery(stocksQuery);
+	private void saveStocks(PreparedStatement stockStatement, Statement deleteStatement, 
+			List<OwnedStock> stockList, int userid) throws SQLException{
+		
+		ResultSet stocksResultSet = stockStatement.executeQuery();
 		
 		//Iterate through ResultSet. If a stock in the table doesn't exist
 		//in the stockList, it is added to the stocksToRemove list.
@@ -439,7 +451,6 @@ public class SQLPortfolioDAO implements
 		List<String> stocksToRemove = new ArrayList<>();
 		while(stocksResultSet.next()){
 			String symbol = stocksResultSet.getString(2).toUpperCase(); //symbol
-			//TODO try and remove use of default implementation here
 			int index = stockList.indexOf(new DefaultStock(symbol));
 			if(index == -1){
 				stocksToRemove.add(symbol);
@@ -448,9 +459,9 @@ public class SQLPortfolioDAO implements
 				OwnedStock oStock = stockList.get(index);
 				Map<String,Object> valueMap = oStock.getValueMap(false);
 				stocksResultSet.updateString(
-						3, (String) valueMap.get(AbstractStock.NAME)); //name
+						3, (String) valueMap.get(Stock.NAME)); //name
 				stocksResultSet.updateBigDecimal(
-						4, (BigDecimal) valueMap.get(AbstractStock.CURRENT_PRICE)); //current_price
+						4, (BigDecimal) valueMap.get(Stock.CURRENT_PRICE)); //current_price
 				stocksResultSet.updateInt(
 						5, (Integer) valueMap.get(OwnedStock.QUANTITY_OF_SHARES)); //share_quantity
 				stocksResultSet.updateBigDecimal(
@@ -472,11 +483,11 @@ public class SQLPortfolioDAO implements
 			
 			stocksResultSet.updateInt(1, userid);
 			stocksResultSet.updateString(
-					2, (String) valueMap.get(AbstractStock.SYMBOL));
+					2, (String) valueMap.get(Stock.SYMBOL));
 			stocksResultSet.updateString(
-					3, (String) valueMap.get(AbstractStock.NAME));
+					3, (String) valueMap.get(Stock.NAME));
 			stocksResultSet.updateBigDecimal(
-					4, (BigDecimal) valueMap.get(AbstractStock.CURRENT_PRICE));
+					4, (BigDecimal) valueMap.get(Stock.CURRENT_PRICE));
 			stocksResultSet.updateInt(
 					5, (Integer) valueMap.get(OwnedStock.QUANTITY_OF_SHARES));
 			stocksResultSet.updateBigDecimal(
@@ -498,10 +509,11 @@ public class SQLPortfolioDAO implements
 			}
 			removeQuery.deleteCharAt(removeQuery.length() - 1);
 			removeQuery.append(");");
+			//TODO this logger statement is still within the lock. Need to figure out a way to remove it.
 			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
 					"saveStocks()", "SQL: Remove Stocks Query: " + removeQuery.toString());
 			
-			statement.executeUpdate(removeQuery.toString());
+			deleteStatement.executeUpdate(removeQuery.toString());
 		}
 	}
 	
@@ -516,8 +528,15 @@ public class SQLPortfolioDAO implements
 		return DriverManager.getConnection(dburl, dbusername, dbpassword);
 	}
 
-	//TODO document how this property change system works. It passes the event to 
-	//an outside listener
+	/**
+	 * This method is merely used to pass <tt>PropertyChangeEvent</tt>s to
+	 * outside listeners. This mechanic is used to allow <tt>PortfolioModel</tt>s
+	 * that are being constructed by this class to have their attributes passed
+	 * to the view as they are set.
+	 * 
+	 * @param event the <tt>PropertyChangeEvent</tt> to pass to outside
+	 * listeners.
+	 */
 	@Override
 	public void propertyChange(PropertyChangeEvent event) {
 		for(PropertyChangeListener listener : listeners){

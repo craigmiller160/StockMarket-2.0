@@ -257,10 +257,10 @@ public class PortfolioNameDialog extends AbstractDefaultDialog {
 	}
 
 	@Override
-	public Object getValueForAction(String valueToGet) {
-		if(valueToGet == SAVE_PORTFOLIO_NAME_ACTION){
+	public Object getValueForAction(String actionCommand) {
+		if(actionCommand == SAVE_PORTFOLIO_NAME_ACTION){
 			LOGGER.logp(Level.FINEST, this.getClass().getName(), "getValue", 
-					"Entering method", new Object[] {"Command: " + valueToGet});
+					"Entering method", new Object[] {"Command: " + actionCommand});
 			
 			//Get the text from the name field, then clear the field
 			String name = getPortfolioNameFieldText();

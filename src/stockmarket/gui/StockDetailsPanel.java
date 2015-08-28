@@ -53,12 +53,24 @@ public class StockDetailsPanel extends AbstractListenerView {
 	 */
 	private static final Logger LOGGER = Logger.getLogger("stockmarket.gui.StockDetailsPanel");
 	
+	/**
+	 * Format for displaying amounts of money in the GUI.
+	 */
 	private NumberFormat moneyFormat = new DecimalFormat("$###,###,###,##0.00");
 	
+	/**
+	 * Format for displaying percentages in the GUI.
+	 */
 	private NumberFormat percentFormat = new DecimalFormat("###,###,###,##0.00%");
 	
+	/**
+	 * Format for displaying date values in the GUI.
+	 */
 	private DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
 	
+	/**
+	 * Format for displaying time values in the GUI.
+	 */
 	private DateFormat timeFormat = new SimpleDateFormat("hh:mmaa");
 	
 	/**
@@ -506,6 +518,11 @@ public class StockDetailsPanel extends AbstractListenerView {
 		return stockDetailsScrollPane;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @throws IllegalArgumentException if the new value from the event is not
+	 * the expected type to perform the operation.
+	 */
 	@Override
 	public void changeProperty(PropertyChangeEvent event) {
 		if(event.getPropertyName() == SELECTED_STOCK_PROPERTY){
@@ -676,12 +693,12 @@ public class StockDetailsPanel extends AbstractListenerView {
 	}
 
 	@Override
-	public Object getValueForAction(String valueToGet) {
+	public Object getValueForAction(String actionCommand) {
 		//LOGGER.logp(Level.FINEST, this.getClass().getName(), "getValue", 
 				//"Entering method", new Object[] {"Command: " + valueToGet});
 		
 		
-		// TODO Auto-generated method stub
+		// TODO Will be filled out if values are needed from this view
 		return null;
 	}
 

@@ -190,6 +190,11 @@ public class StockHistoryPanel extends AbstractListenerView {
 	
 	
 
+	/**
+	 * {@inheritDoc}
+	 * @throws IllegalArgumentException if the new value from the event is not
+	 * the expected type to perform the operation.
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public void changeProperty(PropertyChangeEvent event) {
@@ -218,12 +223,12 @@ public class StockHistoryPanel extends AbstractListenerView {
 	}
 
 	@Override
-	public Object getValueForAction(String valueToGet) {
+	public Object getValueForAction(String actionCommand) {
 		LOGGER.logp(Level.FINEST, this.getClass().getName(), "getValue", 
-				"Entering method", new Object[] {"Command: " + valueToGet});
+				"Entering method", new Object[] {"Command: " + actionCommand});
 		
 		Object result = null;
-		if(valueToGet == STOCK_HISTORY_INTERVAL_ACTION){
+		if(actionCommand == STOCK_HISTORY_INTERVAL_ACTION){
 			result = historyLengthCombo.getSelectedIndex() + 1;
 		}
 		

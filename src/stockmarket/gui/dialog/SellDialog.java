@@ -96,11 +96,11 @@ public class SellDialog extends TransactionDialog {
 	}
 
 	@Override
-	public Object getValueForAction(String valueToGet) {
+	public Object getValueForAction(String actionCommand) {
 		Object result = null;
-		if(valueToGet == SELL_STOCK_ACTION){
+		if(actionCommand == SELL_STOCK_ACTION){
 			LOGGER.logp(Level.FINEST, this.getClass().getName(), "getValue", 
-					"Entering method", new Object[] {"Command: " + valueToGet});
+					"Entering method", new Object[] {"Command: " + actionCommand});
 			
 			result = getQuantity();
 		}

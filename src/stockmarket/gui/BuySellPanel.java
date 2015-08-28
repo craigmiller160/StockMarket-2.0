@@ -8,14 +8,12 @@ import static stockmarket.controller.StockMarketController.ENABLE_NO_STOCK_LOADE
 import static stockmarket.controller.StockMarketController.ENABLE_OWNED_STOCK_LOADED;
 import static stockmarket.controller.StockMarketController.SELL_STOCK_PREP_ACTION;
 
-import java.awt.Font;
 import java.beans.PropertyChangeEvent;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import mvp.listener.AbstractListenerView;
@@ -65,11 +63,6 @@ public class BuySellPanel extends AbstractListenerView {
 	private JButton sellButton;
 	
 	/**
-	 * The program label, fills up space in the middle between the buttons.
-	 */
-	private JLabel programLabel;
-	
-	/**
 	 * Create the panel.
 	 */
 	public BuySellPanel() {
@@ -95,10 +88,6 @@ public class BuySellPanel extends AbstractListenerView {
 	 * Initialize the components for this GUI class.
 	 */
 	private void initComponents(){
-		//TODO remove this program label, it's taking up too much space.
-		programLabel = createLabel(LANGUAGE.getString("program_title"), 
-				Fonts.GIANT_LABEL_FONT, null);
-		programLabel.setHorizontalAlignment(JLabel.CENTER);
 		
 		buyButton = createButton(LANGUAGE.getString("buy_button_label"), "buy",
 				LANGUAGE.getString("buy_button_tooltip"), BUY_STOCK_PREP_ACTION);
@@ -113,26 +102,8 @@ public class BuySellPanel extends AbstractListenerView {
 	 * Assemble the components in this panel.
 	 */
 	private void assembleBuySellPanel(){
-		buySellPanel.add(buyButton, "");
-		buySellPanel.add(programLabel, "center, grow, push");
-		buySellPanel.add(sellButton, "");
-	}
-	
-	/**
-	 * Utility method for creating a <tt>JLabel</tt> based on the specified
-	 * parameters.
-	 * 
-	 * @param text the label's text.
-	 * @param font the label's font.
-	 * @param toolTipText the label's tool tip text.
-	 * @return the created label.
-	 */
-	private JLabel createLabel(String text, Font font, String toolTipText){
-		JLabel label = new JLabel(text);
-		label.setFont(font);
-		label.setToolTipText(toolTipText);
-		
-		return label;
+		buySellPanel.add(buyButton, "align left, pushx");
+		buySellPanel.add(sellButton, "align right, pushx");
 	}
 	
 	/**
@@ -168,6 +139,11 @@ public class BuySellPanel extends AbstractListenerView {
 		return buySellPanel;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @throws IllegalArgumentException if the new value from the event is not
+	 * the expected type to perform the operation.
+	 */
 	@Override
 	public void changeProperty(PropertyChangeEvent event) {
 		if(event.getPropertyName() == COMPONENTS_ENABLED_PROPERTY){
@@ -209,11 +185,12 @@ public class BuySellPanel extends AbstractListenerView {
 	}
 
 	@Override
-	public Object getValueForAction(String valueToGet) {
+	public Object getValueForAction(String actionCommand) {
 		//LOGGER.logp(Level.FINEST, this.getClass().getName(), "getValue", 
 				//"Entering method", new Object[] {"Command: " + valueToGet});
 		
-		// TODO Auto-generated method stub
+		// TODO Will be filled out if any values are ultimately needed
+		//from this class.
 		return null;
 	}
 

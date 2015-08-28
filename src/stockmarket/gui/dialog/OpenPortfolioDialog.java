@@ -118,12 +118,12 @@ public class OpenPortfolioDialog extends AbstractDefaultDialog {
 	}
 
 	@Override
-	public Object getValueForAction(String valueToGet) {
+	public Object getValueForAction(String actionCommand) {
 		Object result = null;
-		if(valueToGet == OPEN_SELECTED_PORTFOLIO_ACTION){
+		if(actionCommand == OPEN_SELECTED_PORTFOLIO_ACTION){
 			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
 					"getValue", "Entering method", 
-					new Object[] {"Command: " + valueToGet});
+					new Object[] {"Command: " + actionCommand});
 			
 			int index = getSelectedIndex();
 			result = portfolioNameList.getModel().getElementAt(index);
