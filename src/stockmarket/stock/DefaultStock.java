@@ -175,28 +175,6 @@ public class DefaultStock extends AbstractStock {
 		super(symbol);
 	}
 	
-	/**
-	 * Downloads the stock's details and sets them to the appropriate fields, while also
-	 * retrieving historical data for a set period of time.
-	 * 
-	 * @param downloader the <tt>StockDownloader</tt> to use to get the data.
-	 * @param months the number of months to retrieve the history for.
-	 * @return a list of <tt>HistoricalQuotes</tt> for this stock's history.
-	 * @throws Exception the <tt>StockDownloader</tt> can throw a number of exceptions. Consult
-	 * the documentation for the <tt>StockDownloader</tt> interface and the implementation being
-	 * used for specifics.
-	 * @see stockmarket.stock.StockDownloader StockDownloader
-	 */
-	public List<HistoricalQuote> setStockDetailsAndGetHistory(
-			StockDownloader downloader, int months) throws Exception{
-		//TODO consider doing history in new thread.
-		//pro: parallel tasks. con: updateDetails returns exception, history doesn't run (so less wasted resources on a bad stock search)
-		//Maybe don't have this method at all, use parallelism in an easier way via both methods being invoked separately
-		//by the invoking class.
-		setStockDetails(downloader, true);
-		return getStockHistory(downloader, months);
-	}
-
 	@Override
 	public void setStockDetails(StockDownloader downloader, boolean fullDetails) 
 			throws InvalidStockException, UnknownHostException, IOException {

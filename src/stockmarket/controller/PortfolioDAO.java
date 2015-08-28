@@ -18,9 +18,11 @@ import stockmarket.model.PortfolioModel;
 public interface PortfolioDAO {
 
 	/**
-	 * Create a new stock portfolio.
+	 * Create a new stock portfolio, with the specified name and starting 
+	 * cash balance.
 	 * 
 	 * @param portfolioName the name of the portfolio.
+	 * @param startingCashBalance the starting cash balance of the portfolio.
 	 * @return a new stock portfolio.
 	 * @throws Exception if a problem occurs while trying to access the data source.
 	 */

@@ -222,7 +222,7 @@ public class ExceptionDialog extends AbstractDefaultDialog {
 	/**
 	 * Set the details text of the Exception Dialog
 	 * 
-	 * @param details the detailed message to add.
+	 * @param message the detailed message to add.
 	 */
 	public void setExceptionMessage(String message){
 		StringBuilder builder = new StringBuilder(

@@ -305,7 +305,12 @@ public interface Stock {
 	 * values.
 	 * @param fullDetails if true, downloads the values for all the stock's fields. If
 	 * false, only downloads a limited set of values for a "quick-view".
-	 * @throws Exception if a problem occurs while attempting to download the stock's details.
+	 * @throws InvalidStockException if this stock is not a valid stock on the New York
+	 * Stock Exchange.
+	 * @throws UnknownHostException if a connection cannot be made to the web server
+	 * to download stock details, most likely due to lack of an internet connection.
+	 * @throws IOException if a problem occurs while trying to download and parse
+	 * the stock details.
 	 * @see stockmarket.stock.StockDownloader StockDownloader
 	 */
 	void setStockDetails(StockDownloader downloader, 
@@ -320,7 +325,12 @@ public interface Stock {
 	 * values from the internet.
 	 * @param months the number of months to get a history for.
 	 * @return a list of <tt>HistoricalQuote</tt>s for the period requested.
-	 * @throws Exception if a problem occurs while attempting to download the stock's history.
+	 * @throws InvalidStockException if this stock is not a valid stock on the New York
+	 * Stock Exchange.
+	 * @throws UnknownHostException if a connection cannot be made to the web server
+	 * to download stock details, most likely due to lack of an internet connection.
+	 * @throws IOException if a problem occurs while trying to download and parse
+	 * the stock details.
 	 * @see stockmarket.stock.StockDownloader StockDownloader
 	 */
 	List<HistoricalQuote> getStockHistory(StockDownloader downloader, 

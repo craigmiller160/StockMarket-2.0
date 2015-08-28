@@ -58,7 +58,8 @@ public class GUIStateModel extends AbstractPropertyModel {
 	 * Sets the components that are enabled in the GUI, based on what state the program 
 	 * is currently in.
 	 * 
-	 * @param guiState the current state of the GUI.
+	 * @param componentsEnabled the state all components should be in, affects whether
+	 * they are enabled/disabled.
 	 */
 	public void setComponentsEnabled(Integer componentsEnabled){
 		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
@@ -75,9 +76,9 @@ public class GUIStateModel extends AbstractPropertyModel {
 	}
 	
 	/**
-	 * Returns the state of the GUI.
+	 * Returns the program state affecting which components are enabled/disabled.
 	 * 
-	 * @return the state of the GUI.
+	 * @return the state of which components are enabled/disabled.
 	 */
 	public synchronized Integer getComponentsEnabled(){
 		return componentsEnabled;

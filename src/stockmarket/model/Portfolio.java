@@ -38,14 +38,14 @@ public interface Portfolio {
 	/**
 	 * Sets the change in net worth since this portfolio was created. 
 	 * 
-	 * @param netWorthChange the change in net worth since this portfolio was created.
+	 * @param changeInNetWorth the change in net worth since this portfolio was created.
 	 */
 	void setChangeInNetWorth(BigDecimal changeInNetWorth);
 	
 	/**
 	 * Sets the total value of the stocks in this portfolio. 
 	 * 
-	 * @param portfolioValue the total value of the stocks in this portfolio.
+	 * @param totalStockValue the total value of the stocks in this portfolio.
 	 */
 	void setTotalStockValue(BigDecimal totalStockValue);
 	

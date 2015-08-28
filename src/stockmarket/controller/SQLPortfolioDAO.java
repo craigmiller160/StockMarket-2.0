@@ -111,9 +111,6 @@ public class SQLPortfolioDAO implements
 	 * file and configuring access permits through a <tt>Semaphore</tt> 
 	 * object. If it is unable to load the database properties, an exception
 	 * is thrown and this object fails to be completely constructed. 
-	 * 
-	 * @throws IOException if the database properties cannot be loaded from
-	 * file.
 	 */
 	public SQLPortfolioDAO(){
 		listeners = new ArrayList<>();
@@ -249,8 +246,8 @@ public class SQLPortfolioDAO implements
 	 * @throws SQLException if an error occurs while trying to access the database.
 	 * @throws InterruptedException if a thread is interrupted while waiting on database access.
 	 * @throws IllegalArgumentException if the parameter is not a valid value.
-	 * @see stockmarket.stock.SQLPortfolioDAO#getPortfolios() 
-	 * SQLPortfolioDAO.getPortfolios()
+	 * @see stockmarket.controller.SQLPortfolioDAO#getSavedPortfolios() 
+	 * SQLPortfolioDAO.getSavedPortfolios()
 	 */
 	@Override
 	public PortfolioModel getPortfolio(String fileName) throws InterruptedException, SQLException {
