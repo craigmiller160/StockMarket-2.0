@@ -25,6 +25,7 @@ import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import mvp.listener.AbstractListenerView;
 import net.jcip.annotations.NotThreadSafe;
 import net.miginfocom.swing.MigLayout;
 import stockmarket.util.Fonts;

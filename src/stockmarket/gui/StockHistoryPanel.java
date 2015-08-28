@@ -24,6 +24,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import mvp.listener.AbstractListenerView;
 import net.miginfocom.swing.MigLayout;
 
 import org.jfree.chart.ChartFactory;

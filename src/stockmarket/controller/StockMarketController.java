@@ -1,7 +1,6 @@
 package stockmarket.controller;
 
 import java.awt.Desktop;
-import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.math.BigDecimal;
@@ -19,9 +18,10 @@ import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
 
+import mvp.concurrent.AbstractConcurrentListenerController;
+import mvp.core.AbstractPropertyModel;
+import mvp.listener.ListenerDialog;
 import stockmarket.gui.dialog.DialogFactory;
-import stockmarket.gui.dialog.ListenerDialog;
-import stockmarket.model.AbstractPropertyModel;
 import stockmarket.model.PortfolioModel;
 import stockmarket.stock.DefaultStock;
 import stockmarket.stock.HistoricalQuote;
@@ -180,16 +180,16 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 	//TODO check methods, if theyre invoked by multiple threads will there be issues???
 	
 	@Override
-	protected void processEvent(ActionEvent event, Object valueFromView) {
-		if(event.getActionCommand() == EDIT_PORTFOLIO_NAME_ACTION){
+	protected void processEvent(final String actionCommand, final Object valueFromView) {
+		if(actionCommand == EDIT_PORTFOLIO_NAME_ACTION){
 			Thread.currentThread().setName("EditPortfolioName");
 			showPortfolioNameDialog();
 		}
-		else if(event.getActionCommand() == MARKET_DATA_ACTION){
+		else if(actionCommand == MARKET_DATA_ACTION){
 			Thread.currentThread().setName("MarketWebData");
 			marketDataWebpage();
 		}
-		else if(event.getActionCommand() == NEW_PORTFOLIO_ACTION){
+		else if(actionCommand == NEW_PORTFOLIO_ACTION){
 			//TODO clear any old data. For this and for the open action. and the close action
 			//That SHOULD already happen, the new model should overwrite the
 			//existing values displayed in the GUI. Test this when the program is more assembled.
@@ -197,27 +197,27 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 			createNewPortfolio();
 			showPortfolioNameDialog();
 		}
-		else if(event.getActionCommand() == OPEN_PORTFOLIO_ACTION){
+		else if(actionCommand == OPEN_PORTFOLIO_ACTION){
 			Thread.currentThread().setName("ShowPortfolioList");
 			showOpenPortfolioDialog();
 		}
-		else if(event.getActionCommand() == OPEN_SELECTED_PORTFOLIO_ACTION){
+		else if(actionCommand == OPEN_SELECTED_PORTFOLIO_ACTION){
 			Thread.currentThread().setName("OpenPortfolio");
 			openPortfolio(valueFromView);
 		}
-		else if(event.getActionCommand() == SAVE_PORTFOLIO_ACTION){
+		else if(actionCommand == SAVE_PORTFOLIO_ACTION){
 			Thread.currentThread().setName("SavePortfolio");
 			savePortfolio();
 		}
-		else if(event.getActionCommand() == SAVE_PORTFOLIO_NAME_ACTION){
+		else if(actionCommand == SAVE_PORTFOLIO_NAME_ACTION){
 			Thread.currentThread().setName("SavePortfolioName");
 			savePortfolioName(valueFromView);
 		}
-		else if(event.getActionCommand() == STOCK_HISTORY_INTERVAL_ACTION){
+		else if(actionCommand == STOCK_HISTORY_INTERVAL_ACTION){
 			Thread.currentThread().setName("StockHistoryInterval");
 			changeStockHistoryInterval(valueFromView);
 		}
-		else if(event.getActionCommand() == STOCK_SEARCH_ACTION){
+		else if(actionCommand == STOCK_SEARCH_ACTION){
 			Thread.currentThread().setName("StockSearch");
 			searchForStock(valueFromView);
 		}

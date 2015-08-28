@@ -26,6 +26,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 
+import mvp.listener.AbstractListenerView;
 import net.jcip.annotations.NotThreadSafe;
 import stockmarket.util.Language;
 

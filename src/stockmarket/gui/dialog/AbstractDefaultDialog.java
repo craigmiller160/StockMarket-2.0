@@ -8,6 +8,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import mvp.listener.AbstractListenerDialog;
 import net.miginfocom.swing.MigLayout;
 
 /**

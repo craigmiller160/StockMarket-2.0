@@ -18,6 +18,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import mvp.listener.AbstractListenerView;
 import net.jcip.annotations.NotThreadSafe;
 import net.miginfocom.swing.MigLayout;
 import stockmarket.util.Fonts;
@@ -94,6 +95,7 @@ public class BuySellPanel extends AbstractListenerView {
 	 * Initialize the components for this GUI class.
 	 */
 	private void initComponents(){
+		//TODO remove this program label, it's taking up too much space.
 		programLabel = createLabel(LANGUAGE.getString("program_title"), 
 				Fonts.GIANT_LABEL_FONT, null);
 		programLabel.setHorizontalAlignment(JLabel.CENTER);

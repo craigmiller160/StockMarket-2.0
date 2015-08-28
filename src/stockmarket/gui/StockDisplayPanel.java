@@ -13,6 +13,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
+import mvp.listener.AbstractListenerView;
 import net.miginfocom.swing.MigLayout;
 import stockmarket.util.Fonts;
 import stockmarket.util.Language;

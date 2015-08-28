@@ -17,6 +17,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 
+import mvp.listener.ListenerDialog;
 import net.jcip.annotations.NotThreadSafe;
 import stockmarket.controller.StockMarketController;
 import stockmarket.gui.BuySellPanel;
@@ -29,7 +30,6 @@ import stockmarket.gui.StockDisplayPanel;
 import stockmarket.gui.StockHistoryPanel;
 import stockmarket.gui.ToolBar;
 import stockmarket.gui.dialog.DialogFactory;
-import stockmarket.gui.dialog.ListenerDialog;
 import stockmarket.model.GUIStateModel;
 import stockmarket.model.StockDisplayModel;
 import stockmarket.util.Language;

@@ -17,10 +17,11 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 
+import mvp.listener.AbstractListenerView;
+import mvp.listener.ListenerDialog;
 import net.jcip.annotations.NotThreadSafe;
 import net.miginfocom.swing.MigLayout;
 import stockmarket.gui.dialog.DialogFactory;
-import stockmarket.gui.dialog.ListenerDialog;
 import stockmarket.util.Language;
 
 /**

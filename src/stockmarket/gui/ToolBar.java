@@ -23,6 +23,7 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
 
+import mvp.listener.AbstractListenerView;
 import net.jcip.annotations.NotThreadSafe;
 import stockmarket.util.Fonts;
 import stockmarket.util.Language;

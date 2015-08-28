@@ -3,6 +3,8 @@ package stockmarket.gui.dialog;
 import java.awt.Frame;
 import java.util.List;
 
+import mvp.listener.ListenerDialog;
+
 /**
  * Factory class for creating dialogs in the program.
  * 

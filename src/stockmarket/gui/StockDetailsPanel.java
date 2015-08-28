@@ -25,6 +25,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import mvp.listener.AbstractListenerView;
 import net.jcip.annotations.NotThreadSafe;
 import net.miginfocom.swing.MigLayout;
 import stockmarket.stock.OwnedStock;

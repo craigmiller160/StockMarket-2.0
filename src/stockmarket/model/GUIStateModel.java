@@ -6,6 +6,7 @@ import static stockmarket.controller.StockMarketController.DIALOG_DISPLAYED_PROP
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import mvp.core.AbstractPropertyModel;
 import net.jcip.annotations.GuardedBy;
 import net.jcip.annotations.ThreadSafe;
 
