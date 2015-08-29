@@ -2,8 +2,8 @@ package stockmarket.gui;
 
 import static stockmarket.controller.StockMarketController.CASH_BALANCE_PROPERTY;
 import static stockmarket.controller.StockMarketController.CHANGE_IN_NET_WORTH_PROPERTY;
-import static stockmarket.controller.StockMarketController.PORTFOLIO_STATE_PROPERTY;
 import static stockmarket.controller.StockMarketController.NET_WORTH_PROPERTY;
+import static stockmarket.controller.StockMarketController.PORTFOLIO_STATE_PROPERTY;
 import static stockmarket.controller.StockMarketController.REFRESH_PORTFOLIO_ACTION;
 import static stockmarket.controller.StockMarketController.STOCK_DETAILS_ACTION;
 import static stockmarket.controller.StockMarketController.STOCK_LIST_PROPERTY;
@@ -16,7 +16,6 @@ import java.beans.PropertyChangeEvent;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -24,6 +23,7 @@ import java.util.logging.Logger;
 
 import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
+import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -361,17 +361,22 @@ public class PortfolioPanel extends AbstractListenerView {
 				"setPortfolioContents", "Entering method", 
 				new Object[]{"Stock List: " + stockList});
 		
-		ownedStockList.setModel(new AbstractListModel<OwnedStock>(){
-			@Override
-			public OwnedStock getElementAt(int index) {
-				return stockList.get(index);
-			}
-			
-			@Override
-			public int getSize() {
-				return stockList.size();
-			}
-		});
+		if(stockList == null){
+			ownedStockList.setModel(new DefaultListModel<OwnedStock>());
+		}
+		else{
+			ownedStockList.setModel(new AbstractListModel<OwnedStock>(){
+				@Override
+				public OwnedStock getElementAt(int index) {
+					return stockList.get(index);
+				}
+				
+				@Override
+				public int getSize() {
+					return stockList.size();
+				}
+			});
+		}
 	}
 
 	/**
@@ -386,43 +391,78 @@ public class PortfolioPanel extends AbstractListenerView {
 			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
 					"changeProperty", "Changing Property", 
 					new Object[]{"Property: " + event.getPropertyName()});
-			
-			portfolioStateChanged((PortfolioState) event.getNewValue());
+			if(event.getNewValue() instanceof PortfolioState){
+				portfolioStateChanged((PortfolioState) event.getNewValue());
+			}
+			else{
+				throw new IllegalArgumentException(
+						"Not instance of PortfolioState: " + event.getNewValue());
+			}
 		}
 		else if(event.getPropertyName() == STOCK_LIST_PROPERTY){
 			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
 					"changeProperty", "Changing Property", 
 					new Object[]{"Property: " + event.getPropertyName()});
 			
-			setPortfolioContents((List<OwnedStock>) event.getNewValue());
+			if(event.getNewValue() instanceof List<?> || event.getNewValue() == null){
+				setPortfolioContents((List<OwnedStock>) event.getNewValue());
+			}
+			else{
+				throw new IllegalArgumentException(
+						"Not valid stock list value: " + event.getNewValue());
+			}
 		}
 		else if(event.getPropertyName() == CASH_BALANCE_PROPERTY){
 			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
 					"changeProperty", "Changing Property", 
 					new Object[]{"Property: " + event.getPropertyName()});
 			
-			setCashBalanceValue((BigDecimal) event.getNewValue());
+			if(event.getNewValue() instanceof BigDecimal){
+				setCashBalanceValue((BigDecimal) event.getNewValue());
+			}
+			else{
+				throw new IllegalArgumentException(
+						"Not instance of Big Decimal " + event.getNewValue());
+			}
 		}
 		else if(event.getPropertyName() == TOTAL_STOCK_VALUE_PROPERTY){
 			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
 					"changeProperty", "Changing Property", 
 					new Object[]{"Property: " + event.getPropertyName()});
 			
-			setTotalStockValue((BigDecimal) event.getNewValue());
+			if(event.getNewValue() instanceof BigDecimal){
+				setTotalStockValue((BigDecimal) event.getNewValue());
+			}
+			else{
+				throw new IllegalArgumentException(
+						"Not instance of Big Decimal " + event.getNewValue());
+			}
 		}
 		else if(event.getPropertyName() == NET_WORTH_PROPERTY){
 			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
 					"changeProperty", "Changing Property", 
 					new Object[]{"Property: " + event.getPropertyName()});
 			
-			setNetWorthValue((BigDecimal) event.getNewValue());
+			if(event.getNewValue() instanceof BigDecimal){
+				setNetWorthValue((BigDecimal) event.getNewValue());
+			}
+			else{
+				throw new IllegalArgumentException(
+						"Not instance of Big Decimal " + event.getNewValue());
+			}
 		}
 		else if(event.getPropertyName() == CHANGE_IN_NET_WORTH_PROPERTY){
 			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
 					"changeProperty", "Changing Property", 
 					new Object[]{"Property: " + event.getPropertyName()});
 			
-			setChangeInNetWorthValue((BigDecimal) event.getNewValue());
+			if(event.getNewValue() instanceof BigDecimal){
+				setChangeInNetWorthValue((BigDecimal) event.getNewValue());
+			}
+			else{
+				throw new IllegalArgumentException(
+						"Not instance of Big Decimal " + event.getNewValue());
+			}
 		}
 		
 		//TODO add +/- or fancy up/down icons to the labels after the value
@@ -499,7 +539,6 @@ public class PortfolioPanel extends AbstractListenerView {
 		if(portfolioState == PortfolioState.CLOSED){
 			detailsButton.setEnabled(false);
 			refreshButton.setEnabled(false);
-			setPortfolioContents(new ArrayList<>());
 		}
 		else if(portfolioState == PortfolioState.OPEN_NO_STOCK){
 			detailsButton.setEnabled(true);

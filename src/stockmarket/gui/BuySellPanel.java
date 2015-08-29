@@ -147,7 +147,13 @@ public class BuySellPanel extends AbstractListenerView {
 					"changeProperty", "Changing Property", 
 					new Object[]{"Property: " + event.getPropertyName()});
 			
-			portfolioStateChanged((PortfolioState) event.getNewValue());
+			if(event.getNewValue() instanceof PortfolioState){
+				portfolioStateChanged((PortfolioState) event.getNewValue());
+			}
+			else{
+				throw new IllegalArgumentException(
+						"Not instance of PortfolioState: " + event.getNewValue());
+			}
 		}
 	}
 	

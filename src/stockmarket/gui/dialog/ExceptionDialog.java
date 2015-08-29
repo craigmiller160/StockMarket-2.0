@@ -36,23 +36,6 @@ import stockmarket.util.Language;
 @NotThreadSafe
 public class ExceptionDialog extends AbstractDefaultDialog {
 
-	//TODO remove this main method after testing is done
-	public static void main(String[] args){
-		ExceptionDialog dialog = new ExceptionDialog();
-		
-		try{
-			throw new Exception();
-		}
-		catch(Exception ex){
-			dialog.setThrowable(ex);
-		}
-		
-		dialog.showDialog();
-	}
-	
-	//TODO redo the non-throwable text setting methods. The standard exception
-	//format doesn't work with the custom text dialogs.
-	
 	/**
 	 * The title label, either <tt>Exception</tt>, <tt>RuntimeException</tt>, 
 	 * or <tt>Error</tt>.
@@ -207,7 +190,11 @@ public class ExceptionDialog extends AbstractDefaultDialog {
 
 		setExceptionTitle(title);
 		
-		setExceptionMessage(t.toString());
+		String message = LANGUAGE.getString("exception_starting_text") 
+				+ "<br><br><b>" + LANGUAGE.getString("message") + "</b>: "
+				+ t.toString();
+		
+		setExceptionMessage(message);
 	}
 	
 	/**
@@ -228,8 +215,6 @@ public class ExceptionDialog extends AbstractDefaultDialog {
 		StringBuilder builder = new StringBuilder(
 				"<html><body style='width: 330px'>");
 		
-		builder.append(LANGUAGE.getString("exception_starting_text") + "<br><br>");
-		builder.append("<b>" + LANGUAGE.getString("message") + "</b>: ");
 		builder.append(message + "<br><br>");
 		builder.append(LANGUAGE.getString("exception_ending_text"));
 		builder.append(" <u>craigmiller160@gmail.com</u>.</body></html>");
@@ -251,7 +236,6 @@ public class ExceptionDialog extends AbstractDefaultDialog {
 		
 		expandButton = new JButton(expandAction);
 		expandButton.setFont(Fonts.SMALL_LABEL_FONT);
-		expandButton.setVisible(false);
 		expandButton.setEnabled(false);
 		
 		configureInputActionMaps();
@@ -326,8 +310,6 @@ public class ExceptionDialog extends AbstractDefaultDialog {
 		detailsPanel.setLayout(new MigLayout());
 		
 		detailsPanel.add(exceptionLabel, "wrap");
-		
-		//detailsPanel.add(expandButton, "align right, pushx, wrap");
 		
 		return detailsPanel;
 	}

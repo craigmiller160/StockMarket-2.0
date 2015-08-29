@@ -242,7 +242,13 @@ public class Frame extends AbstractListenerView {
 					"changeProperty", "Changing Property", 
 					new Object[]{"Property: " + event.getPropertyName()});
 			
-			displayDialog((Object[]) event.getNewValue());
+			if(event.getNewValue() instanceof Object[]){
+				displayDialog((Object[]) event.getNewValue());
+			}
+			else{
+				throw new IllegalArgumentException(
+						"Not instance of Object[] " + event.getNewValue());
+			}
 		}
 	}
 	

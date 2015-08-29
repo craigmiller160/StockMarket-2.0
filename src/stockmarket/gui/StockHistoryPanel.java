@@ -129,7 +129,6 @@ public class StockHistoryPanel extends AbstractListenerView {
 		JComboBox<String> comboBox = new JComboBox<>(comboText);
 		comboBox.setFont(font);
 		comboBox.setToolTipText(toolTipText);
-		comboBox.setSelectedIndex(INITIAL_HISTORY_LENGTH_MONTHS - 1);
 		comboBox.addItemListener(new ComboItemListener());
 		
 		return comboBox;
@@ -196,6 +195,7 @@ public class StockHistoryPanel extends AbstractListenerView {
 				"setStockHistory", "Entering", 
 				new Object[]{"History List: " + historyList});
 		
+		historyLengthCombo.setSelectedIndex(INITIAL_HISTORY_LENGTH_MONTHS - 1);
 		String chartName = "";
 		if(historyList instanceof StockHistoryList){
 			chartName = ((StockHistoryList) historyList).getSymbol();
@@ -286,14 +286,26 @@ public class StockHistoryPanel extends AbstractListenerView {
 					"changeProperty", "Changing Property", 
 					new Object[]{"Property: " + event.getPropertyName()});
 			
-			setStockHistory((List<HistoricalQuote>) event.getNewValue());
+			if(event.getNewValue() instanceof List<?>){
+				setStockHistory((List<HistoricalQuote>) event.getNewValue());
+			}
+			else{
+				throw new IllegalArgumentException(
+						"Not valid stock history list: " + event.getNewValue());
+			}
 		}
 		else if(event.getPropertyName() == PORTFOLIO_STATE_PROPERTY){
 			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
 					"changeProperty", "Changing Property", 
 					new Object[]{"Property: " + event.getPropertyName()});
 			
-			portfolioStateChanged((PortfolioState) event.getNewValue());
+			if(event.getNewValue() instanceof PortfolioState){
+				portfolioStateChanged((PortfolioState) event.getNewValue());
+			}
+			else{
+				throw new IllegalArgumentException(
+						"Not instance of PortfolioState: " + event.getNewValue());
+			}
 		}
 	}
 	

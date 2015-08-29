@@ -14,6 +14,7 @@ import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
@@ -114,7 +115,7 @@ public class SQLPortfolioDAO implements
 	 * is thrown and this object fails to be completely constructed. 
 	 */
 	public SQLPortfolioDAO(){
-		listeners = new ArrayList<>();
+		listeners = Collections.synchronizedList(new ArrayList<>());
 		semaphore = new Semaphore(1);
 		Properties defaultProps = new Properties();
 		try {
@@ -174,6 +175,8 @@ public class SQLPortfolioDAO implements
 		portfolio.setNetWorth(startingCashBalance);
 		portfolio.setChangeInNetWorth(new BigDecimal(0.00));
 		portfolio.setTotalStockValue(new BigDecimal(0.00));
+		
+		portfolio.setStockList(null);
 		
 		int userid = 0;
 		semaphore.acquire();
@@ -539,8 +542,10 @@ public class SQLPortfolioDAO implements
 	 */
 	@Override
 	public void propertyChange(PropertyChangeEvent event) {
-		for(PropertyChangeListener listener : listeners){
-			listener.propertyChange(event);
+		synchronized(listeners){
+			for(PropertyChangeListener listener : listeners){
+				listener.propertyChange(event);
+			}
 		}
 	}
 

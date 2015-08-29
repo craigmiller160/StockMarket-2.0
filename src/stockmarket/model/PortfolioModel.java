@@ -111,7 +111,12 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 		List<OwnedStock> oldValue = null;
 		synchronized(this){
 			oldValue = this.stockList;
-			this.stockList = stockList;
+			if(stockList == null){
+				this.stockList = new ArrayList<>();
+			}
+			else{
+				this.stockList = stockList;
+			}
 		}
 		
 		firePropertyChange(STOCK_LIST_PROPERTY, oldValue, stockList);

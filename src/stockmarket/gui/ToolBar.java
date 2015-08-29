@@ -242,14 +242,26 @@ public class ToolBar extends AbstractListenerView {
 					"changeProperty", "Changing Property", 
 					new Object[]{"Property: " + event.getPropertyName()});
 			
-			portfolioStateChanged((PortfolioState) event.getNewValue());
+			if(event.getNewValue() instanceof PortfolioState){
+				portfolioStateChanged((PortfolioState) event.getNewValue());
+			}
+			else{
+				throw new IllegalArgumentException(
+						"Not instance of PortfolioState: " + event.getNewValue());
+			}
 		}
 		else if(event.getPropertyName() == PORTFOLIO_NAME_PROPERTY){
 			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
 					"changeProperty", "Changing Property", 
 					new Object[]{"Property: " + event.getPropertyName()});
 			
-			setPortfolioNameFieldText((String) event.getNewValue());
+			if(event.getNewValue() instanceof String){
+				setPortfolioNameFieldText((String) event.getNewValue());
+			}
+			else{
+				throw new IllegalArgumentException(
+						"Not valid String: " + event.getNewValue());
+			}
 		}
 	}
 	

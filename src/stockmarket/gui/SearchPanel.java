@@ -258,6 +258,11 @@ public class SearchPanel extends AbstractListenerView {
 		return searchPanel;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @throws IllegalArgumentException if the new value from the event is not
+	 * the expected type to perform the operation.
+	 */
 	@Override
 	public void changeProperty(PropertyChangeEvent event) {
 		if(event.getPropertyName() == PORTFOLIO_STATE_PROPERTY){
@@ -265,7 +270,13 @@ public class SearchPanel extends AbstractListenerView {
 					"changeProperty", "Changing Property", 
 					new Object[]{"Property: " + event.getPropertyName()});
 			
-			portfolioStateChanged((PortfolioState) event.getNewValue());
+			if(event.getNewValue() instanceof PortfolioState){
+				portfolioStateChanged((PortfolioState) event.getNewValue());
+			}
+			else{
+				throw new IllegalArgumentException(
+						"Not valid PortfolioState: " + event.getNewValue());
+			}
 		}
 	}
 	

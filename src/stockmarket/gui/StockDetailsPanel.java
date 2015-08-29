@@ -516,14 +516,26 @@ public class StockDetailsPanel extends AbstractListenerView {
 					"changeProperty", "Changing Property",
 					new Object[] {"Property: " + event.getPropertyName()});
 			
-			displayStockDetails((Stock) event.getNewValue());
+			if(event.getNewValue() instanceof Stock){
+				displayStockDetails((Stock) event.getNewValue());
+			}
+			else{
+				throw new IllegalArgumentException(
+						"Not instance of Stock: " + event.getNewValue());
+			}
 		}
 		else if(event.getPropertyName() == PORTFOLIO_STATE_PROPERTY){
 			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
 					"changeProperty", "Changing Property", 
 					new Object[]{"Property: " + event.getPropertyName()});
 			
-			portfolioStateChanged((PortfolioState) event.getNewValue());
+			if(event.getNewValue() instanceof PortfolioState){
+				portfolioStateChanged((PortfolioState) event.getNewValue());
+			}
+			else{
+				throw new IllegalArgumentException(
+						"Not instance of PortfolioState: " + event.getNewValue());
+			}
 		}
 	}
 	
