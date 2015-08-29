@@ -114,7 +114,7 @@ public class StockFileDownloader implements StockDownloader {
 	}
 
 	@Override
-	public synchronized Map<String, String> downloadStockDetails(String symbol,
+	public Map<String, String> downloadStockDetails(String symbol,
 			String[] fields) throws InvalidStockException, UnknownHostException, IOException {
 		return valueMap;
 	}

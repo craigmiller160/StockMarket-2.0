@@ -45,9 +45,6 @@ import net.jcip.annotations.ThreadSafe;
 @ThreadSafe
 public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 
-	//TODO add documentation about the posibility of NumberFormatExceptions from the setters with
-	//String params
-	
 	/**
 	 * SerialVersionUID for serialization support.
 	 */
@@ -129,9 +126,14 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 	 * bypass the normal process of setting this value.
 	 * 
 	 * @param quantity the quantity of shares.
+	 * @throws NumberFormatException if the raw text value wasn't properly
+	 * parsed and is not a number value.
 	 */
-	private synchronized void setQuantity(String quantity){
-		this.quantityOfShares = Integer.parseInt(quantity);
+	private void setQuantity(String quantity){
+		int num = Integer.parseInt(quantity);
+		synchronized(this){
+			this.quantityOfShares = num;
+		}
 	}
 	
 	/**
@@ -139,9 +141,14 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 	 * bypass the normal process of setting this value.
 	 * 
 	 * @param principle the principle, the initial amount spent on this stock.
+	 * @throws NumberFormatException if the raw text value wasn't properly
+	 * parsed and is not a number value.
 	 */
-	private synchronized void setPrinciple(String principle){
-		this.principle = new BigDecimal(Double.parseDouble(principle));
+	private void setPrinciple(String principle){
+		BigDecimal num = new BigDecimal(Double.parseDouble(principle));
+		synchronized(this){
+			this.principle = num;
+		}
 	}
 	
 	/**
@@ -149,9 +156,14 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 	 * bypass the normal process of setting this value.
 	 * 
 	 * @param totalValue the total value of all shares of this stock.
+	 * @throws NumberFormatException if the raw text value wasn't properly
+	 * parsed and is not a number value.
 	 */
-	private synchronized void setTotalValue(String totalValue){
-		this.totalValue = new BigDecimal(Double.parseDouble(totalValue));
+	private void setTotalValue(String totalValue){
+		BigDecimal num = new BigDecimal(Double.parseDouble(totalValue));
+		synchronized(this){
+			this.totalValue = num;
+		}
 	}
 	
 	/**
@@ -159,9 +171,14 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 	 * bypass the normal process of setting this value.
 	 * 
 	 * @param net the net gains/losses on this stock.
+	 * @throws NumberFormatException if the raw text value wasn't properly
+	 * parsed and is not a number value.
 	 */
-	private synchronized void setNet(String net){
-		this.net = new BigDecimal(Double.parseDouble(net));
+	private void setNet(String net){
+		BigDecimal num = new BigDecimal(Double.parseDouble(net));
+		synchronized(this){
+			this.net = num;
+		}
 	}
 	
 	@Override
@@ -180,7 +197,10 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 		setTotalValueAndNet();
 	}
 	
-	//TODO consider using a custom exception if there aren't enough shares
+	//TODO create and use a custom exception for if there are not enough
+	//shares to decrease by the selected quantity. Use this instead
+	//of a runtimeexception to force the caller to deal with this condition
+	//in a catch block.
 	@Override
 	public boolean decreaseShares(int quantity){
 		boolean sharesRemaining = true;
@@ -208,9 +228,6 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 		}
 		
 		setTotalValueAndNet();
-		
-		//TODO ultimately remove this section below, it's not necessary in tandem with the exception
-		//thrown at the start of the method
 		
 		synchronized(this){
 			if(quantityOfShares > 0){

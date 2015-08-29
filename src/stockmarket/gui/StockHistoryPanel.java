@@ -41,16 +41,41 @@ import stockmarket.stock.StockHistoryList;
 import stockmarket.util.Fonts;
 import stockmarket.util.Language;
 
+/**
+ * Utilizes the <tt>JFreeChart</tt> library to display a chart of the 
+ * history of a stock's price. Provides a button to change the length of time 
+ * that the history is gathered for.
+ * <p>
+ * <b>THREAD SAFETY:</b> Swing is NOT thread safe.
+ * 
+ * @author craig
+ * @version 2.0
+ */
 public class StockHistoryPanel extends AbstractListenerView {
 
+	/**
+	 * Shared <tt>Language</tt> module for locale-specific text.
+	 */
 	private static final Language LANGUAGE = Language.getInstance();
 	
+	/**
+	 * Shared logger for the program.
+	 */
 	private static final Logger LOGGER = Logger.getLogger("stockmarket.gui.StockHistoryPanel");
 	
+	/**
+	 * The panel created by this class.
+	 */
 	private final JPanel stockHistoryPanel;
 	
+	/**
+	 * The combo box to select the length of the stock history.
+	 */
 	private JComboBox<String> historyLengthCombo;
 	
+	/**
+	 * The title label for this panel.
+	 */
 	private JLabel panelTitleLabel;
 	
 	/**
@@ -59,6 +84,9 @@ public class StockHistoryPanel extends AbstractListenerView {
 	 */
 	private JPanel chartPanel;
 	
+	/**
+	 * Create a new stock history panel.
+	 */
 	public StockHistoryPanel() {
 		super();
 		stockHistoryPanel = createStockHistoryPanel();
@@ -66,6 +94,9 @@ public class StockHistoryPanel extends AbstractListenerView {
 		assembleHistoryPanel();
 	}
 	
+	/**
+	 * Initialize the components of the panel.
+	 */
 	private void initComponents(){
 		chartPanel = new JPanel();
 		
@@ -87,18 +118,36 @@ public class StockHistoryPanel extends AbstractListenerView {
 				"23 Months", "24 Months"
 		};
 		
-		historyLengthCombo = createComboBox(timeInterval, Fonts.FIELD_FONT);
+		historyLengthCombo = createComboBox(timeInterval, Fonts.FIELD_FONT, 
+				LANGUAGE.getString("history_combo_tooltip"));
 	}
 	
-	private JComboBox<String> createComboBox(String[] comboText, Font font){
+	/**
+	 * Utility method for creating a combo box.
+	 * 
+	 * @param comboText the text for the intervals of the combo box.
+	 * @param font the font of the text of the combo box.
+	 * @param toolTipText the text for this component's tooltip.
+	 * @return
+	 */
+	private JComboBox<String> createComboBox(String[] comboText, Font font, 
+			String toolTipText){
 		JComboBox<String> comboBox = new JComboBox<>(comboText);
 		comboBox.setFont(font);
+		comboBox.setToolTipText(toolTipText);
 		comboBox.setSelectedIndex(INITIAL_HISTORY_LENGTH_MONTHS - 1);
 		comboBox.addItemListener(new ComboItemListener());
 		
 		return comboBox;
 	}
 	
+	/**
+	 * Utility method for creating a label.
+	 * 
+	 * @param text the label's text.
+	 * @param font the label's font.
+	 * @return the created label.
+	 */
 	private JLabel createLabel(String text, Font font){
 		JLabel label = new JLabel(text);
 		label.setFont(font);
@@ -106,6 +155,9 @@ public class StockHistoryPanel extends AbstractListenerView {
 		return label;
 	}
 	
+	/**
+	 * Assemble the stock history panel.
+	 */
 	private void assembleHistoryPanel(){
 		stockHistoryPanel.removeAll();
 		
@@ -118,6 +170,11 @@ public class StockHistoryPanel extends AbstractListenerView {
 		stockHistoryPanel.repaint();
 	}
 	
+	/**
+	 * Create the stock history panel.
+	 * 
+	 * @return the stock history panel.
+	 */
 	private JPanel createStockHistoryPanel(){
 		JPanel stockHistoryPanel = new JPanel();
 		stockHistoryPanel.setLayout(new MigLayout());
@@ -126,10 +183,20 @@ public class StockHistoryPanel extends AbstractListenerView {
 		return stockHistoryPanel;
 	}
 	
+	/**
+	 * Get the panel created by this class.
+	 * 
+	 * @return the panel created by this class.
+	 */
 	public JPanel getPanel(){
 		return stockHistoryPanel;
 	}
 	
+	/**
+	 * Set the stock history to be displayed in the chart.
+	 * 
+	 * @param historyList the stock history to be displayed.
+	 */
 	public void setStockHistory(List<HistoricalQuote> historyList){
 		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
 				"setStockHistory", "Entering", 
@@ -151,8 +218,15 @@ public class StockHistoryPanel extends AbstractListenerView {
 				"setStockHistory", "Stock History Displayed");
 	}
 	
+	/**
+	 * Create the dataset for the history chart by converting 
+	 * a list of stock history values.
+	 * 
+	 * @param historyList the stock history list to be converted into the dataset.
+	 * @return the chart dataset.
+	 */
 	private XYDataset createDataset(List<HistoricalQuote> historyList){
-		TimeSeries timeSeries = new TimeSeries("Stock History"); //TODO add this name to locale text
+		TimeSeries timeSeries = new TimeSeries(LANGUAGE.getString("time_series"));
 		
 		for(int i = (historyList.size() - 1); i >= 0; i--){
 			Calendar cal = historyList.get(i).DATE;
@@ -168,13 +242,28 @@ public class StockHistoryPanel extends AbstractListenerView {
 		return timeSeriesCollection;
 	}
 	
+	/**
+	 * Create the chart panel, containing a chart based on the dataset.
+	 * 
+	 * @param dataset the data to use to create the chart.
+	 * @param chartName the name to display on the chart.
+	 * @return the constructed chart panel. 
+	 */
 	private JPanel createChartPanel(XYDataset dataset, String chartName){
 		JFreeChart chart = createChart(dataset, chartName);
 		return new ChartPanel(chart);
 	}
 	
+	/**
+	 * Create the chart, based on the dataset provided.
+	 * 
+	 * @param dataset the data to use to create the chart.
+	 * @param chartName the name to display on the chart.
+	 * @return the created chart.
+	 */
 	private JFreeChart createChart(XYDataset dataset, String chartName){
-		//TODO explore the tooltips option, it's one of the boolean params. See JFreeChart documentation
+		//TODO in the future, explore the tooltips option, it's one of the 
+		//boolean params. See JFreeChart documentation
 		JFreeChart chart = ChartFactory.createTimeSeriesChart(
 				chartName, 
 				LANGUAGE.getString("chart_date"), 
@@ -207,17 +296,24 @@ public class StockHistoryPanel extends AbstractListenerView {
 		}
 	}
 	
-	public void guiStateChange(int newState){
-		if(newState == ENABLE_NO_PORTFOLIO_OPEN){
+	/**
+	 * Change what components are enabled based on changes to the 
+	 * overall program state.
+	 * 
+	 * @param componentsEnabled the state to base which components 
+	 * are enabled on.
+	 */
+	public void changeComponentsEnabled(Integer componentsEnabled){
+		if(componentsEnabled == ENABLE_NO_PORTFOLIO_OPEN){
 			
 		}
-		else if(newState == ENABLE_NO_STOCK_LOADED){
+		else if(componentsEnabled == ENABLE_NO_STOCK_LOADED){
 			
 		}
-		else if(newState == ENABLE_LOOKUP_STOCK_LOADED){
+		else if(componentsEnabled == ENABLE_LOOKUP_STOCK_LOADED){
 			
 		}
-		else if(newState == ENABLE_OWNED_STOCK_LOADED){
+		else if(componentsEnabled == ENABLE_OWNED_STOCK_LOADED){
 			
 		}
 	}
@@ -235,6 +331,14 @@ public class StockHistoryPanel extends AbstractListenerView {
 		return result;
 	}
 	
+	/**
+	 * Listener for selections on the history length combo box. It responds
+	 * to an item selected state change by wrapping it in an <tt>ActionEvent</tt> and
+	 * firing it to external listening controllers.
+	 * 
+	 * @author craig
+	 * @version 2.0
+	 */
 	private class ComboItemListener implements ItemListener{
 
 		@Override

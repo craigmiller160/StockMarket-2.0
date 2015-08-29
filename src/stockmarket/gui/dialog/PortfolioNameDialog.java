@@ -26,9 +26,6 @@ import net.miginfocom.swing.MigLayout;
 import stockmarket.util.Fonts;
 import stockmarket.util.Language;
 
-//TODO add enter/escape keyboard shortcuts
-//TODO document that the action listener is invoked from within the actions
-
 /**
  * A dialog to set the name of the portfolio. In order to conform with
  * the <tt>ListenerView</tt> interface, this dialog invokes the class's
@@ -110,6 +107,9 @@ public class PortfolioNameDialog extends AbstractDefaultDialog {
 		init();
 	}
 	
+	/**
+	 * Initialize the values and components of this dialog.
+	 */
 	private void init(){
 		titleLabel = createLabel(LANGUAGE.getString("name_dialog_title"), 
 				Fonts.LABEL_FONT);
@@ -218,9 +218,6 @@ public class PortfolioNameDialog extends AbstractDefaultDialog {
 		
 		return label;
 	}
-	
-	//The action passes the event to the class's listener, no need to add it here
-	
 	
 	/**
 	 * Creates a text field based on the specified parameters.

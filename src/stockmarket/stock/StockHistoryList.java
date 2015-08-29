@@ -55,6 +55,33 @@ public class StockHistoryList extends AbstractList<HistoricalQuote> {
 	}
 	
 	/**
+	 * Create the stock history list for a stock
+	 * with the specified symbol, with the specified
+	 * initial capacity.
+	 * 
+	 * @param symbol the symbol of the stock.
+	 * @param capacity the initial capacity of the list.
+	 */
+	public StockHistoryList(String symbol, int capacity){
+		this.historyList = new ArrayList<>(capacity);
+		this.symbol = symbol;
+	}
+	
+	/**
+	 * Create the stock history list for a stock
+	 * with the specified symbol, and fill it with
+	 * the values in the collection provided.
+	 * 
+	 * @param symbol the symbol of the stock.
+	 * @param collection the initial values to add to the list.
+	 */
+	public StockHistoryList(String symbol, 
+			Collection<? extends HistoricalQuote> collection){
+		this.historyList = new ArrayList<>(collection);
+		this.symbol = symbol;
+	}
+	
+	/**
 	 * Get the symbol of the stock this history is for.
 	 * 
 	 * @return the stock's symbol.
@@ -200,6 +227,7 @@ public class StockHistoryList extends AbstractList<HistoricalQuote> {
 		return historyList.toArray(array);
 	}
 	
-	
+	//TODO work on the thread safety of this list, along with the other
+		//list in the PortfolioModel
 
 }

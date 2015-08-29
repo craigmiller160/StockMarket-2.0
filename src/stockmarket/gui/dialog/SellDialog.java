@@ -8,40 +8,65 @@ import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.SwingUtilities;
 
+import net.jcip.annotations.NotThreadSafe;
 import stockmarket.stock.OwnedStock;
 import stockmarket.stock.Stock;
 import stockmarket.util.Fonts;
 import stockmarket.util.Language;
 
+/**
+ * A dialog for performing a sell shares transaction. The maximum limit
+ * on the quantity of shares is the number of shares owned of the stock.
+ * The amount of shares selected by this dialog will be "sold", and the
+ * profits will be added to the cash balance available to buy more stocks.
+ * <p>
+ * <b>THREAD SAFETY:</b> Swing is NOT thread safe.
+ * 
+ * @author craig
+ * @version 2.0
+ */
+@NotThreadSafe
 public class SellDialog extends TransactionDialog {
 
-	//TODO delete this method after testing is done
-	public static void main(String[] args){
-		SwingUtilities.invokeLater(new Runnable(){
-
-			@Override
-			public void run() {
-				
-			}
-			
-		});
-	}
-	
+	/**
+	 * Shared <tt>Language</tt> module for locale-specific text.
+	 */
 	private static final Language LANGUAGE = Language.getInstance();
 	
+	/**
+	 * The logger for the program.
+	 */
 	private static final Logger LOGGER = Logger.getLogger("stockmarket.gui.dialog.SellDialog");
 	
-	public SellDialog(OwnedStock stock) {
+	/**
+	 * The maximum limit on how many shares can be sold.
+	 */
+	private int shareLimit;
+	
+	/**
+	 * Create a new, non-modal dialog with no owner.
+	 */
+	public SellDialog() {
 		super();
 	}
 
-	public SellDialog(Frame owner, OwnedStock stock) {
+	/**
+	 * Create a new, non-modal dialog with the specified owner.
+	 * 
+	 * @param owner the owner of the dialog.
+	 */
+	public SellDialog(Frame owner) {
 		super(owner);
 	}
 
-	public SellDialog(Frame owner, boolean modal, OwnedStock stock) {
+	/**
+	 * Create a new dialog with the specified owner and modality.
+	 * 
+	 * @param owner the owner of the dialog.
+	 * @param modal the modality of the dialog.
+	 */
+	public SellDialog(Frame owner, boolean modal) {
 		super(owner, modal);
 	}
 	
@@ -63,7 +88,7 @@ public class SellDialog extends TransactionDialog {
 		}
 		else{
 			OwnedStock ownedStock = (OwnedStock) stock;
-			setShareLimit(ownedStock.getQuantityOfShares());
+			shareLimit = ownedStock.getQuantityOfShares();
 			super.setStock(stock);
 		}
 	}
@@ -121,6 +146,11 @@ public class SellDialog extends TransactionDialog {
 	@Override
 	protected String createTitleBarText() {
 		return LANGUAGE.getString("sell_button_text");
+	}
+
+	@Override
+	protected int shareLimit() {
+		return shareLimit;
 	}
 
 }

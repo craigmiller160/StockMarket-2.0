@@ -46,8 +46,6 @@ import net.jcip.annotations.ThreadSafe;
 @ThreadSafe
 public class DefaultStock extends AbstractStock {
 
-	//TODO add documentation about how the setter methods can throw NumberFormatException
-	
 	/**
 	 * SerialVersionUID for serialization support.
 	 */
@@ -65,13 +63,13 @@ public class DefaultStock extends AbstractStock {
 	private String companyName;
 	
 	/**
-	 *  TODO change could still need to be changed to changeSinceOpen, since that might be what it is
+	 *  The change in price during the last day of trading.
 	 */
 	@GuardedBy("this")
 	private BigDecimal changeToday;
 	
 	/**
-	 * TODO figure out same as above
+	 * The change in price during the last day of trading in percent.
 	 */
 	@GuardedBy("this")
 	private BigDecimal changeTodayInPercent;
@@ -261,6 +259,8 @@ public class DefaultStock extends AbstractStock {
 	 * Sets the change field.
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
+	 * @throws NumberFormatException if the raw text value wasn't properly
+	 * parsed and is not a number value.
 	 */
 	private void setChangeToday(String rawText){
 		double value = Double.parseDouble(rawText);
@@ -274,6 +274,8 @@ public class DefaultStock extends AbstractStock {
 	 * Sets the change in percent field.
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
+	 * @throws NumberFormatException if the raw text value wasn't properly
+	 * parsed and is not a number value.
 	 */
 	private void setChangeTodayInPercent(String rawText){
 		double value = Double.parseDouble(rawText);
@@ -287,6 +289,8 @@ public class DefaultStock extends AbstractStock {
 	 * Sets the 50 day average field.
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
+	 * @throws NumberFormatException if the raw text value wasn't properly
+	 * parsed and is not a number value.
 	 */
 	private void setFiftyDayAvg(String rawText){
 		double value = Double.parseDouble(rawText);
@@ -300,6 +304,8 @@ public class DefaultStock extends AbstractStock {
 	 * Sets the change from 50 day average field.
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
+	 * @throws NumberFormatException if the raw text value wasn't properly
+	 * parsed and is not a number value.
 	 */
 	private void setChange50DayAvg(String rawText){
 		double value = Double.parseDouble(rawText);
@@ -313,6 +319,8 @@ public class DefaultStock extends AbstractStock {
 	 * Sets the sets change from 50 day average in percent field.
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
+	 * @throws NumberFormatException if the raw text value wasn't properly
+	 * parsed and is not a number value.
 	 */
 	private void setChange50DayAvgPercent(String rawText){
 		double value = 0;
@@ -324,6 +332,8 @@ public class DefaultStock extends AbstractStock {
 	 * Sets the 200 day average field.
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
+	 * @throws NumberFormatException if the raw text value wasn't properly
+	 * parsed and is not a number value.
 	 */
 	private void setTwoHundredDayAvg(String rawText){
 		double value = Double.parseDouble(rawText);
@@ -337,6 +347,8 @@ public class DefaultStock extends AbstractStock {
 	 * Sets the change from 200 day average field.
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
+	 * @throws NumberFormatException if the raw text value wasn't properly
+	 * parsed and is not a number value.
 	 */
 	private void setChange200DayAvg(String rawText){
 		double value = Double.parseDouble(rawText);
@@ -350,6 +362,8 @@ public class DefaultStock extends AbstractStock {
 	 * Sets the change from 200 day average in percent field.
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
+	 * @throws NumberFormatException if the raw text value wasn't properly
+	 * parsed and is not a number value.
 	 */
 	private void setChange200DayAvgPercent(String rawText){
 		double value = Double.parseDouble(rawText);
@@ -363,6 +377,8 @@ public class DefaultStock extends AbstractStock {
 	 * Sets the year high field.
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
+	 * @throws NumberFormatException if the raw text value wasn't properly
+	 * parsed and is not a number value.
 	 */
 	private void setYearHigh(String rawText){
 		double value = Double.parseDouble(rawText);
@@ -376,6 +392,8 @@ public class DefaultStock extends AbstractStock {
 	 * Sets the change from year high field.
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
+	 * @throws NumberFormatException if the raw text value wasn't properly
+	 * parsed and is not a number value.
 	 */
 	private void setChangeYearHigh(String rawText){
 		double value = Double.parseDouble(rawText);
@@ -389,6 +407,8 @@ public class DefaultStock extends AbstractStock {
 	 * Sets the change from year high in percent field.
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
+	 * @throws NumberFormatException if the raw text value wasn't properly
+	 * parsed and is not a number value.
 	 */
 	private void setChangeYearHighPercent(String rawText){
 		double value = Double.parseDouble(rawText);
@@ -402,6 +422,8 @@ public class DefaultStock extends AbstractStock {
 	 * Sets the year low field.
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
+	 * @throws NumberFormatException if the raw text value wasn't properly
+	 * parsed and is not a number value.
 	 */
 	private void setYearLow(String rawText){
 		double value = Double.parseDouble(rawText);
@@ -415,6 +437,8 @@ public class DefaultStock extends AbstractStock {
 	 * Sets the change from year low field.
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
+	 * @throws NumberFormatException if the raw text value wasn't properly
+	 * parsed and is not a number value.
 	 */
 	private void setChangeYearLow(String rawText){
 		double value = Double.parseDouble(rawText);
@@ -428,6 +452,8 @@ public class DefaultStock extends AbstractStock {
 	 * Sets the change from year low in percent field.
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
+	 * @throws NumberFormatException if the raw text value wasn't properly
+	 * parsed and is not a number value.
 	 */
 	private void setChangeYearLowPercent(String rawText){
 		double value = Double.parseDouble(rawText);
@@ -441,6 +467,8 @@ public class DefaultStock extends AbstractStock {
 	 * Sets the current price field.
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
+	 * @throws NumberFormatException if the raw text value wasn't properly
+	 * parsed and is not a number value.
 	 */
 	private void setCurrentPrice(String rawText){
 		double value = Double.parseDouble(rawText);
@@ -454,6 +482,8 @@ public class DefaultStock extends AbstractStock {
 	 * Sets the last trade date field.
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
+	 * @throws NumberFormatException if the raw text value wasn't properly
+	 * parsed and is not a number value.
 	 */
 	private void setLastTradeDate(String rawText){
 		String[] dateArr = rawText.split("/");
@@ -470,6 +500,8 @@ public class DefaultStock extends AbstractStock {
 	 * Sets the last trade time field.
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
+	 * @throws NumberFormatException if the raw text value wasn't properly
+	 * parsed and is not a number value.
 	 */
 	private void setLastTradeTime(String rawText){
 		int hours = 12, minutes = 0;

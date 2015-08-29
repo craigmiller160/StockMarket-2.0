@@ -92,10 +92,6 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 	 */
 	public PortfolioModel() {
 		super();
-		//TODO for the moment, this is no longer a synchronized list. If I stick with that,
-		//documentation will need to change.
-		//TODO the DAO will need to be changed if this sticks, no need to synchronize and copy 
-		//the list now. Probably still the need to copy though.
 		stockList = new ArrayList<>();
 	}
 	
@@ -257,5 +253,10 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 	public synchronized BigDecimal getCashBalance(){
 		return cashBalance;
 	}
+	
+	//TODO the handling of the stock list needs to be improved for thread-safety purposes.
+		//The stock history list has the same issue. Need to figure out the most thread-safe
+		//way to share handling these lists between threads. They don't need to be accessed
+		//concurrently, but their data needs to be passed between classes safely.
 
 }

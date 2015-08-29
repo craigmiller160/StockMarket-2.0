@@ -31,70 +31,198 @@ import javax.swing.text.Document;
 import javax.swing.text.DocumentFilter;
 import javax.swing.text.PlainDocument;
 
+import net.jcip.annotations.NotThreadSafe;
 import net.miginfocom.swing.MigLayout;
 import stockmarket.stock.Stock;
 import stockmarket.util.Fonts;
 import stockmarket.util.Language;
 
-//TODO document how subclasses must use setShareLimit(int) method to ensure 
-//that a limit is properly set.
-
-//TODO also test what happens when that limit isn't set... just in case...
-
+/**
+ * An extension of the <tt>AbstractDefaultDialog</tt> framework. Most of that class's
+ * methods have been implemented here, with a host of new abstract methods
+ * provided for creating transaction dialogs. Transaction dialogs are used for 
+ * performing an operation on a certain quantity of shares of a stock.
+ * <p>
+ * In order to extend this class, two of the abstract methods from the
+ * base dialog API, <tt>createIcon()</tt> and <tt>createTitleBarText()</tt>, must
+ * be implemented. In additon, there are four more abstract methods must be implemented
+ * to integrate with the transaction-specific design of this class. These methods 
+ * provide both visual elements and key components for executing the type of transaction 
+ * determined by the subclass.
+ * <p>
+ * <tt>limitLabelText()</tt> returns the text for the label describing what is
+ * serving as the limit on the number of shares that can be involved in the 
+ * transaction.
+ * <p>
+ * <tt>limitValueText()</tt> returns the text for the label displaying the value
+ * of that limit. This does NOT need to be the actual raw number of how many shares
+ * can be involved in the transaction, and can be any value that ultimately determines
+ * what that limit is.
+ * <p>
+ * <tt>shareLimit()</tt> returns the exact number of shares that is the limit on
+ * the transaction. This value is used in the actual operation performed by this
+ * dialog.
+ * <p>
+ * <tt>transactionButton()</tt> the button that executes the transaction. Essentially
+ * the "Ok" button of the dialog, but this method allows a more specialized implementation.
+ * <p>
+ * Other features of this class include a bound slider and text field. Both are used to
+ * set the quantity of shares involved in this transaction, and both will dynamically change
+ * to remain synchronized with the other.
+ * <p>
+ * <b>THREAD SAFETY:</b> Swing is NOT thread safe.
+ * 
+ * @author craig
+ * @version 2.0
+ */
+@NotThreadSafe
 public abstract class TransactionDialog extends AbstractDefaultDialog {
 
+	/**
+	 * Shares <tt>Language</tt> module for locale-specific text.
+	 */
 	private static final Language LANGUAGE = Language.getInstance();
 	
-	private static final String DISMISS_ONLY_ACTION = "Dismiss";
+	/**
+	 * The action command for canceling the transaction and closing the dialog.
+	 */
+	private static final String CANCEL_ACTION = "Cancel";
 	
-	//TODO should this be here, or in the controller?
+	/**
+	 * Placeholder action command for the shared <tt>transactionAction</tt>.
+	 * The actual command is replaced by the action command from the 
+	 * transaction button provided by the subclass.
+	 */
 	private static final String TRANSACTION_ACTION = "TransactionAction";
 	
+	/**
+	 * The title label for the dialog.
+	 */
 	private JLabel dialogTitleLabel;
+	
+	/**
+	 * The label describing the limit for the dialog.
+	 */
 	private JLabel limitLabel;
+	
+	/**
+	 * The label displaying the limit's value for the dialog.
+	 */
 	private JLabel limitValue;
+	
+	/**
+	 * The label for the current share price.
+	 */
 	private JLabel sharePriceLabel;
+	
+	/**
+	 * The value for the current share price.
+	 */
 	private JLabel sharePriceValue;
 	
+	/**
+	 * The label for the slider.
+	 */
 	private JLabel sliderLabel;
+	
+	/**
+	 * The slider to select a quantity of shares.
+	 */
 	private JSlider quantitySlider;
 	
+	/**
+	 * The text field to select a quantity of shares.
+	 */
 	private JTextField quantityField;
+	
+	/**
+	 * The text field to display the value of the selected shares.
+	 */
 	private JTextField valueField;
+	
+	/**
+	 * The label for the quantity field.
+	 */
 	private JLabel quantityFieldLabel;
+	
+	/**
+	 * The label for the value field.
+	 */
 	private JLabel valueFieldLabel;
 	
+	/**
+	 * The transaction button.
+	 */
 	private JButton transactionButton;
+	
+	/**
+	 * The cancel button.
+	 */
 	private JButton cancelButton;
 	
+	/**
+	 * The maximum limit on the number of shares allowed in this transaction.
+	 */
 	private int shareLimit;
 	
+	/**
+	 * The quantity of shares selected for the transaction.
+	 */
 	private int quantity;
 	
-	private NumberFormat moneyFormat = new DecimalFormat("$###,###,###,##0.00");
+	/**
+	 * The format for displaying an amount of money.
+	 */
+	private final NumberFormat moneyFormat = new DecimalFormat("$###,###,###,##0.00");
 	
+	/**
+	 * The logger for the program.
+	 */
 	private static final Logger LOGGER = Logger.getLogger("stockmarket.gui.dialog.TransactionDialog");
 	
-	//TODO document how this field is available for subclass access
+	/**
+	 * The stock this transaction involves. The field is protected so that 
+	 * it is available for subclasses to access.
+	 */
 	protected Stock stock;
 	
+	/**
+	 * The <tt>Action</tt> for executing a transaction.
+	 */
 	private DialogAction transactionAction;
 	
+	/**
+	 * Create a new, non-modal dialog with no owner.
+	 */
 	public TransactionDialog() {
 		super();
 		init();
 	}
 
+	/**
+	 * Create a new, non-modal dialog with the specified owner.
+	 * 
+	 * @param owner the owner of the dialog.
+	 */
 	public TransactionDialog(Frame owner) {
 		super(owner);
 		init();
 	}
 
+	/**
+	 * Create a new dialog with the specified owner and modality.
+	 * 
+	 * @param owner the owner of the dialog.
+	 * @param modal the modality of the dialog.
+	 */
 	public TransactionDialog(Frame owner, boolean modal) {
 		super(owner, modal);
 		init();
 	}
 
+	/**
+	 * Initialize the values and components of the dialog.
+	 */
 	private void init() {
 		transactionAction = new DialogAction();
 		transactionAction.setActionCommand(TRANSACTION_ACTION);
@@ -138,46 +266,49 @@ public abstract class TransactionDialog extends AbstractDefaultDialog {
 		
 		cancelButton = createButton(LANGUAGE.getString("cancel_button_label"),
 				LANGUAGE.getString("cancel_button_tooltip"), 
-				DISMISS_ONLY_ACTION, Fonts.SMALL_LABEL_FONT);
+				CANCEL_ACTION, Fonts.SMALL_LABEL_FONT);
 		
 		configureInputActionMaps();		
 	}
 	
+	/**
+	 * Configure the input/action maps for the dialog.
+	 */
 	private void configureInputActionMaps(){
-		DialogAction dismissAction = new DialogAction();
-		dismissAction.setActionCommand(DISMISS_ONLY_ACTION);
+		DialogAction cancelAction = new DialogAction();
+		cancelAction.setActionCommand(CANCEL_ACTION);
 		
 		JRootPane root = dialog.getRootPane();
 		root.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), 
-				DISMISS_ONLY_ACTION);
-		root.getActionMap().put(DISMISS_ONLY_ACTION, dismissAction);
+				CANCEL_ACTION);
+		root.getActionMap().put(CANCEL_ACTION, cancelAction);
 		
 		quantitySlider.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), 
-				DISMISS_ONLY_ACTION);
+				CANCEL_ACTION);
 		quantitySlider.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), 
 				TRANSACTION_ACTION);
-		quantitySlider.getActionMap().put(DISMISS_ONLY_ACTION, dismissAction);
+		quantitySlider.getActionMap().put(CANCEL_ACTION, cancelAction);
 		quantitySlider.getActionMap().put(TRANSACTION_ACTION, transactionAction);
 		
 		quantityField.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), 
-				DISMISS_ONLY_ACTION);
+				CANCEL_ACTION);
 		quantityField.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), 
 				TRANSACTION_ACTION);
-		quantityField.getActionMap().put(DISMISS_ONLY_ACTION, dismissAction);
+		quantityField.getActionMap().put(CANCEL_ACTION, cancelAction);
 		quantityField.getActionMap().put(TRANSACTION_ACTION, transactionAction);
 		
 		transactionButton.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), 
-				DISMISS_ONLY_ACTION);
+				CANCEL_ACTION);
 		transactionButton.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), 
 				TRANSACTION_ACTION);
-		transactionButton.getActionMap().put(DISMISS_ONLY_ACTION, dismissAction);
+		transactionButton.getActionMap().put(CANCEL_ACTION, cancelAction);
 		transactionButton.getActionMap().put(TRANSACTION_ACTION, transactionAction);
 		
 		cancelButton.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), 
-				DISMISS_ONLY_ACTION);
+				CANCEL_ACTION);
 		cancelButton.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), 
-				DISMISS_ONLY_ACTION);
-		cancelButton.getActionMap().put(DISMISS_ONLY_ACTION, dismissAction);
+				CANCEL_ACTION);
+		cancelButton.getActionMap().put(CANCEL_ACTION, cancelAction);
 	}
 	
 	/**
@@ -194,7 +325,14 @@ public abstract class TransactionDialog extends AbstractDefaultDialog {
 		sharePriceValue.setText(moneyFormat.format(stock.getCurrentPrice()));
 	}
 	
-	protected void setShareLimit(int shareLimit){
+	/**
+	 * Set the maximum limit on how many shares can be used 
+	 * in a transaction, and configure the slider to display it.
+	 * 
+	 * @param shareLimit the maximum limit on how many shares can
+	 * be used in a transaction.
+	 */
+	private void setShareLimit(int shareLimit){
 		this.shareLimit = shareLimit;
 		quantitySlider.setMaximum(shareLimit);
 		int majorTick = shareLimit / 5;
@@ -202,18 +340,45 @@ public abstract class TransactionDialog extends AbstractDefaultDialog {
 		quantitySlider.setMinorTickSpacing(majorTick / 5);
 	}
 	
+	/**
+	 * Get the limit on the maximum number of shares that 
+	 * can be a part of the transaction.
+	 * 
+	 * @return the share limit.
+	 */
 	public int getShareLimit(){
 		return shareLimit;
 	}
 	
+	/**
+	 * Get the current price of shares of the stock
+	 * involved in the transaction.
+	 * 
+	 * @return the current share price.
+	 */
 	public BigDecimal getCurrentPrice(){
 		return stock.getCurrentPrice();
 	}
 	
+	/**
+	 * Get the quantity of shares currently selected by 
+	 * this dialog.
+	 * 
+	 * @return the quantity of shares selected.
+	 */
 	public int getQuantity(){
 		return quantity;
 	}
 	
+	/**
+	 * A utility class for creating buttons.
+	 * 
+	 * @param text the button's text.
+	 * @param toolTipText the button's tooltip text.
+	 * @param actionCommand the button's action command.
+	 * @param font the button's font.
+	 * @return the created button.
+	 */
 	private JButton createButton(String text, String toolTipText, 
 			String actionCommand, Font font){
 		DialogAction action = new DialogAction();
@@ -224,6 +389,14 @@ public abstract class TransactionDialog extends AbstractDefaultDialog {
 		return createButton(action, font);
 	}
 	
+	/**
+	 * A utility class for creating buttons, with an <tt>Action</tt>
+	 * parameter.
+	 * 
+	 * @param action the action to wrap this button around.
+	 * @param font the button's font.
+	 * @return the created button.
+	 */
 	private JButton createButton(Action action, Font font){
 		JButton button = new JButton(action);
 		button.setFont(font);
@@ -231,6 +404,13 @@ public abstract class TransactionDialog extends AbstractDefaultDialog {
 		return button;
 	}
 	
+	/**
+	 * A utility class to create a slider.
+	 * 
+	 * @param max the maximum position of the slider.
+	 * @param toolTipText the tooltip text for the slider.
+	 * @return the created slider.
+	 */
 	private JSlider createSlider(int max, String toolTipText){
 		JSlider slider = new JSlider(JSlider.HORIZONTAL, 0, max, 0);
 		slider.setPaintTicks(true);
@@ -241,23 +421,63 @@ public abstract class TransactionDialog extends AbstractDefaultDialog {
 		return slider;
 	}
 	
+	/**
+	 * Set the position of the slider.
+	 * 
+	 * @param position the position to set the slider to.
+	 */
 	private void setSliderPosition(int position){
 		quantitySlider.setValue(position);
 		quantity = position;
 	}
 	
-	//TODO this could throw NumberFormatException, but won't because the filter prevents
-	//non numeric text from being in this field
+	/**
+	 * Set the current position of the slider as the value
+	 * of the quantity field.
+	 * 
+	 * @param position the position of the slider.
+	 */
 	private void setQuantityPositionToField(int position){
+		//This could throw a NumberFormatException, but won't
+		//because the filter prevents non-numeric text from 
+		//being put into the field.
 		quantityField.setText("" + position);
 		quantity = position;
 	}
 	
+	/**
+	 * Returns true if the quantity field currently has 
+	 * focus. Used for the document and change listeners
+	 * for the quantity field and slider respectively.
+	 * Checking this value prevents an endless loop, where one
+	 * changes the other, which changes the other, etc.
+	 * 
+	 * @return true if the quantity field has focus.
+	 */
+	private boolean quantityFieldHasFocus(){
+		return quantityField.hasFocus();
+	}
+	
+	/**
+	 * Set the value field by multiplying the current share
+	 * price by the currently selected quantity.
+	 * 
+	 * @param quantity the currently selected quantity.
+	 */
 	private void setValueField(int quantity){
 		BigDecimal value = stock.getCurrentPrice().multiply(new BigDecimal(quantity));
 		valueField.setText(moneyFormat.format(value));
 	}
 	
+	/**
+	 * Utility method for creating text fields.
+	 * 
+	 * @param text the text for the text field.
+	 * @param length the length of the text field.
+	 * @param font the font of the text field.
+	 * @param toolTipText the tool tip text of the text field.
+	 * @return the created text field.
+	 */
 	private JTextField createTextField(String text, int length, Font font, String toolTipText){
 		JTextField field = new JTextField(text, length);
 		field.setFont(font);
@@ -265,6 +485,13 @@ public abstract class TransactionDialog extends AbstractDefaultDialog {
 		return field;
 	}
 	
+	/**
+	 * Utility method for creating labels.
+	 * 
+	 * @param text the text of the label.
+	 * @param font the font of the label.
+	 * @return the created label.
+	 */
 	private JLabel createLabel(String text, Font font){
 		JLabel label = new JLabel(text);
 		label.setFont(font);
@@ -322,6 +549,7 @@ public abstract class TransactionDialog extends AbstractDefaultDialog {
 	protected void assembleDialog(){
 		limitLabel.setText(limitLabelText());
 		limitValue.setText(limitValueText());
+		setShareLimit(shareLimit());
 		super.assembleDialog();
 	}
 	
@@ -348,6 +576,16 @@ public abstract class TransactionDialog extends AbstractDefaultDialog {
 	protected abstract String limitValueText();
 	
 	/**
+	 * This method should return an integer value that is
+	 * the limit on the maximum amount of shares that can
+	 * be used in a transaction by this dialog.
+	 * 
+	 * @return the maximum number of shares that can be used in
+	 * a transaction by this dialog.
+	 */
+	protected abstract int shareLimit();
+	
+	/**
 	 * This method should return the button to execute the
 	 * transaction. This is the equivalent of "ok" or "execute",
 	 * but labeled based on the type of transaction.
@@ -356,7 +594,14 @@ public abstract class TransactionDialog extends AbstractDefaultDialog {
 	 */
 	protected abstract JButton createTransactionButton();
 	
-	
+	/**
+	 * A listener for the slider of this dialog. It tracks the 
+	 * changes to the slider's position, and sets the quantity field
+	 * to the currently set value.
+	 * 
+	 * @author craig
+	 * @version 2.0
+	 */
 	private class QuantitySliderListener implements ChangeListener{
 
 		@Override
@@ -364,7 +609,7 @@ public abstract class TransactionDialog extends AbstractDefaultDialog {
 			if(event.getSource() instanceof JSlider){
 				JSlider slider = (JSlider) event.getSource();
 				int position = slider.getValue();
-				if(!quantityField.hasFocus()){
+				if(!quantityFieldHasFocus()){
 					setQuantityPositionToField(position);
 					setValueField(position);
 				}
@@ -373,6 +618,13 @@ public abstract class TransactionDialog extends AbstractDefaultDialog {
 		
 	}
 	
+	/**
+	 * A document listener for the quantity field, that passes any
+	 * changes in the field along to the slider, and changes its position.
+	 * 
+	 * @author craig
+	 * @version 2.0
+	 */
 	private class QuantityFieldListener implements DocumentListener{
 
 		@Override
@@ -390,7 +642,7 @@ public abstract class TransactionDialog extends AbstractDefaultDialog {
 			updateSlider(event);
 		}
 		
-		//TODO this can throw NumberFormatException, but shouldn't because
+		//This can throw NumberFormatException, but shouldn't because
 		//The filter won't allow non-numerical text in the field.
 		private void updateSlider(DocumentEvent event){
 			try{
@@ -404,8 +656,7 @@ public abstract class TransactionDialog extends AbstractDefaultDialog {
 					position = Integer.parseInt(text);
 				}
 				
-				//TODO unsafe reference to quantityField
-				if(quantityField.hasFocus()){
+				if(quantityFieldHasFocus()){
 					setSliderPosition(position);
 					setValueField(position);
 				}
@@ -655,7 +906,7 @@ public abstract class TransactionDialog extends AbstractDefaultDialog {
 		
 		@Override
 		public void actionPerformed(ActionEvent event) {
-			if(event.getActionCommand() != DISMISS_ONLY_ACTION){
+			if(event.getActionCommand() != CANCEL_ACTION){
 				TransactionDialog.this.actionPerformed(event);
 			}
 			

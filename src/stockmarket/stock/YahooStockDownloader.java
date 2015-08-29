@@ -342,8 +342,6 @@ public final class YahooStockDownloader implements StockDownloader {
 			historyList = parseHistoryCSV(csvFile.toString(), symbol);
 		}
 		
-		//TODO document how the list is not thread safe. It can't be made that way,
-		//it needs to be usable with the reflection method.
 		return historyList;
 	}
 	

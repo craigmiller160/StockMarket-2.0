@@ -81,9 +81,6 @@ public class StockDisplayPanel extends AbstractListenerView {
 	 */
 	private JLabel historyTabLabel;
 	
-	//TODO consider expanding the display switch panel to include the
-	//buy sell panel
-	
 	/**
 	 * Panel that displays or hides the tabbed pane with stock information.
 	 */
@@ -97,7 +94,7 @@ public class StockDisplayPanel extends AbstractListenerView {
 	/**
 	 * The panel to be shown when the tabbed pane is hidden.
 	 */
-	private JPanel nothingSelectedPanel; //TODO add some sort of decoration to this panel
+	private JPanel nothingSelectedPanel; //TODO in the end, add some sort of decoration to this panel
 	
 	/**
 	 * Shared <tt>Language</tt> module for locale-specific text.

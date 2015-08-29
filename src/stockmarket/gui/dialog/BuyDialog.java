@@ -11,72 +11,104 @@ import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.SwingUtilities;
 
-import stockmarket.stock.DefaultStock;
-import stockmarket.stock.YahooStockDownloader;
+import net.jcip.annotations.NotThreadSafe;
 import stockmarket.util.Fonts;
 import stockmarket.util.Language;
 
+/**
+ * A dialog for the buy stock transaction. The maximum limit on shares
+ * that can be purchased is the cash balance available to be spent on
+ * stocks. The amount of shares selected by this dialog will be 
+ * "bought" and added to the user's portfolio.
+ * <p>
+ * <b>THREAD SAFETY:</b> Swing is NOT thread safe.
+ * 
+ * @author craig
+ * @version 2.0
+ */
+@NotThreadSafe
 public class BuyDialog extends TransactionDialog {
 
-	//TODO delete this method after testing is done
-	public static void main(String[] args) throws Exception{
-		YahooStockDownloader downloader = new YahooStockDownloader();
-		
-		final DefaultStock stock = new DefaultStock("AAPL");
-		stock.setStockDetails(downloader, false);
-		
-		SwingUtilities.invokeLater(new Runnable(){
-
-			@Override
-			public void run() {
-				
-				
-				BigDecimal cashBalance = new BigDecimal(5000);
-				BuyDialog dialog = new BuyDialog();
-				dialog.setStock(stock);
-				dialog.setCashBalance(cashBalance);
-				
-				dialog.showDialog();
-			}
-			
-		});
-	}
-	
+	/**
+	 * Shares langauge module for locale-specific text.
+	 */
 	private static final Language LANGUAGE = Language.getInstance();
 	
+	/**
+	 * The logger for this program.
+	 */
 	private static final Logger LOGGER = Logger.getLogger("stockmarket.gui.dialog.BuyDialog");
 
+	/**
+	 * Format for displaying money values.
+	 */
 	private NumberFormat moneyFormat = new DecimalFormat("$###,###,###,##0.00");
 	
+	/**
+	 * The cash balance available to spend on shares of this stock.
+	 */
 	private BigDecimal cashBalance;
 	
+	/**
+	 * The maximum limit on how many shares can be bought.
+	 */
+	private int shareLimit;
+	
+	/**
+	 * Create a new non-modal buy dialog, with no owner.
+	 */
 	public BuyDialog() {
 		super();
 		init();
 	}
 
+	/**
+	 * Create a new non-modal buy dialog with the specified container
+	 * as its owner.
+	 * 
+	 * @param owner the owner of the dialog.
+	 */
 	public BuyDialog(Frame owner) {
 		super(owner);
 		init();
 	}
 
+	/**
+	 * Create a new buy dialog with the specified container as
+	 * its owner, and its modality specified.
+	 * 
+	 * @param owner the owner of the dialog.
+	 * @param modal the modality of the dialog.
+	 */
 	public BuyDialog(Frame owner, boolean modal) {
 		super(owner, modal);
 		init();
 	}
 	
+	/**
+	 * Initialize values for this dialog.
+	 */
 	private void init(){
 		cashBalance = new BigDecimal(50);
 	}
 	
+	/**
+	 * Set the cash balance available to spend on stocks.
+	 * 
+	 * @param cashBalance the cash balance.
+	 */
 	public void setCashBalance(BigDecimal cashBalance){
 		this.cashBalance = cashBalance;
-		setShareLimit(cashBalance.divide(
-				getCurrentPrice(), BigDecimal.ROUND_DOWN).intValue());
+		shareLimit = cashBalance.divide(
+				getCurrentPrice(), BigDecimal.ROUND_DOWN).intValue();
 	}
 	
+	/**
+	 * Get the cash balance available to spend on stocks.
+	 * 
+	 * @return the cash balance.
+	 */
 	public BigDecimal getCashBalance(){
 		return cashBalance;
 	}
@@ -138,6 +170,11 @@ public class BuyDialog extends TransactionDialog {
 	@Override
 	protected String createTitleBarText() {
 		return LANGUAGE.getString("buy_button_label");
+	}
+
+	@Override
+	protected int shareLimit() {
+		return shareLimit;
 	}
 
 }
