@@ -1,11 +1,12 @@
 package stockmarket.model;
 
-import static stockmarket.controller.StockMarketController.COMPONENTS_ENABLED_PROPERTY;
+import static stockmarket.controller.StockMarketController.PORTFOLIO_STATE_PROPERTY;
 import static stockmarket.controller.StockMarketController.DIALOG_DISPLAYED_PROPERTY;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import stockmarket.gui.PortfolioState;
 import mvp.core.AbstractPropertyModel;
 import net.jcip.annotations.GuardedBy;
 import net.jcip.annotations.ThreadSafe;
@@ -32,7 +33,7 @@ public class GUIStateModel extends AbstractPropertyModel {
 	 * The components enabled in the GUI.
 	 */
 	@GuardedBy("this")
-	private Integer componentsEnabled;
+	private PortfolioState portfolioState;
 	
 	/**
 	 * The configuration info for the dialog that should be displayed at this time.
@@ -47,32 +48,31 @@ public class GUIStateModel extends AbstractPropertyModel {
 
 	/**
 	 * Creates a new instance of this bound property model. Sets
-	 * the GUI state to NO_PORTFOLIO_OPEN by default.
+	 * the portfolio state to CLOSED by default.
 	 */
 	public GUIStateModel() {
 		super();
-		this.componentsEnabled = 1;
+		portfolioState = PortfolioState.CLOSED;
 	}
 	
 	/**
-	 * Sets the components that are enabled in the GUI, based on what state the program 
-	 * is currently in.
+	 * Sets the current state of the portfolio, which determines which
+	 * components should be enabled/disabled, shown/hidden, etc.
 	 * 
-	 * @param componentsEnabled the state all components should be in, affects whether
-	 * they are enabled/disabled.
+	 * @param portfolioState the state of the portfolio.
 	 */
-	public void setComponentsEnabled(Integer componentsEnabled){
+	public void setPortfolioState(PortfolioState portfolioState){
 		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"setComponentsEnabled", "Entering method", 
-				new Object[] {"Enable State: " + componentsEnabled});
+				"setPortfolioState", "Entering method", 
+				new Object[] {"Portfolio State: " + portfolioState});
 		
 		//No old value here, needs to be null so that even if the setting isn't actually
 		//being changed, it still registers so, in certain cases, the stock list gets cleared
 		synchronized(this){
-			this.componentsEnabled = componentsEnabled;
+			this.portfolioState = portfolioState;
 		}
 		
-		firePropertyChange(COMPONENTS_ENABLED_PROPERTY, null, componentsEnabled);
+		firePropertyChange(PORTFOLIO_STATE_PROPERTY, null, portfolioState);
 	}
 	
 	/**
@@ -80,8 +80,8 @@ public class GUIStateModel extends AbstractPropertyModel {
 	 * 
 	 * @return the state of which components are enabled/disabled.
 	 */
-	public synchronized Integer getComponentsEnabled(){
-		return componentsEnabled;
+	public synchronized PortfolioState getPortfolioState(){
+		return portfolioState;
 	}
 	
 	/**

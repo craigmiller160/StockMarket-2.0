@@ -120,6 +120,7 @@ public class Main {
 					+ "Please contact the developer at <u>craigmiller160@gmail.com";
 			
 			displayExceptionDialog("Critical Error!", errorText);
+			System.exit(1);
 		}
 		
 		//Configure the program's logger

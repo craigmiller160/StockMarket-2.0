@@ -1,11 +1,7 @@
 package stockmarket.gui;
 
 import static stockmarket.controller.StockMarketController.BUY_STOCK_PREP_ACTION;
-import static stockmarket.controller.StockMarketController.COMPONENTS_ENABLED_PROPERTY;
-import static stockmarket.controller.StockMarketController.ENABLE_LOOKUP_STOCK_LOADED;
-import static stockmarket.controller.StockMarketController.ENABLE_NO_PORTFOLIO_OPEN;
-import static stockmarket.controller.StockMarketController.ENABLE_NO_STOCK_LOADED;
-import static stockmarket.controller.StockMarketController.ENABLE_OWNED_STOCK_LOADED;
+import static stockmarket.controller.StockMarketController.PORTFOLIO_STATE_PROPERTY;
 import static stockmarket.controller.StockMarketController.SELL_STOCK_PREP_ACTION;
 
 import java.beans.PropertyChangeEvent;
@@ -146,39 +142,39 @@ public class BuySellPanel extends AbstractListenerView {
 	 */
 	@Override
 	public void changeProperty(PropertyChangeEvent event) {
-		if(event.getPropertyName() == COMPONENTS_ENABLED_PROPERTY){
+		if(event.getPropertyName() == PORTFOLIO_STATE_PROPERTY){
 			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
 					"changeProperty", "Changing Property", 
 					new Object[]{"Property: " + event.getPropertyName()});
 			
-			changeComponentsEnabled((Integer) event.getNewValue());
+			portfolioStateChanged((PortfolioState) event.getNewValue());
 		}
 	}
 	
 	/**
-	 * Change which components are enabled in this class.
+	 * Respond to a change in the portfolio state by changing which
+	 * components are enabled/disabled, shown/hidden, etc.
 	 * 
-	 * @param componentsEnabledState the state of the program to enable
-	 * components for.
+	 * @param portfolioState the state of the portfolio.
 	 */
-	public void changeComponentsEnabled(Integer componentsEnabledState){
+	public void portfolioStateChanged(PortfolioState portfolioState){
 		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"changeComponentsEnabled", "Entering method", 
-				new Object[] {"Enable State: " + componentsEnabledState});
+				"portfolioStateChanged", "Entering method", 
+				new Object[] {"Portfolio State: " + portfolioState});
 		
-		if(componentsEnabledState == ENABLE_NO_PORTFOLIO_OPEN){
+		if(portfolioState == PortfolioState.CLOSED){
 			buyButton.setEnabled(false);
 			sellButton.setEnabled(false);
 		}
-		else if(componentsEnabledState == ENABLE_NO_STOCK_LOADED){
+		else if(portfolioState == PortfolioState.OPEN_NO_STOCK){
 			buyButton.setEnabled(false);
 			sellButton.setEnabled(false);
 		}
-		else if(componentsEnabledState == ENABLE_LOOKUP_STOCK_LOADED){
+		else if(portfolioState == PortfolioState.OPEN_STOCK){
 			buyButton.setEnabled(true);
 			sellButton.setEnabled(false);
 		}
-		else if(componentsEnabledState == ENABLE_OWNED_STOCK_LOADED){
+		else if(portfolioState == PortfolioState.OPEN_OWNED_STOCK){
 			buyButton.setEnabled(true);
 			sellButton.setEnabled(true);
 		}

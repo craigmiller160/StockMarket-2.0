@@ -21,6 +21,7 @@ import javax.swing.SwingUtilities;
 import mvp.concurrent.AbstractConcurrentListenerController;
 import mvp.core.AbstractPropertyModel;
 import mvp.listener.ListenerDialog;
+import stockmarket.gui.PortfolioState;
 import stockmarket.gui.dialog.DialogFactory;
 import stockmarket.model.PortfolioModel;
 import stockmarket.stock.DefaultStock;
@@ -59,7 +60,7 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 	
 	public static final String SELECTED_STOCK_HISTORY_PROPERTY = "SelectedStockHistory";
 	
-	public static final String COMPONENTS_ENABLED_PROPERTY = "ComponentsEnabled";
+	public static final String PORTFOLIO_STATE_PROPERTY = "PortfolioState";
 	
 	public static final String DIALOG_DISPLAYED_PROPERTY = "DialogDisplayed";
 	
@@ -114,13 +115,13 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 	 * Components Enabled value. Enable components for when the program is running, 
 	 * but no portfolio is currently open.
 	 */
-	public static final Integer ENABLE_NO_PORTFOLIO_OPEN = 1;
+	//public static final Integer ENABLE_NO_PORTFOLIO_OPEN = 1; //TODO remove
 	
 	/**
 	 * Components Enabled value. Enable components for when portfolio is open, but 
 	 * no stock has been loaded into the main display.
 	 */
-	public static final Integer ENABLE_NO_STOCK_LOADED = 2;
+	//public static final Integer ENABLE_NO_STOCK_LOADED = 2; //TODO remove
 	
 	/**
 	 * Components Enabled value. Enable components for when portfolio is open and a 
@@ -128,24 +129,24 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 	 * A "lookup" stock is one whose values are being viewed, but no shares of
 	 * it are currently owned in the portfolio.
 	 */
-	public static final Integer ENABLE_LOOKUP_STOCK_LOADED = 3;
+	//public static final Integer ENABLE_LOOKUP_STOCK_LOADED = 3; //TODO remove
 	
 	/**
 	 * Components Enabled value. Enable components for when portfolio is open and an 
 	 * "owned" stock is loaded into the main display.
 	 * An "owned" stock has at least one share owned in the portfolio.
 	 */
-	public static final Integer ENABLE_OWNED_STOCK_LOADED = 4;
+	//public static final Integer ENABLE_OWNED_STOCK_LOADED = 4; //TODO remove
 	
 	/**
 	 * Components Enabled value. Enable components for when portfolio is open and 
 	 * currently being refreshed.
 	 */
-	public static final int ENABLE_REFRESH_PORTFOLIO = 5;
+	//public static final int ENABLE_REFRESH_PORTFOLIO = 5; //TODO remove
 	
-	public static final Integer PORTFOLIO_NAME_DIALOG = 6;
+	public static final Integer PORTFOLIO_NAME_DIALOG = 6; //TODO remove
 	
-	public static final Integer OPEN_PORTFOLIO_DIALOG = 7;
+	public static final Integer OPEN_PORTFOLIO_DIALOG = 7; //TODO remove
 	
 	private static final Logger LOGGER = Logger.getLogger(
 			"stockmarket.controller.StockMarketController");
@@ -338,7 +339,7 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 			Stock downloadedStock = downloadStock.get();
 			List<HistoricalQuote> historyList = downloadHistory.get();
 			
-			setModelProperty(COMPONENTS_ENABLED_PROPERTY, ENABLE_LOOKUP_STOCK_LOADED);
+			setModelProperty(PORTFOLIO_STATE_PROPERTY, PortfolioState.OPEN_STOCK);
 			setModelProperty(SELECTED_STOCK_PROPERTY, downloadedStock);
 			setModelProperty(SELECTED_STOCK_HISTORY_PROPERTY, historyList);
 			
@@ -464,7 +465,7 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 		
 		try {
 			//Enable GUI components
-			setModelProperty(COMPONENTS_ENABLED_PROPERTY, ENABLE_NO_STOCK_LOADED);
+			setModelProperty(PORTFOLIO_STATE_PROPERTY, PortfolioState.OPEN_NO_STOCK);
 			
 			//Load portfolio model from the DAO
 			PortfolioModel portfolioModel = portfolioDAO.getPortfolio(
@@ -614,7 +615,7 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 				"newPortfolio", "Entering method");
 		try{
 			//Enable GUI components
-			setModelProperty(COMPONENTS_ENABLED_PROPERTY, ENABLE_NO_STOCK_LOADED);
+			setModelProperty(PORTFOLIO_STATE_PROPERTY, PortfolioState.OPEN_NO_STOCK);
 			
 			PortfolioModel portfolioModel = portfolioDAO.createNewPortfolio(
 					LANGUAGE.getString("new_portfolio_name"), 

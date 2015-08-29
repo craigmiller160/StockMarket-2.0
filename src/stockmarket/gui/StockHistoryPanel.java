@@ -1,12 +1,6 @@
 package stockmarket.gui;
 
-import static stockmarket.controller.StockMarketController.ENABLE_LOOKUP_STOCK_LOADED;
-import static stockmarket.controller.StockMarketController.ENABLE_NO_PORTFOLIO_OPEN;
-import static stockmarket.controller.StockMarketController.ENABLE_NO_STOCK_LOADED;
-import static stockmarket.controller.StockMarketController.ENABLE_OWNED_STOCK_LOADED;
-import static stockmarket.controller.StockMarketController.INITIAL_HISTORY_LENGTH_MONTHS;
-import static stockmarket.controller.StockMarketController.SELECTED_STOCK_HISTORY_PROPERTY;
-import static stockmarket.controller.StockMarketController.STOCK_HISTORY_INTERVAL_ACTION;
+import static stockmarket.controller.StockMarketController.*;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -294,26 +288,36 @@ public class StockHistoryPanel extends AbstractListenerView {
 			
 			setStockHistory((List<HistoricalQuote>) event.getNewValue());
 		}
+		else if(event.getPropertyName() == PORTFOLIO_STATE_PROPERTY){
+			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
+					"changeProperty", "Changing Property", 
+					new Object[]{"Property: " + event.getPropertyName()});
+			
+			portfolioStateChanged((PortfolioState) event.getNewValue());
+		}
 	}
 	
 	/**
-	 * Change what components are enabled based on changes to the 
-	 * overall program state.
+	 * Respond to a change in the portfolio state by changing which
+	 * components are enabled/disabled, shown/hidden, etc.
 	 * 
-	 * @param componentsEnabled the state to base which components 
-	 * are enabled on.
+	 * @param portfolioState the state of the portfolio.
 	 */
-	public void changeComponentsEnabled(Integer componentsEnabled){
-		if(componentsEnabled == ENABLE_NO_PORTFOLIO_OPEN){
+	public void portfolioStateChanged(PortfolioState portfolioState){
+		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
+				"portfolioStateChanged", "Entering method", 
+				new Object[] {"Portfolio State: " + portfolioState});
+		
+		if(portfolioState == PortfolioState.CLOSED){
 			
 		}
-		else if(componentsEnabled == ENABLE_NO_STOCK_LOADED){
+		else if(portfolioState == PortfolioState.OPEN_NO_STOCK){
 			
 		}
-		else if(componentsEnabled == ENABLE_LOOKUP_STOCK_LOADED){
+		else if(portfolioState == PortfolioState.OPEN_STOCK){
 			
 		}
-		else if(componentsEnabled == ENABLE_OWNED_STOCK_LOADED){
+		else if(portfolioState == PortfolioState.OPEN_OWNED_STOCK){
 			
 		}
 	}
