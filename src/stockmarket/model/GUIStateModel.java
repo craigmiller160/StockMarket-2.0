@@ -7,6 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import stockmarket.gui.PortfolioState;
+import stockmarket.gui.dialog.Dialog;
 import mvp.core.AbstractPropertyModel;
 import net.jcip.annotations.GuardedBy;
 import net.jcip.annotations.ThreadSafe;
@@ -90,17 +91,17 @@ public class GUIStateModel extends AbstractPropertyModel {
 	 * Configuration information for the dialog is passed along as part of
 	 * the parameter array.
 	 * 
-	 * @param dialogCode the code for which dialog to display.
+	 * @param dialog the constant name for the dialog to display.
 	 * @param dialogConfig optional configuration information for displaying
 	 * the dialog.
 	 */
-	public void setDialogDisplayed(Integer dialogCode, Object... dialogConfig){
+	public void setDialogDisplayed(Dialog dialog, Object... dialogConfig){
 		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
 				"setDialogDisplayed", "Entering method", 
-				new Object[] {"Dialog Code" + dialogConfig[0], dialogConfig.toString()});
+				new Object[] {"Dialog: " + dialog, dialogConfig.toString()});
 		
 		Object[] fullConfig = new Object[dialogConfig.length + 1];
-		fullConfig[0] = dialogCode;
+		fullConfig[0] = dialog;
 		for(int i = 0; i < dialogConfig.length; i++){
 			fullConfig[i + 1] = dialogConfig[i];
 		}

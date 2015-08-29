@@ -1,8 +1,6 @@
 package stockmarket.gui;
 
 import static stockmarket.controller.StockMarketController.DIALOG_DISPLAYED_PROPERTY;
-import static stockmarket.controller.StockMarketController.OPEN_PORTFOLIO_DIALOG;
-import static stockmarket.controller.StockMarketController.PORTFOLIO_NAME_DIALOG;
 
 import java.beans.PropertyChangeEvent;
 import java.util.List;
@@ -21,6 +19,7 @@ import mvp.listener.AbstractListenerView;
 import mvp.listener.ListenerDialog;
 import net.jcip.annotations.NotThreadSafe;
 import net.miginfocom.swing.MigLayout;
+import stockmarket.gui.dialog.Dialog;
 import stockmarket.gui.dialog.DialogFactory;
 import stockmarket.util.Language;
 
@@ -255,13 +254,13 @@ public class Frame extends AbstractListenerView {
 	public void displayDialog(Object[] dialogConfig){
 		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
 				"displayDialog", "Entering method", 
-				new Object[]{"Dialog Code: " + dialogConfig[0], "Name: " + dialogConfig[1]});
+				new Object[]{"Dialog: " + dialogConfig.toString()});
 		
 		ListenerDialog dialog = null;
-		if((Integer) dialogConfig[0] == PORTFOLIO_NAME_DIALOG){
+		if((Dialog) dialogConfig[0] == Dialog.PORTFOLIO_NAME_DIALOG){
 			dialog = DialogFactory.createPortfolioNameDialog(frame, (String) dialogConfig[1]);
 		}
-		else if((Integer) dialogConfig[0] == OPEN_PORTFOLIO_DIALOG){
+		else if((Dialog) dialogConfig[0] == Dialog.OPEN_PORTFOLIO_DIALOG){
 			dialog = DialogFactory.createOpenPortfolioDialog(frame, (List<String>) dialogConfig[1]);
 		}
 		

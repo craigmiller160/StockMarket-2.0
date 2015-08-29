@@ -22,6 +22,7 @@ import mvp.concurrent.AbstractConcurrentListenerController;
 import mvp.core.AbstractPropertyModel;
 import mvp.listener.ListenerDialog;
 import stockmarket.gui.PortfolioState;
+import stockmarket.gui.dialog.Dialog;
 import stockmarket.gui.dialog.DialogFactory;
 import stockmarket.model.PortfolioModel;
 import stockmarket.stock.DefaultStock;
@@ -144,9 +145,9 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 	 */
 	//public static final int ENABLE_REFRESH_PORTFOLIO = 5; //TODO remove
 	
-	public static final Integer PORTFOLIO_NAME_DIALOG = 6; //TODO remove
+	//public static final Integer PORTFOLIO_NAME_DIALOG = 6; //TODO remove
 	
-	public static final Integer OPEN_PORTFOLIO_DIALOG = 7; //TODO remove
+	//public static final Integer OPEN_PORTFOLIO_DIALOG = 7; //TODO remove
 	
 	private static final Logger LOGGER = Logger.getLogger(
 			"stockmarket.controller.StockMarketController");
@@ -525,16 +526,19 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 		try {
 			List<String> portfolioNameList = portfolioDAO.getSavedPortfolios();
 			
-			Object[] dialogConfig = new Object[2];
-			dialogConfig[0] = OPEN_PORTFOLIO_DIALOG;
-			dialogConfig[1] = portfolioNameList;
+			//TODO remove these
+			//Object[] dialogConfig = new Object[2];
+			//dialogConfig[0] = OPEN_PORTFOLIO_DIALOG;
+			//dialogConfig[1] = portfolioNameList;
 			
-			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-					"showOpenPortfolioDialog()", "Dialog Config Values: 0: " 
-							+ dialogConfig[0] + " 1: " 
-							+ dialogConfig[1]);
+			//TODO redo this log entry
+			//LOGGER.logp(Level.FINEST, this.getClass().getName(), 
+					//"showOpenPortfolioDialog()", "Dialog Config Values: 0: " 
+							//+ dialogConfig[0] + " 1: " 
+							//+ dialogConfig[1]);
 			
-			setModelProperty(DIALOG_DISPLAYED_PROPERTY, dialogConfig);
+			setModelProperty(DIALOG_DISPLAYED_PROPERTY, 
+					Dialog.OPEN_PORTFOLIO_DIALOG, portfolioNameList);
 			
 			LOGGER.logp(Level.INFO, this.getClass().getName(), 
 					"showOpenPortfolioDialog()", 
@@ -571,23 +575,25 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 				"showPortfolioNameDialog", 
 				"Entering method");
 		
-		String name = null;
+		String name = "";
 		try {
 			Object obj = getModelProperty(PORTFOLIO_NAME_PROPERTY);
-			if(obj instanceof String){
+			if(obj != null && obj instanceof String){
 				name = (String) obj;
 			}
 			
-			Object[] dialogConfig = new Object[2];
-			dialogConfig[0] = PORTFOLIO_NAME_DIALOG;
-			dialogConfig[1] = name != null ? name : "";
+			//TODO remove this code and redo the log entry
+			//Object[] dialogConfig = new Object[2];
+			//dialogConfig[0] = PORTFOLIO_NAME_DIALOG;
+			//dialogConfig[1] = name != null ? name : "";
 			
-			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-					"showPortfolioNameDialog", "Dialog Config Values",
-					new Object[] {"Dialog Code: " + dialogConfig[0], 
-								  "Name: " + dialogConfig[1]});
+			//LOGGER.logp(Level.FINEST, this.getClass().getName(), 
+					//"showPortfolioNameDialog", "Dialog Config Values",
+					//new Object[] {"Dialog Code: " + dialogConfig[0], 
+								 // "Name: " + dialogConfig[1]});
 			
-			setModelProperty(DIALOG_DISPLAYED_PROPERTY, dialogConfig);
+			setModelProperty(DIALOG_DISPLAYED_PROPERTY, 
+					Dialog.PORTFOLIO_NAME_DIALOG, name);
 			
 			LOGGER.logp(Level.INFO, this.getClass().getName(), 
 					"showPortfolioNameDialog", 
