@@ -252,22 +252,49 @@ public class Frame extends AbstractListenerView {
 		}
 	}
 	
-	//TODO for the moment, this method has no value because dialogs
-	//are not being routed through the Frame class. This should ultimately
-	//be changed.
-	//TODO add documentation that this could throw an IllegalArgumentException if the types don't match
-	@SuppressWarnings("unchecked")
+	/**
+	 * Displays a dialog according to the specified parameters.
+	 * 
+	 * @param dialogConfig the dialog configuration parameters.
+	 * @throws IllegalArgumentException if any of the dialog config parameters
+	 * are not the correct types for the specified dialog.
+	 */
+	@SuppressWarnings("unchecked") //Because it can't verify the type parameter on the list due to type erasure
 	public void displayDialog(Object[] dialogConfig){
 		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
 				"displayDialog", "Entering method", 
 				new Object[]{"Dialog: " + dialogConfig.toString()});
 		
 		ListenerDialog dialog = null;
-		if((Dialog) dialogConfig[0] == Dialog.PORTFOLIO_NAME_DIALOG){
-			dialog = DialogFactory.createPortfolioNameDialog(frame, (String) dialogConfig[1]);
+		if(dialogConfig[0] instanceof Dialog){
+			if((Dialog) dialogConfig[0] == Dialog.PORTFOLIO_NAME_DIALOG){
+				String portfolioName = null;
+				if(dialogConfig[1] != null && dialogConfig[1] instanceof String){
+					portfolioName = (String) dialogConfig[1];
+				}
+				else{
+					throw new IllegalArgumentException
+					("Not a valid String: " + dialogConfig[1]);
+				}
+				
+				dialog = DialogFactory.createPortfolioNameDialog(frame, portfolioName);
+			}
+			else if((Dialog) dialogConfig[0] == Dialog.OPEN_PORTFOLIO_DIALOG){
+				List<String> portfolioNameList = null;
+				if(dialogConfig[1] != null && dialogConfig[1] instanceof List<?>){
+					portfolioNameList = (List<String>) dialogConfig[1];
+				}
+				else{
+					throw new IllegalArgumentException
+					("Not a valid name list: " + dialogConfig[1]);
+				}
+				
+				dialog = DialogFactory.createOpenPortfolioDialog(frame, portfolioNameList);
+			}
 		}
-		else if((Dialog) dialogConfig[0] == Dialog.OPEN_PORTFOLIO_DIALOG){
-			dialog = DialogFactory.createOpenPortfolioDialog(frame, (List<String>) dialogConfig[1]);
+		else{
+			throw new IllegalArgumentException(
+					"Not a valid dialog value: " + dialogConfig[0]);
 		}
 		
 		if(dialog != null){
@@ -282,6 +309,8 @@ public class Frame extends AbstractListenerView {
 					"displayDialog", "Failed to display dialog");
 		}
 	}
+	
+	
 
 	@Override
 	public Object getValueForAction(String actionCommand) {

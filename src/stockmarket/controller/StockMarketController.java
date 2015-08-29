@@ -718,17 +718,6 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 		try {
 			List<String> portfolioNameList = portfolioDAO.getSavedPortfolios();
 			
-			//TODO remove these
-			//Object[] dialogConfig = new Object[2];
-			//dialogConfig[0] = OPEN_PORTFOLIO_DIALOG;
-			//dialogConfig[1] = portfolioNameList;
-			
-			//TODO redo this log entry
-			//LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-					//"showOpenPortfolioDialog()", "Dialog Config Values: 0: " 
-							//+ dialogConfig[0] + " 1: " 
-							//+ dialogConfig[1]);
-			
 			setModelProperty(DIALOG_DISPLAYED_PROPERTY, 
 					Dialog.OPEN_PORTFOLIO_DIALOG, portfolioNameList);
 			
@@ -785,16 +774,6 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 			if(obj != null && obj instanceof String){
 				name = (String) obj;
 			}
-			
-			//TODO remove this code and redo the log entry
-			//Object[] dialogConfig = new Object[2];
-			//dialogConfig[0] = PORTFOLIO_NAME_DIALOG;
-			//dialogConfig[1] = name != null ? name : "";
-			
-			//LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-					//"showPortfolioNameDialog", "Dialog Config Values",
-					//new Object[] {"Dialog Code: " + dialogConfig[0], 
-								 // "Name: " + dialogConfig[1]});
 			
 			setModelProperty(DIALOG_DISPLAYED_PROPERTY, 
 					Dialog.PORTFOLIO_NAME_DIALOG, name);
@@ -1034,6 +1013,12 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 		});
 	}
 	
+	/**
+	 * The thread factory used by the executor in this controller.
+	 * 
+	 * @author craig
+	 * @version 2.0
+	 */
 	private class EventThreadFactory implements ThreadFactory{
 
 		@Override
@@ -1043,8 +1028,20 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 		
 	}
 	
+	/**
+	 * The thread used by the executor in this controller. Sets
+	 * a custom thread name and an <tt>UncaughtExceptionHandler</tt>.
+	 * 
+	 * @author craig
+	 * @version 2.0
+	 */
 	private class EventActionThread extends Thread{
 		
+		/**
+		 * Creates a new thread of this type.
+		 * 
+		 * @param r the task for the thread to execute.
+		 */
 		public EventActionThread(Runnable r){
 			super(r);
 			setName("EventActionThread");
@@ -1053,11 +1050,18 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 		
 	}
 	
+	/**
+	 * The <tt>UncaughtExceptionHandler</tt> for the threads created
+	 * by this class.
+	 * 
+	 * @author craig
+	 * @version 2.0
+	 *
+	 */
 	private class EventUncaughtExceptionHandler implements UncaughtExceptionHandler{
 
 		@Override
 		public void uncaughtException(Thread thread, Throwable throwable) {
-			//TODO figure out a unified gui response for exceptions
 			displayExceptionDialog(throwable);
 			
 			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
