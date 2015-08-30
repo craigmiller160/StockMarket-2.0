@@ -209,7 +209,7 @@ public class Main {
 		catch(IOException ex){
 			ex = new IOException(ex.getMessage() 
 					+ ": logger and debugging mode will not work.", 
-					ex.getCause());
+					ex);
 			displayExceptionDialog(ex);
 		}
 	}
@@ -239,7 +239,7 @@ public class Main {
 		}
 		catch (IOException ex){
 			String message = "Default properties failed to load";
-			ex = new IOException(ex.getMessage() + ": " + message, ex.getCause());
+			ex = new IOException(ex.getMessage() + ": " + message, ex);
 			displayExceptionDialog(ex);
 			
 			LOGGER.logp(Level.SEVERE, Main.class.getName(), 
@@ -271,7 +271,7 @@ public class Main {
 			}
 			catch(IOException ex){
 				String message = "User properties failed to load";
-				ex = new IOException(ex.getMessage() + ": " + message, ex.getCause());
+				ex = new IOException(ex.getMessage() + ": " + message, ex);
 				displayExceptionDialog(ex);
 				LOGGER.logp(Level.SEVERE, Main.class.getName(), "loadUserProperties()",
 						"Exception", ex);
@@ -310,7 +310,7 @@ public class Main {
 			}
 			catch(IOException ex){
 				String message = "User properties failed to load";
-				ex = new IOException(ex.getMessage() + ": " + message, ex.getCause());
+				ex = new IOException(ex.getMessage() + ": " + message, ex);
 				displayExceptionDialog(ex);
 				LOGGER.logp(Level.SEVERE, Main.class.getName(), "saveUserProperties()",
 						"Exception", ex);

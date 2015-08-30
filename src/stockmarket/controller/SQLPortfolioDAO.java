@@ -112,23 +112,18 @@ public class SQLPortfolioDAO implements
 	 * Constructs this controller by loading the database properties from
 	 * file and configuring access permits through a <tt>Semaphore</tt> 
 	 * object. If it is unable to load the database properties, an exception
-	 * is thrown and this object fails to be completely constructed. 
+	 * is thrown and this object fails to be completely constructed.
+	 * 
+	 * @throws IOException if the database properties cannot be loaded.
 	 */
-	public SQLPortfolioDAO(){
+	public SQLPortfolioDAO() throws IOException{
 		listeners = Collections.synchronizedList(new ArrayList<>());
 		semaphore = new Semaphore(1);
 		Properties defaultProps = new Properties();
-		try {
-			defaultProps.load(
-					this.getClass().getClassLoader().getResourceAsStream(
-							"default.properties"));
-		} catch (IOException ex) {
-			//TODO the program will still fail after this
-			//eventually come up with a better plan than "log and let fail"
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), "Constructor",
-					"Failed to load database properties. "
-					+ "All sorts of problems will follow this.", ex);
-		}
+		
+		defaultProps.load(
+				this.getClass().getClassLoader().getResourceAsStream(
+						"default.properties"));
 		
 		dburl = defaultProps.getProperty("dburl");
 		dbusername = defaultProps.getProperty("dbusername");
@@ -403,9 +398,9 @@ public class SQLPortfolioDAO implements
 		semaphore.acquire();
 		try(Statement portfolioStatement = getConnection().createStatement(
 				ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE); 
-				PreparedStatement stockStatement = getConnection().prepareStatement(
-						stocksQuery, ResultSet.TYPE_SCROLL_INSENSITIVE, 
-						ResultSet.CONCUR_UPDATABLE)){
+			PreparedStatement stockStatement = getConnection().prepareStatement(
+				stocksQuery, ResultSet.TYPE_SCROLL_INSENSITIVE, 
+				ResultSet.CONCUR_UPDATABLE);){
 			
 			ResultSet resultSet = portfolioStatement.executeQuery(portfolioQuery);
 			
@@ -423,6 +418,7 @@ public class SQLPortfolioDAO implements
 				resultSet.updateRow();
 			}
 			
+			//Currently re-using portfolioStatement here for the sake of simplicity
 			saveStocks(stockStatement, portfolioStatement, stockList, userid);
 		}
 		semaphore.release();
@@ -504,19 +500,16 @@ public class SQLPortfolioDAO implements
 		
 		//Any stocks in the stocksToRemove list are removed from the table.
 		if(stocksToRemove.size() > 0){
-			StringBuilder removeQuery = new StringBuilder(
-					"delete from stocks where userid=" + userid 
-					+ " and symbol in(");
+			StringBuilder remove = new StringBuilder(
+					"delete from stocks where userid=" 
+					+ userid + " and symbol in(");
 			for(String s : stocksToRemove){
-				removeQuery.append("'" + s + "',");
+				remove.append("'" + s + "',");
 			}
-			removeQuery.deleteCharAt(removeQuery.length() - 1);
-			removeQuery.append(");");
-			//TODO this logger statement is still within the lock. Need to figure out a way to remove it.
-			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-					"saveStocks()", "SQL: Remove Stocks Query: " + removeQuery.toString());
+			remove.deleteCharAt(remove.length() - 1);
+			remove.append(");");
 			
-			deleteStatement.executeUpdate(removeQuery.toString());
+			deleteStatement.executeUpdate(remove.toString());
 		}
 	}
 	

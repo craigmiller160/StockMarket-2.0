@@ -39,6 +39,9 @@ import stockmarket.stock.OwnedStock;
 @ThreadSafe
 public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 
+	//TODO this model needs default values to avoid exceptions occuring when attempting
+	//to save values to database.
+	
 	/**
 	 * SerialVersionUID for serialization support.
 	 */

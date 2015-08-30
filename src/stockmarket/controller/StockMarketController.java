@@ -234,7 +234,7 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 	/**
 	 * The data access object for saving/loading the program's state.
 	 */
-	private final PortfolioDAO portfolioDAO;
+	private PortfolioDAO portfolioDAO;
 	
 	/**
 	 * The shared <tt>Language</tt> module for locale-specific text.
@@ -248,8 +248,18 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 	 */
 	public StockMarketController() {
 		super();
-		this.portfolioDAO = new SQLPortfolioDAO();
-		((SQLPortfolioDAO) portfolioDAO).addPropertyChangeListener(this);
+		try{
+			this.portfolioDAO = new SQLPortfolioDAO();
+			((SQLPortfolioDAO) portfolioDAO).addPropertyChangeListener(this);
+		}
+		catch(IOException ex){
+			ex = new IOException(
+					"Database connection failed: " + ex.getMessage(), ex);
+			displayExceptionDialog(ex);
+			LOGGER.logp(Level.SEVERE, this.getClass().getName(), "Constructor",
+					"Exception", ex);
+		}
+		
 		setThreadFactory(new EventThreadFactory());
 		
 	}
@@ -265,8 +275,17 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 	 */
 	public StockMarketController(int threadPoolSize){
 		super(threadPoolSize);
-		this.portfolioDAO = new SQLPortfolioDAO();
-		((SQLPortfolioDAO) portfolioDAO).addPropertyChangeListener(this);
+		try{
+			this.portfolioDAO = new SQLPortfolioDAO();
+			((SQLPortfolioDAO) portfolioDAO).addPropertyChangeListener(this);
+		}
+		catch(IOException ex){
+			ex = new IOException(
+					"Database connection failed: " + ex.getMessage(), ex);
+			displayExceptionDialog(ex);
+			LOGGER.logp(Level.SEVERE, this.getClass().getName(), "Constructor",
+					"Exception", ex);
+		}
 		setThreadFactory(new EventThreadFactory());
 	}
 
@@ -286,8 +305,17 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 	public StockMarketController(int corePoolSize, int maximumPoolSize,
 			long keepAliveTime, TimeUnit unit){
 		super(corePoolSize, maximumPoolSize, keepAliveTime, unit);
-		this.portfolioDAO = new SQLPortfolioDAO();
-		((SQLPortfolioDAO) portfolioDAO).addPropertyChangeListener(this);
+		try{
+			this.portfolioDAO = new SQLPortfolioDAO();
+			((SQLPortfolioDAO) portfolioDAO).addPropertyChangeListener(this);
+		}
+		catch(IOException ex){
+			ex = new IOException(
+					"Database connection failed: " + ex.getMessage(), ex);
+			displayExceptionDialog(ex);
+			LOGGER.logp(Level.SEVERE, this.getClass().getName(), "Constructor",
+					"Exception", ex);
+		}
 		setThreadFactory(new EventThreadFactory());
 	}
 
@@ -636,74 +664,82 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 				"openPortfolio", "Entering method", 
 				new Object[]{"|" + valueFromView + "|"});
 		
-		try {
-			//Enable GUI components
-			setModelProperty(PORTFOLIO_STATE_PROPERTY, PortfolioState.OPEN_NO_STOCK);
-			
-			String portfolioName = null;
-			if(valueFromView instanceof String){
-				portfolioName = (String) valueFromView;
-			}
-			else{
-				throw new IllegalArgumentException("Not a valid String: " + valueFromView);
-			}
-			
-			//Load portfolio model from the DAO
-			PortfolioModel portfolioModel = portfolioDAO.getPortfolio(
-					portfolioName);
-			
-			//If there's already a PortfolioModel in this controller, remove it.
-			AbstractPropertyModel oldModel = null;
-			synchronized(modelList){
-				for(AbstractPropertyModel model : modelList){
-					if(model instanceof PortfolioModel){
-						oldModel = model;
-						break;
+		if(portfolioDAO != null){
+			try {
+				//Enable GUI components
+				setModelProperty(PORTFOLIO_STATE_PROPERTY, PortfolioState.OPEN_NO_STOCK);
+				
+				String portfolioName = null;
+				if(valueFromView instanceof String){
+					portfolioName = (String) valueFromView;
+				}
+				else{
+					throw new IllegalArgumentException("Not a valid String: " + valueFromView);
+				}
+				
+				//Load portfolio model from the DAO
+				PortfolioModel portfolioModel = portfolioDAO.getPortfolio(
+						portfolioName);
+				
+				//If there's already a PortfolioModel in this controller, remove it.
+				AbstractPropertyModel oldModel = null;
+				synchronized(modelList){
+					for(AbstractPropertyModel model : modelList){
+						if(model instanceof PortfolioModel){
+							oldModel = model;
+							break;
+						}
 					}
 				}
+				if(oldModel != null){
+					removePropertyModel(oldModel);
+				}
+				
+				//Add new portfolio model
+				addPropertyModel(portfolioModel);
+				
+				LOGGER.logp(Level.INFO, this.getClass().getName(), 
+						"openPortfolio", "Portfolio loaded and opened in the program");
+				
 			}
-			if(oldModel != null){
-				removePropertyModel(oldModel);
+			catch(IllegalAccessException ex){
+				displayExceptionDialog(ex);
+				LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
+						"changeStockHistoryInterval", 
+						"Exception", ex);
 			}
-			
-			//Add new portfolio model
-			addPropertyModel(portfolioModel);
-			
-			LOGGER.logp(Level.INFO, this.getClass().getName(), 
-					"openPortfolio", "Portfolio loaded and opened in the program");
-			
+			catch(NoSuchMethodException ex){
+				displayExceptionDialog(ex);
+				LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
+						"openPortfolio", 
+						"Exception", ex);
+			}
+			catch(ReflectiveOperationException ex){
+				displayExceptionDialog(ex);
+				LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
+						"changeStockHistoryInterval", 
+						"Exception", ex);
+			}
+			catch(InterruptedException ex){
+				Thread.currentThread().interrupt();
+				//TODO do I need a dialog here? see stock search method for pros and cons
+				LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
+						"openPortfolio", 
+						"Exception", ex);
+			}
+			catch(Exception ex){
+				displayExceptionDialog(ex);
+				LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
+						"openPortfolio", 
+						"Exception", ex);
+			}
 		}
-		catch(IllegalAccessException ex){
-			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"changeStockHistoryInterval", 
-					"Exception", ex);
+		else{
+			displayExceptionDialog(LANGUAGE.getString("database_failed_title"), 
+					LANGUAGE.getString("database_failed_text"));
 		}
-		catch(NoSuchMethodException ex){
-			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"openPortfolio", 
-					"Exception", ex);
-		}
-		catch(ReflectiveOperationException ex){
-			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"changeStockHistoryInterval", 
-					"Exception", ex);
-		}
-		catch(InterruptedException ex){
-			Thread.currentThread().interrupt();
-			//TODO do I need a dialog here? see stock search method for pros and cons
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"openPortfolio", 
-					"Exception", ex);
-		}
-		catch(Exception ex){
-			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"openPortfolio", 
-					"Exception", ex);
-		}
+		
+		
 	}
 	
 	/**
@@ -715,46 +751,52 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 				"showOpenPortfolioDialog", 
 				"Entering method");
 		
-		try {
-			List<String> portfolioNameList = portfolioDAO.getSavedPortfolios();
-			
-			setModelProperty(DIALOG_DISPLAYED_PROPERTY, 
-					Dialog.OPEN_PORTFOLIO_DIALOG, portfolioNameList);
-			
-			LOGGER.logp(Level.INFO, this.getClass().getName(), 
-					"showOpenPortfolioDialog()", 
-					"Open portfolio dialog displayed");
+		if(portfolioDAO != null){
+			try {
+				List<String> portfolioNameList = portfolioDAO.getSavedPortfolios();
+				
+				setModelProperty(DIALOG_DISPLAYED_PROPERTY, 
+						Dialog.OPEN_PORTFOLIO_DIALOG, portfolioNameList);
+				
+				LOGGER.logp(Level.INFO, this.getClass().getName(), 
+						"showOpenPortfolioDialog()", 
+						"Open portfolio dialog displayed");
+			}
+			catch(IllegalAccessException ex){
+				displayExceptionDialog(ex);
+				LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
+						"changeStockHistoryInterval", 
+						"Exception", ex);
+			}
+			catch(NoSuchMethodException ex){
+				displayExceptionDialog(ex);
+				LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
+						"showPortfolioNameDialog()", 
+						"Exception", ex);
+			}
+			catch(ReflectiveOperationException ex){
+				displayExceptionDialog(ex);
+				LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
+						"changeStockHistoryInterval", 
+						"Exception", ex);
+			}
+			catch(InterruptedException ex){
+				Thread.currentThread().interrupt();
+				//TODO visual or not? see stock search method for pros and cons
+				LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
+						"showPortfolioNameDialog()", 
+						"Exception", ex);
+			}
+			catch (Exception ex) {
+				displayExceptionDialog(ex);
+				LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
+						"showPortfolioNameDialog()", 
+						"Exception", ex);
+			}
 		}
-		catch(IllegalAccessException ex){
-			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"changeStockHistoryInterval", 
-					"Exception", ex);
-		}
-		catch(NoSuchMethodException ex){
-			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"showPortfolioNameDialog()", 
-					"Exception", ex);
-		}
-		catch(ReflectiveOperationException ex){
-			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"changeStockHistoryInterval", 
-					"Exception", ex);
-		}
-		catch(InterruptedException ex){
-			Thread.currentThread().interrupt();
-			//TODO visual or not? see stock search method for pros and cons
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"showPortfolioNameDialog()", 
-					"Exception", ex);
-		}
-		catch (Exception ex) {
-			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"showPortfolioNameDialog()", 
-					"Exception", ex);
+		else{
+			displayExceptionDialog(LANGUAGE.getString("database_failed_title"), 
+					LANGUAGE.getString("database_failed_text"));
 		}
 		
 	}
@@ -818,9 +860,23 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 			//Enable GUI components
 			setModelProperty(PORTFOLIO_STATE_PROPERTY, PortfolioState.OPEN_NO_STOCK);
 			
-			PortfolioModel portfolioModel = portfolioDAO.createNewPortfolio(
-					LANGUAGE.getString("new_portfolio_name"), 
-					new BigDecimal(INITIAL_CASH_BALANCE_VALUE));
+			PortfolioModel portfolioModel = null;
+			if(portfolioDAO != null){
+				portfolioModel = portfolioDAO.createNewPortfolio(
+						LANGUAGE.getString("new_portfolio_name"), 
+						new BigDecimal(INITIAL_CASH_BALANCE_VALUE));
+			}
+			else{
+				portfolioModel = new PortfolioModel();
+				portfolioModel.setPortfolioName(LANGUAGE.getString("new_portfolio_name"));
+				portfolioModel.setCashBalance(new BigDecimal(INITIAL_CASH_BALANCE_VALUE));
+				portfolioModel.setNetWorth(new BigDecimal(INITIAL_CASH_BALANCE_VALUE));
+				portfolioModel.setStockList(null);
+				portfolioModel.setChangeInNetWorth(new BigDecimal(0));
+				portfolioModel.setTotalStockValue(new BigDecimal(0));
+				displayExceptionDialog(LANGUAGE.getString("database_failed_title"),
+						LANGUAGE.getString("database_failed_text"));
+			}
 			
 			//If there's already a PortfolioModel in this controller, remove it.
 			AbstractPropertyModel oldModel = null;
@@ -937,43 +993,50 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
 				"savePortfolio", "Entering method");
 		
-		PortfolioModel portfolioModel = null;
-		synchronized(modelList){
-			for(AbstractPropertyModel model : modelList){
-				if(model instanceof PortfolioModel){
-					portfolioModel = (PortfolioModel) model;
-					break;
+		if(portfolioDAO != null){
+			PortfolioModel portfolioModel = null;
+			synchronized(modelList){
+				for(AbstractPropertyModel model : modelList){
+					if(model instanceof PortfolioModel){
+						portfolioModel = (PortfolioModel) model;
+						break;
+					}
 				}
 			}
-		}
-		
-		if(portfolioModel != null){
-			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-					"savePortfolio", "Portfolio Model found and "
-							+ "about to try to save it");
 			
-			try {
-				portfolioDAO.savePortfolio(portfolioModel);
-				LOGGER.logp(Level.INFO, this.getClass().getName(), 
-						"savePortfolio", "Portfolio saved successfully");
+			if(portfolioModel != null){
+				LOGGER.logp(Level.FINEST, this.getClass().getName(), 
+						"savePortfolio", "Portfolio Model found and "
+								+ "about to try to save it");
+				
+				try {
+					portfolioDAO.savePortfolio(portfolioModel);
+					LOGGER.logp(Level.INFO, this.getClass().getName(), 
+							"savePortfolio", "Portfolio saved successfully");
+				}
+				catch(InterruptedException ex){
+					Thread.currentThread().interrupt();
+					//TODO gui dialog? see stock search method for pros and cons
+					LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
+							"savePortfolio", "Exception", ex);
+				}
+				catch (Exception ex) {
+					displayExceptionDialog(ex);
+					LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
+							"savePortfolio", "Exception", ex);
+				}
 			}
-			catch(InterruptedException ex){
-				Thread.currentThread().interrupt();
-				//TODO gui dialog? see stock search method for pros and cons
+			else{
 				LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-						"savePortfolio", "Exception", ex);
-			}
-			catch (Exception ex) {
-				displayExceptionDialog(ex);
-				LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-						"savePortfolio", "Exception", ex);
+						"savePortfolio", "Portfolio Model not found and saving"
+								+ " has failed");
 			}
 		}
 		else{
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"savePortfolio", "Portfolio Model not found and saving"
-							+ " has failed");
+			displayExceptionDialog(LANGUAGE.getString("database_failed_title"),
+					LANGUAGE.getString("database_failed_text"));
 		}
+		
 	}
 	
 	/**
