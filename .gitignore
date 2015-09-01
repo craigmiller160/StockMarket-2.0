@@ -4,6 +4,10 @@
 # Class directory
 bin/
 
+# Eclipse Config Files
+.settings/
+*.project
+
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
