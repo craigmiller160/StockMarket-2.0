@@ -8,6 +8,9 @@ bin/
 .settings/
 *.project
 
+# JUnit Test Directory
+src/test/
+
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
