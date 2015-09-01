@@ -53,7 +53,7 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 	/**
 	 * Logger for this class.
 	 */
-	private static final Logger logger = Logger.getLogger("stockmarket.stock.OwnedStock");
+	private static final Logger LOGGER = Logger.getLogger("stockmarket.stock.OwnedStock");
 	
 	/**
 	 * Private <tt>NumberFormat</tt> used for formatting <tt>BigDecimal</tt> values
@@ -122,14 +122,14 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 	}
 	
 	/**
-	 * Private setter method for allowing a <tt>StockFileDownloader</tt> to
-	 * bypass the normal process of setting this value.
+	 * Sets the quantity field. This method is private to only serve as
+	 * a helper method for <tt>setStockDetails(StockDownloader,boolean)</tt>.
 	 * 
 	 * @param quantity the quantity of shares.
 	 * @throws NumberFormatException if the raw text value wasn't properly
 	 * parsed and is not a number value.
 	 */
-	private void setQuantity(String quantity){
+	private void setQuantityOfShares(String quantity){
 		int num = Integer.parseInt(quantity);
 		synchronized(this){
 			this.quantityOfShares = num;
@@ -137,8 +137,20 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 	}
 	
 	/**
-	 * Private setter method for allowing a <tt>StockFileDownloader</tt> to
-	 * bypass the normal process of setting this value.
+	 * Sets the quantity field. This method is protected to allow
+	 * this class and subclasses an internal tool to change this value.
+	 * Other classes should rely on <tt>setStockDetails(StockDownloader,boolean)</tt>
+	 * to update this stock.
+	 * 
+	 * @param quantity the quantity of shares owned of this stock.
+	 */
+	protected synchronized void setQuantityOfShares(int quantity){
+		this.quantityOfShares = quantity;
+	}
+	
+	/**
+	 * Sets the principle field. This method is private to only serve as
+	 * a helper method for <tt>setStockDetails(StockDownloader,boolean)</tt>.
 	 * 
 	 * @param principle the principle, the initial amount spent on this stock.
 	 * @throws NumberFormatException if the raw text value wasn't properly
@@ -152,8 +164,20 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 	}
 	
 	/**
-	 * Private setter method for allowing a <tt>StockFileDownloader</tt> to
-	 * bypass the normal process of setting this value.
+	 * Sets the principle field. This method is protected to allow
+	 * this class and subclasses an internal tool to change this value.
+	 * Other classes should rely on <tt>setStockDetails(StockDownloader,boolean)</tt>
+	 * to update this stock.
+	 * 
+	 * @param principle the principle, the initial amount spent on the stock.
+	 */
+	protected synchronized void setPrinciple(BigDecimal principle){
+		this.principle = principle;
+	}
+	
+	/**
+	 * Sets the total value field. This method is private to only serve as
+	 * a helper method for <tt>setStockDetails(StockDownloader,boolean)</tt>.
 	 * 
 	 * @param totalValue the total value of all shares of this stock.
 	 * @throws NumberFormatException if the raw text value wasn't properly
@@ -167,8 +191,20 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 	}
 	
 	/**
-	 * Private setter method for allowing a <tt>StockFileDownloader</tt> to
-	 * bypass the normal process of setting this value.
+	 * Sets the total value field. This method is protected to allow
+	 * this class and subclasses an internal tool to change this value.
+	 * Other classes should rely on <tt>setStockDetails(StockDownloader,boolean)</tt>
+	 * to update this stock.
+	 * 
+	 * @param totalValue the totalValue of all shares of the stock.
+	 */
+	protected synchronized void setTotalValue(BigDecimal totalValue){
+		this.totalValue = totalValue;
+	}
+	
+	/**
+	 * Sets the net field. This method is private to only serve as
+	 * a helper method for <tt>setStockDetails(StockDownloader,boolean)</tt>.
 	 * 
 	 * @param net the net gains/losses on this stock.
 	 * @throws NumberFormatException if the raw text value wasn't properly
@@ -181,11 +217,30 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 		}
 	}
 	
+	/**
+	 * Sets the net field. This method is protected to allow
+	 * this class and subclasses an internal tool to change this value.
+	 * Other classes should rely on <tt>setStockDetails(StockDownloader,boolean)</tt>
+	 * to update this stock.
+	 * 
+	 * @param net the net gains/losses on this stock.
+	 */
+	protected synchronized void setNet(BigDecimal net){
+		this.net = net;
+	}
+	
 	@Override
-	public void increaseShares(int quantity){
+	public void addShares(int quantity){
+		//getCurrentPrice() is synchronized, no need for additional synchronization here
 		BigDecimal valueToAdd = getCurrentPrice().multiply(new BigDecimal(quantity));
 		
-		logger.logp(Level.FINEST, this.getClass().getName(), "increaseShares()", 
+		if(getCurrentPrice() == null){
+			throw new IllegalStateException(
+					"Stock details must be set before "
+					+ "adding/subtracting shares");
+		}
+		
+		LOGGER.logp(Level.FINEST, this.getClass().getName(), "increaseShares()", 
 				symbol + ": Added Quantity: " + quantity + " Value To Add: " 
 				+ moneyFormat.format(valueToAdd));
 		
@@ -197,29 +252,36 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 		setTotalValueAndNet();
 	}
 	
-	//TODO create and use a custom exception for if there are not enough
-	//shares to decrease by the selected quantity. Use this instead
-	//of a runtimeexception to force the caller to deal with this condition
-	//in a catch block.
 	@Override
-	public boolean decreaseShares(int quantity){
+	public boolean subtractShares(int quantity){
 		boolean sharesRemaining = true;
+		
+		if(getCurrentPrice() == null){
+			throw new IllegalStateException(
+					"Stock details must be set before "
+					+ "adding/subtracting shares");
+		}
 		
 		BigDecimal valueToSubtractFromPrinciple = null;
 		synchronized(this){
 			if(quantity > quantityOfShares){
-				throw new IllegalArgumentException(quantity 
-						+ " is more shares than are available");
+				throw new InsufficientSharesException(
+						"Only own " + quantityOfShares 
+						+ ", not enough to subtract " + quantity);
 			}
 			
-			valueToSubtractFromPrinciple = principle.multiply(new BigDecimal(quantity / quantityOfShares));
+			valueToSubtractFromPrinciple = principle.multiply(
+					new BigDecimal(quantity / quantityOfShares));
 		}
 		
-		BigDecimal valueToSubtractFromTotal = getCurrentPrice().multiply(new BigDecimal(quantity));
+		//TODO might be able to get rid of this value here, I don't think I need it. Setting
+		//the total in a completely separate way. If the method words with this commented out,
+		//then remove it.
+		//getCurrentPrice() method is synchronized, no need for additional synchronization here
+		//BigDecimal valueToSubtractFromTotal = getCurrentPrice().multiply(new BigDecimal(quantity));
 		
-		logger.logp(Level.FINEST, this.getClass().getName(), "decreaseShares()", 
-				symbol + ": Subtracted Quantity: " + quantity + " Value to Subtract From Total: " 
-				+ moneyFormat.format(valueToSubtractFromTotal) + " Value to Subtract From Principle: " 
+		LOGGER.logp(Level.FINEST, this.getClass().getName(), "decreaseShares()", 
+				symbol + ": Subtracted Quantity: " + quantity + " Value to Subtract From Principle: " 
 				+ moneyFormat.format(valueToSubtractFromPrinciple));
 		
 		synchronized(this){
@@ -249,7 +311,7 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 		BigDecimal tempTotalValue = null;
 		int tempQuantity = 0;
 		BigDecimal tempNet = null;
-		BigDecimal currentPrice = getCurrentPrice();
+		BigDecimal currentPrice = getCurrentPrice(); //getCurrentPrice() is synchronized already
 		synchronized(this){
 			totalValue = currentPrice.multiply(new BigDecimal(quantityOfShares));
 			net = totalValue.subtract(principle);
@@ -259,7 +321,7 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 			tempNet = net;
 		}
 		
-		logger.logp(Level.FINEST, this.getClass().getName(), "setTotalValueAndNet()", 
+		LOGGER.logp(Level.FINEST, this.getClass().getName(), "setTotalValueAndNet()", 
 				symbol + ": Quantity of Shares: " + tempQuantity + " Total Value: " 
 				+ moneyFormat.format(tempTotalValue) + " Net: " + moneyFormat.format(tempNet));
 	}
@@ -287,7 +349,9 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 	/**
 	 * {@inheritDoc}
 	 * <p>
-	 * <b>StockFileDownloader:</b> This type of <tt>StockDownloader</tt> should only
+	 * <b>StockFileDownloader:</b> This downloader can be used with this method 
+	 * as a way of updating <tt>OwnedStock</tt> properties after loading a saved 
+	 * portfolio. This type of <tt>StockDownloader</tt> should only
 	 * be used with <tt>fullDetails</tt> set to false, as it only contains a subset
 	 * of the stock data.
 	 */
@@ -299,11 +363,14 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 			Map<String,String> valueMap = downloader.downloadStockDetails(symbol, null);
 			
 			synchronized(this){
-				setQuantity(valueMap.get(QUANTITY_OF_SHARES));
+				setQuantityOfShares(valueMap.get(QUANTITY_OF_SHARES));
 				setPrinciple(valueMap.get(PRINCIPLE));
 				setTotalValue(valueMap.get(TOTAL_VALUE));
 				setNet(valueMap.get(NET));
 			}
+			
+			LOGGER.logp(Level.INFO, this.getClass().getName(), 
+					"setStockDetails", "StockFileDownloader has set owned values");
 			
 		}
 		else{
@@ -323,6 +390,42 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 		}
 		
 		return valueMap;
+	}
+
+	@Override
+	public void addShares(OwnedStock stock) {
+		if(!this.equals(stock)){
+			throw new IllegalArgumentException(this.getSymbol() 
+					+ " != " + stock.getSymbol());
+		}
+		
+		if(stock.getCurrentPrice() == null || 
+				stock.getCurrentPrice().equals(new BigDecimal(0))){
+			throw new IllegalStateException("Stock parameter details not set");
+		}
+		
+		setCurrentPrice(stock.getCurrentPrice());
+		addShares(stock.getQuantityOfShares());
+	}
+
+	@Override
+	public boolean subtractShares(OwnedStock stock) {
+		boolean sharesRemaining = true;
+		
+		if(!this.equals(stock)){
+			throw new IllegalArgumentException(this.getSymbol() 
+					+ " != " + stock.getSymbol());
+		}
+		
+		if(stock.getCurrentPrice() == null || 
+				stock.getCurrentPrice().equals(new BigDecimal(0))){
+			throw new IllegalStateException("Stock parameter details not set");
+		}
+		
+		setCurrentPrice(stock.getCurrentPrice());
+		sharesRemaining = subtractShares(stock.getQuantityOfShares());
+		
+		return sharesRemaining;
 	}
 
 }

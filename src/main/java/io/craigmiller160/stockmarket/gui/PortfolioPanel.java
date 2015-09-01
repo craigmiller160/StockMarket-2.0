@@ -180,7 +180,7 @@ public class PortfolioPanel extends AbstractListenerView {
 		ownedStockList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		ownedStockList.setToolTipText(LANGUAGE.getString("stock_list_tooltip"));
 		ownedStockList.setCellRenderer(new PortfolioListCellRenderer());
-		ownedStockList.setVisibleRowCount(4);
+		ownedStockList.setVisibleRowCount(3);
 		
 		stockListScrollPane = new JScrollPane(ownedStockList);
 		stockListScrollPane.getVerticalScrollBar().setUnitIncrement(15);

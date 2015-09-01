@@ -79,25 +79,99 @@ public interface OwnedStock extends Stock{
 	BigDecimal getPrinciple();
 	
 	/**
-	 * Increase the number of shares owned of this stock. Adjusts the principle, totalValue,
-	 * and net based on the change.
+	 * Add the specified number of shares of this stock. The number of shares added is multiplied by 
+	 * the current share price to get the amount to increase the  total value. 
+	 * The principle and net are also updated accordingly.
+	 * <p>
+	 * The stock details must be set before adding/subtracting any shares. 
+	 * If they have not been set, an exception is thrown.
 	 * 
-	 * @param quantity the quantity of shares to increase by.
+	 * @param quantity the quantity of shares to add.
+	 * @throws IllegalStateException if the stock details have not been set before
+	 * invoking this method.
 	 */
-	void increaseShares(int quantity);
+	void addShares(int quantity);
 	
 	/**
-	 * Decrease the number of shares owned of this stok. Adjusts the principle, totalValue,
-	 * and net based on the change. Returns a boolean value for whether or not there are
-	 * any shares remaining of the stock.
+	 * Add the shares of the <tt>OwnedStock</tt> parameter to this stock, only if the
+	 * parameter is the same stock as this one (ie, has the same symbol). If it is not 
+	 * the same stock as this one, an exception is thrown. This method is
+	 * a helper method for adding shares, and should be used with a more recently updated
+	 * OwnedStock object as its parameter. 
 	 * <p>
-	 * Code handling an instance of <tt>OwnedStock</tt> can use the boolean value it returns
-	 * as a means of executing a special response to if all shares have been sold.
+	 * The stock details must be set before adding/subtracting any shares. 
+	 * If they have not been set, an exception is thrown.
+	 * <p>
+	 * The current share price is also updated during this operation. This method
+	 * operates on the assumption that the stock parameter has had its details
+	 * updated more recently than this object has been, and it sets the current
+	 * price of the parameter as the current price of this whole object. This is
+	 * done prior to the operations to update the principle, total value, and net.
+	 * 
+	 * @param stock the stock who's shares are to be added to this one.
+	 * @throws IllegalStateException if the stock details have not been set before
+	 * invoking this method, either in this stock class or the parameter.
+	 * @throws IllegalStateException if the stock details have not been set before
+	 * invoking this method.
+	 * @throws IllegalArgumentException if the stock parameter is not the same
+	 * stock as this one (symbols don't match).
+	 */
+	void addShares(OwnedStock stock);
+	
+	/**
+	 * Subtract the specified number of shares from this stock. The number of shares subtracted is 
+	 * multiplied by the current share price to get the amount to decrease the
+	 * total value by. The principle and net are also updated accordingly.
+	 * <p>
+	 * The stock details must be set before adding/subtracting any shares. 
+	 * If they have not been set, an exception is thrown.
+	 * <p>
+	 * This method returns true if there are shares remaining in this stock
+	 * after the subtraction. If it returns false, then there are no shares
+	 * remaining, and the program may want to remove this <tt>OwnedStoc</tt>
+	 * from the portfolio.
 	 * 
 	 * @param quantity the quantity of shares to decrease by.
 	 * @return true if there are shares remaining of the stock, false if there are
 	 * not shares remaining.
+	 * @throws InsufficientSharesException if the quantity of shares to be subtracted
+	 * is greater than the total quantity that this stock has.
+	 * @throws IllegalStateException if the stock details have not been set before
+	 * invoking this method.
 	 */
-	boolean decreaseShares(int quantity);
+	boolean subtractShares(int quantity);
+	
+	/**
+	 * Subtract the shares of the <tt>OwnedStock</tt> parameter to this stock, only if the
+	 * parameter is the same stock as this one (ie, has the same symbol). If it
+	 * is not the same stock as this one, an exception is thrown. This method is
+	 * a helper method for subtracting shares, and should be used with a more recently updated
+	 * OwnedStock object as its parameter.
+	 * <p>
+	 * The stock details must be set before adding/subtracting any shares. 
+	 * If they have not been set, an exception is thrown.
+	 * <p>
+	 * The current share price is also updated during this operation. This method
+	 * operates on the assumption that the stock parameter has had its details
+	 * updated more recently than this object has been, and it sets the current
+	 * price of the parameter as the current price of this whole object. This is
+	 * done prior to the operations to update the principle, total value, and net.
+	 * <p>
+	 * This method returns true if there are shares remaining in this stock
+	 * after the subtraction. If it returns false, then there are no shares
+	 * remaining, and the program may want to remove this <tt>OwnedStoc</tt>
+	 * from the portfolio.
+	 * 
+	 * @param stock the stock who's shares are to be added to this one.
+	 * @return true if there are shares remaining of the stock, false if there are
+	 * not shares remaining.
+	 * @throws InsufficientSharesException if the quantity of shares to be subtracted
+	 * is greater than the total quantity that this stock has.
+	 * @throws IllegalStateException if the stock details have not been set before
+	 * invoking this method, either in this stock class or the parameter.
+	 * @throws IllegalArgumentException if the stock parameter is not the same
+	 * stock as this one (symbols don't match).
+	 */
+	boolean subtractShares(OwnedStock stock);
 	
 }

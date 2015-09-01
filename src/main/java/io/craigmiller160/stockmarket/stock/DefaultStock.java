@@ -46,6 +46,9 @@ import net.jcip.annotations.ThreadSafe;
 @ThreadSafe
 public class DefaultStock extends AbstractStock {
 
+	//TODO occasionally Yahoo! Finance screws up the download, and provides an "N/A"
+	//for a value that needs a number. Work on a response for this.
+	
 	/**
 	 * SerialVersionUID for serialization support.
 	 */
@@ -212,6 +215,8 @@ public class DefaultStock extends AbstractStock {
 		
 		Map<String,String> stockDataMap = downloader.downloadStockDetails(symbol, fields);
 		
+		//TODO what happens if fullDetails is true, but all the values are not available?
+		
 		synchronized(this){
 			setCompanyName(stockDataMap.get(NAME));
 			setCurrentPrice(stockDataMap.get(CURRENT_PRICE));
@@ -256,7 +261,8 @@ public class DefaultStock extends AbstractStock {
 	}
 	
 	/**
-	 * Sets the change field.
+	 * Sets the change today field. This method is private to only serve as
+	 * a helper method for <tt>setStockDetails(StockDownloader,boolean)</tt>.
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
 	 * @throws NumberFormatException if the raw text value wasn't properly
@@ -271,7 +277,20 @@ public class DefaultStock extends AbstractStock {
 	}
 	
 	/**
-	 * Sets the change in percent field.
+	 * Sets the change today field. This method is protected to allow
+	 * this class and subclasses an internal tool to change this value.
+	 * Other classes should rely on <tt>setStockDetails(StockDownloader,boolean)</tt>
+	 * to update this stock.
+	 * 
+	 * @param changeToday the change in price today.
+	 */
+	protected synchronized void setChangeToday(BigDecimal changeToday){
+		this.changeToday = changeToday;
+	}
+	
+	/**
+	 * Sets the change today in percent field. This method is private to only serve as
+	 * a helper method for <tt>setStockDetails(StockDownloader,boolean)</tt>.
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
 	 * @throws NumberFormatException if the raw text value wasn't properly
@@ -286,7 +305,20 @@ public class DefaultStock extends AbstractStock {
 	}
 	
 	/**
-	 * Sets the 50 day average field.
+	 * Sets the change today in percent field. This method is protected to allow
+	 * this class and subclasses an internal tool to change this value.
+	 * Other classes should rely on <tt>setStockDetails(StockDownloader,boolean)</tt>
+	 * to update this stock.
+	 * 
+	 * @param changeTodayPercent the percent change in price today.
+	 */
+	protected synchronized void setChangeTodayInPecent(BigDecimal changeTodayPercent){
+		this.changeTodayInPercent = changeTodayPercent;
+	}
+	
+	/**
+	 * Sets the 50 day average field. This method is private to only serve as
+	 * a helper method for <tt>setStockDetails(StockDownloader,boolean)</tt>.
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
 	 * @throws NumberFormatException if the raw text value wasn't properly
@@ -301,7 +333,20 @@ public class DefaultStock extends AbstractStock {
 	}
 	
 	/**
-	 * Sets the change from 50 day average field.
+	 * Sets the 50 day average field. This method is protected to allow
+	 * this class and subclasses an internal tool to change this value.
+	 * Other classes should rely on <tt>setStockDetails(StockDownloader,boolean)</tt>
+	 * to update this stock.
+	 * 
+	 * @param fiftyDayAvg the 50 day average price.
+	 */
+	protected synchronized void setFiftyDayAvg(BigDecimal fiftyDayAvg){
+		this.fiftyDayAvg = fiftyDayAvg;
+	}
+	
+	/**
+	 * Sets the change from 50 day average field. This method is private to only serve as
+	 * a helper method for <tt>setStockDetails(StockDownloader,boolean)</tt>.
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
 	 * @throws NumberFormatException if the raw text value wasn't properly
@@ -316,7 +361,20 @@ public class DefaultStock extends AbstractStock {
 	}
 	
 	/**
-	 * Sets the sets change from 50 day average in percent field.
+	 * Sets the change from 50 day average field. This method is protected to allow
+	 * this class and subclasses an internal tool to change this value.
+	 * Other classes should rely on <tt>setStockDetails(StockDownloader,boolean)</tt>
+	 * to update this stock.
+	 * 
+	 * @param change50DayAvg the change from 50 day average price.
+	 */
+	protected synchronized void setChange50DayAvg(BigDecimal change50DayAvg){
+		this.change50DayAvg = change50DayAvg;
+	}
+	
+	/**
+	 * Sets the sets change from 50 day average in percent field. This method is private to only serve as
+	 * a helper method for <tt>setStockDetails(StockDownloader,boolean)</tt>.
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
 	 * @throws NumberFormatException if the raw text value wasn't properly
@@ -329,7 +387,20 @@ public class DefaultStock extends AbstractStock {
 	}
 	
 	/**
-	 * Sets the 200 day average field.
+	 * Sets the percent change from 50 day average field. This method is protected to allow
+	 * this class and subclasses an internal tool to change this value.
+	 * Other classes should rely on <tt>setStockDetails(StockDownloader,boolean)</tt>
+	 * to update this stock.
+	 * 
+	 * @param change50DayAvgPercent the percent change from 50 day average price.
+	 */
+	protected synchronized void setChange50DayAvgPercent(BigDecimal change50DayAvgPercent){
+		this.change50DayAvgPercent = change50DayAvgPercent;
+	}
+	
+	/**
+	 * Sets the 200 day average field. This method is private to only serve as
+	 * a helper method for <tt>setStockDetails(StockDownloader,boolean)</tt>.
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
 	 * @throws NumberFormatException if the raw text value wasn't properly
@@ -344,7 +415,20 @@ public class DefaultStock extends AbstractStock {
 	}
 	
 	/**
-	 * Sets the change from 200 day average field.
+	 * Sets the 200 day average field. This method is protected to allow
+	 * this class and subclasses an internal tool to change this value.
+	 * Other classes should rely on <tt>setStockDetails(StockDownloader,boolean)</tt>
+	 * to update this stock.
+	 * 
+	 * @param twoHundredDayAvg the 200 day average price.
+	 */
+	protected synchronized void setTwoHundredDayAvg(BigDecimal twoHundredDayAvg){
+		this.twoHundredDayAvg = twoHundredDayAvg;
+	}
+	
+	/**
+	 * Sets the change from 200 day average field. This method is private to only serve as
+	 * a helper method for <tt>setStockDetails(StockDownloader,boolean)</tt>.
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
 	 * @throws NumberFormatException if the raw text value wasn't properly
@@ -359,7 +443,20 @@ public class DefaultStock extends AbstractStock {
 	}
 	
 	/**
-	 * Sets the change from 200 day average in percent field.
+	 * Sets the change from 200 day average field. This method is protected to allow
+	 * this class and subclasses an internal tool to change this value.
+	 * Other classes should rely on <tt>setStockDetails(StockDownloader,boolean)</tt>
+	 * to update this stock.
+	 * 
+	 * @param change200DayAvg the change from 200 day average price.
+	 */
+	protected synchronized void setChang200DayAvg(BigDecimal change200DayAvg){
+		this.change200DayAvg = change200DayAvg;
+	}
+	
+	/**
+	 * Sets the change from 200 day average in percent field. This method is private to only serve as
+	 * a helper method for <tt>setStockDetails(StockDownloader,boolean)</tt>.
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
 	 * @throws NumberFormatException if the raw text value wasn't properly
@@ -374,7 +471,20 @@ public class DefaultStock extends AbstractStock {
 	}
 	
 	/**
-	 * Sets the year high field.
+	 * Sets the percent change from 200 day average field. This method is protected to allow
+	 * this class and subclasses an internal tool to change this value.
+	 * Other classes should rely on <tt>setStockDetails(StockDownloader,boolean)</tt>
+	 * to update this stock.
+	 * 
+	 * @param change200DayAvgPercent the percent change from 200 day average price.
+	 */
+	protected synchronized void setChang200DayAvgPercent(BigDecimal change200DayAvgPercent){
+		this.change200DayAvgPercent = change200DayAvgPercent;
+	}
+	
+	/**
+	 * Sets the year high field. This method is private to only serve as
+	 * a helper method for <tt>setStockDetails(StockDownloader,boolean)</tt>.
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
 	 * @throws NumberFormatException if the raw text value wasn't properly
@@ -389,7 +499,20 @@ public class DefaultStock extends AbstractStock {
 	}
 	
 	/**
-	 * Sets the change from year high field.
+	 * Sets the year high field. This method is protected to allow
+	 * this class and subclasses an internal tool to change this value.
+	 * Other classes should rely on <tt>setStockDetails(StockDownloader,boolean)</tt>
+	 * to update this stock.
+	 * 
+	 * @param yearHigh the year high price.
+	 */
+	protected synchronized void setYearHigh(BigDecimal yearHigh){
+		this.yearHigh = yearHigh;
+	}
+	
+	/**
+	 * Sets the change from year high field. This method is private to only serve as
+	 * a helper method for <tt>setStockDetails(StockDownloader,boolean)</tt>.
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
 	 * @throws NumberFormatException if the raw text value wasn't properly
@@ -404,7 +527,20 @@ public class DefaultStock extends AbstractStock {
 	}
 	
 	/**
-	 * Sets the change from year high in percent field.
+	 * Sets the change from the year high field. This method is protected to allow
+	 * this class and subclasses an internal tool to change this value.
+	 * Other classes should rely on <tt>setStockDetails(StockDownloader,boolean)</tt>
+	 * to update this stock.
+	 * 
+	 * @param changeYearHigh the change from the year high price.
+	 */
+	protected synchronized void setChangeYearHigh(BigDecimal changeYearHigh){
+		this.changeYearHigh = changeYearHigh;
+	}
+	
+	/**
+	 * Sets the change from year high in percent field. This method is private to only serve as
+	 * a helper method for <tt>setStockDetails(StockDownloader,boolean)</tt>.
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
 	 * @throws NumberFormatException if the raw text value wasn't properly
@@ -419,7 +555,20 @@ public class DefaultStock extends AbstractStock {
 	}
 	
 	/**
-	 * Sets the year low field.
+	 * Sets the percent change from the year high field. This method is protected to allow
+	 * this class and subclasses an internal tool to change this value.
+	 * Other classes should rely on <tt>setStockDetails(StockDownloader,boolean)</tt>
+	 * to update this stock.
+	 * 
+	 * @param changeYearHighPercent the percent change from the year high price.
+	 */
+	protected synchronized void setChangeYearHighPercent(BigDecimal changeYearHighPercent){
+		this.changeYearHighPercent = changeYearHighPercent;
+	}
+	
+	/**
+	 * Sets the year low field. This method is private to only serve as
+	 * a helper method for <tt>setStockDetails(StockDownloader,boolean)</tt>.
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
 	 * @throws NumberFormatException if the raw text value wasn't properly
@@ -434,7 +583,20 @@ public class DefaultStock extends AbstractStock {
 	}
 	
 	/**
-	 * Sets the change from year low field.
+	 * Sets the year low field. This method is protected to allow
+	 * this class and subclasses an internal tool to change this value.
+	 * Other classes should rely on <tt>setStockDetails(StockDownloader,boolean)</tt>
+	 * to update this stock.
+	 * 
+	 * @param yearLow the year low price.
+	 */
+	protected synchronized void setYearLow(BigDecimal yearLow){
+		this.yearLow = yearLow;
+	}
+	
+	/**
+	 * Sets the change from year low field. This method is private to only serve as
+	 * a helper method for <tt>setStockDetails(StockDownloader,boolean)</tt>.
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
 	 * @throws NumberFormatException if the raw text value wasn't properly
@@ -449,7 +611,20 @@ public class DefaultStock extends AbstractStock {
 	}
 	
 	/**
-	 * Sets the change from year low in percent field.
+	 * Sets the change from the year low field. This method is protected to allow
+	 * this class and subclasses an internal tool to change this value.
+	 * Other classes should rely on <tt>setStockDetails(StockDownloader,boolean)</tt>
+	 * to update this stock.
+	 * 
+	 * @param changeYearLow the change from the year low price.
+	 */
+	protected synchronized void setChangeYearLow(BigDecimal changeYearLow){
+		this.changeYearLow = changeYearLow;
+	}
+	
+	/**
+	 * Sets the change from year low in percent field. This method is private to only serve as
+	 * a helper method for <tt>setStockDetails(StockDownloader,boolean)</tt>.
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
 	 * @throws NumberFormatException if the raw text value wasn't properly
@@ -464,7 +639,20 @@ public class DefaultStock extends AbstractStock {
 	}
 	
 	/**
-	 * Sets the current price field.
+	 * Sets the percent change from the year low field. This method is protected to allow
+	 * this class and subclasses an internal tool to change this value.
+	 * Other classes should rely on <tt>setStockDetails(StockDownloader,boolean)</tt>
+	 * to update this stock.
+	 * 
+	 * @param changeYearLowPercent the percent change from the year low price.
+	 */
+	protected synchronized void setChangeYearLowPercent(BigDecimal changeYearLowPercent){
+		this.changeYearLowPercent = changeYearLowPercent;
+	}
+	
+	/**
+	 * Sets the current price field. This method is private to only serve as
+	 * a helper method for <tt>setStockDetails(StockDownloader,boolean)</tt>.
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
 	 * @throws NumberFormatException if the raw text value wasn't properly
@@ -479,7 +667,20 @@ public class DefaultStock extends AbstractStock {
 	}
 	
 	/**
-	 * Sets the last trade date field.
+	 * Sets the current share price field. This method is protected to allow
+	 * this class and subclasses an internal tool to change this value.
+	 * Other classes should rely on <tt>setStockDetails(StockDownloader,boolean)</tt>
+	 * to update this stock.
+	 * 
+	 * @param currentPrice the current share price.
+	 */
+	protected synchronized void setCurrentPrice(BigDecimal currentPrice){
+		this.currentPrice = currentPrice;
+	}
+	
+	/**
+	 * Sets the last trade date field. This method is private to only serve as
+	 * a helper method for <tt>setStockDetails(StockDownloader,boolean)</tt>.
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
 	 * @throws NumberFormatException if the raw text value wasn't properly
@@ -497,7 +698,20 @@ public class DefaultStock extends AbstractStock {
 	}
 	
 	/**
-	 * Sets the last trade time field.
+	 * Sets the last trade date field. This method is protected to allow
+	 * this class and subclasses an internal tool to change this value.
+	 * Other classes should rely on <tt>setStockDetails(StockDownloader,boolean)</tt>
+	 * to update this stock.
+	 * 
+	 * @param lastTradeDate the last trade date.
+	 */
+	protected synchronized void setLastTradeDate(Calendar lastTradeDate){
+		this.lastTradeDate = lastTradeDate;
+	}
+	
+	/**
+	 * Sets the last trade time field. This method is private to only serve as
+	 * a helper method for <tt>setStockDetails(StockDownloader,boolean)</tt>.
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
 	 * @throws NumberFormatException if the raw text value wasn't properly
@@ -518,6 +732,18 @@ public class DefaultStock extends AbstractStock {
 		synchronized(this){
 			this.lastTradeTime = new GregorianCalendar(1970, 0, 1, hours, minutes);
 		}
+	}
+	
+	/**
+	 * Sets the last trade time field. This method is protected to allow
+	 * this class and subclasses an internal tool to change this value.
+	 * Other classes should rely on <tt>setStockDetails(StockDownloader,boolean)</tt>
+	 * to update this stock.
+	 * 
+	 * @param lastTradeTime the last trade time.
+	 */
+	protected synchronized void setLastTradeTime(Calendar lastTradeTime){
+		this.lastTradeTime = lastTradeTime;
 	}
 	
 	/**

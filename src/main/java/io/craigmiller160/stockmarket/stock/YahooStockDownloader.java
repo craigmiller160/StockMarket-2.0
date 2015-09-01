@@ -341,6 +341,9 @@ public final class YahooStockDownloader implements StockDownloader {
 		if(!(csvFile.toString().equals(""))){
 			historyList = parseHistoryCSV(csvFile.toString(), symbol);
 		}
+
+		//TODO still some concerns about the thread-safety of this list and
+		//how it's used. Review this, and change if necessary.
 		
 		return historyList;
 	}
