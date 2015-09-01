@@ -103,12 +103,54 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 	}
 	
 	/**
-	 * Constructs a <tt>DefaultOwnedStock</tt> wrapping around an existing <tt>AbstractStock</tt>. 
+	 * Copy constructor for <tt>DefaultOwnedStock</tt>. Creates a 
+	 * deep copy of the stock parameter. Accepts all kinds of 
+	 * stock objects, and parses the object along the way to check
+	 * for which fields to set.
+	 * <p>
+	 * <b>NOTE:</b> This does NOT guarantee that all fields
+	 * of this class will have a value. Whether a field will
+	 * have a value or be null is determined entirely by
+	 * whether is has a value or is null in the stock
+	 * parameter being copied. In addition, this constructor
+	 * accepts <tt>Stock</tt> objects that are NOT 
+	 * <tt>OwnedStock</tt>s. If that is the case, all the 
+	 * <tt>OwnedStock</tt> values will be set to 0. 
 	 * 
-	 * @param stock the stock to wrap around.
+	 * @param stock the stock to copy to this class.
 	 */
-	public DefaultOwnedStock(AbstractStock stock) {
-		this(stock.getSymbol());
+	public DefaultOwnedStock(Stock stock) {
+		super(stock);
+		if(stock instanceof OwnedStock){
+			copyStock((OwnedStock) stock);
+		}
+		else{
+			principle = new BigDecimal(0);
+			totalValue = new BigDecimal(0);
+			net = new BigDecimal(0);
+		}
+	}
+	
+	/**
+	 * Stock copying method. The values of the stock
+	 * parameter, if there are any, will be set to 
+	 * this class.
+	 * 
+	 * @param stock the stock to be copied.
+	 */
+	private void copyStock(OwnedStock stock){
+		//If quantity == 0, then 
+		if(stock.getQuantityOfShares() > 0){
+			setQuantityOfShares(stock.getQuantityOfShares());
+			setPrinciple(stock.getPrinciple());
+			setTotalValue(stock.getTotalValue());
+			setNet(stock.getNet());
+		}
+		else{
+			principle = new BigDecimal(0);
+			totalValue = new BigDecimal(0);
+			net = new BigDecimal(0);
+		}
 	}
 	
 	@Override
@@ -125,12 +167,17 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 	 * Sets the quantity field. This method is private to only serve as
 	 * a helper method for <tt>setStockDetails(StockDownloader,boolean)</tt>.
 	 * 
-	 * @param quantity the quantity of shares.
+	 * @param rawText the text for the quantity of shares.
 	 * @throws NumberFormatException if the raw text value wasn't properly
 	 * parsed and is not a number value.
+	 * @throws IllegalArgumentException if the value passed to this method is 
+	 * less than 0.
 	 */
-	private void setQuantityOfShares(String quantity){
-		int num = Integer.parseInt(quantity);
+	private void setQuantityOfShares(String rawText){
+		int num = Integer.parseInt(rawText);
+		if(num < 0){
+			throw new IllegalArgumentException("Quantity can't be less than 0: " + num);
+		}
 		synchronized(this){
 			this.quantityOfShares = num;
 		}
@@ -143,21 +190,33 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 	 * to update this stock.
 	 * 
 	 * @param quantity the quantity of shares owned of this stock.
+	 * @throws IllegalArgumentException if the value passed to this method is 
+	 * less than 0.
 	 */
-	protected synchronized void setQuantityOfShares(int quantity){
-		this.quantityOfShares = quantity;
+	protected void setQuantityOfShares(int quantity){
+		if(quantity < 0){
+			throw new IllegalArgumentException("Quantity can't be less than 0: " + quantity);
+		}
+		synchronized(this){
+			this.quantityOfShares = quantity;
+		}
 	}
 	
 	/**
 	 * Sets the principle field. This method is private to only serve as
 	 * a helper method for <tt>setStockDetails(StockDownloader,boolean)</tt>.
 	 * 
-	 * @param principle the principle, the initial amount spent on this stock.
+	 * @param rawText the text for the principle, the initial amount spent on this stock.
 	 * @throws NumberFormatException if the raw text value wasn't properly
 	 * parsed and is not a number value.
+	 * @throws IllegalArgumentException if the value passed to this method is 
+	 * less than 0.
 	 */
-	private void setPrinciple(String principle){
-		BigDecimal num = new BigDecimal(Double.parseDouble(principle));
+	private void setPrinciple(String rawText){
+		BigDecimal num = new BigDecimal(Double.parseDouble(rawText));
+		if(num.compareTo(new BigDecimal(0)) < 0){
+			throw new IllegalArgumentException("Principle can't be less than 0: " + num);
+		}
 		synchronized(this){
 			this.principle = num;
 		}
@@ -170,21 +229,33 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 	 * to update this stock.
 	 * 
 	 * @param principle the principle, the initial amount spent on the stock.
+	 * @throws IllegalArgumentException if the value passed to this method is 
+	 * less than 0.
 	 */
-	protected synchronized void setPrinciple(BigDecimal principle){
-		this.principle = principle;
+	protected void setPrinciple(BigDecimal principle){
+		if(principle.compareTo(new BigDecimal(0)) < 0){
+			throw new IllegalArgumentException("Principle can't be less than 0: " + principle);
+		}
+		synchronized(this){
+			this.principle = principle;
+		}
 	}
 	
 	/**
 	 * Sets the total value field. This method is private to only serve as
 	 * a helper method for <tt>setStockDetails(StockDownloader,boolean)</tt>.
 	 * 
-	 * @param totalValue the total value of all shares of this stock.
+	 * @param rawText the text for the total value of all shares of this stock.
 	 * @throws NumberFormatException if the raw text value wasn't properly
 	 * parsed and is not a number value.
+	 * @throws IllegalArgumentException if the value passed to this method is 
+	 * less than 0.
 	 */
-	private void setTotalValue(String totalValue){
-		BigDecimal num = new BigDecimal(Double.parseDouble(totalValue));
+	private void setTotalValue(String rawText){
+		BigDecimal num = new BigDecimal(Double.parseDouble(rawText));
+		if(num.compareTo(new BigDecimal(0)) < 0){
+			throw new IllegalArgumentException("Total Value can't be less than 0: " + num);
+		}
 		synchronized(this){
 			this.totalValue = num;
 		}
@@ -197,8 +268,13 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 	 * to update this stock.
 	 * 
 	 * @param totalValue the totalValue of all shares of the stock.
+	 * @throws IllegalArgumentException if the value passed to this method is 
+	 * less than 0.
 	 */
-	protected synchronized void setTotalValue(BigDecimal totalValue){
+	protected void setTotalValue(BigDecimal totalValue){
+		if(totalValue.compareTo(new BigDecimal(0)) < 0){
+			throw new IllegalArgumentException("Total Value can't be less than 0: " + totalValue);
+		}
 		this.totalValue = totalValue;
 	}
 	
@@ -206,12 +282,12 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 	 * Sets the net field. This method is private to only serve as
 	 * a helper method for <tt>setStockDetails(StockDownloader,boolean)</tt>.
 	 * 
-	 * @param net the net gains/losses on this stock.
+	 * @param rawText the text for the net gains/losses on this stock.
 	 * @throws NumberFormatException if the raw text value wasn't properly
 	 * parsed and is not a number value.
 	 */
-	private void setNet(String net){
-		BigDecimal num = new BigDecimal(Double.parseDouble(net));
+	private void setNet(String rawText){
+		BigDecimal num = new BigDecimal(Double.parseDouble(rawText));
 		synchronized(this){
 			this.net = num;
 		}
@@ -225,8 +301,10 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 	 * 
 	 * @param net the net gains/losses on this stock.
 	 */
-	protected synchronized void setNet(BigDecimal net){
-		this.net = net;
+	protected void setNet(BigDecimal net){
+		synchronized(this){
+			this.net = net;
+		}
 	}
 	
 	@Override
@@ -262,7 +340,7 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 					+ "adding/subtracting shares");
 		}
 		
-		BigDecimal valueToSubtractFromPrinciple = null;
+		BigDecimal valueToSubtract = null;
 		synchronized(this){
 			if(quantity > quantityOfShares){
 				throw new InsufficientSharesException(
@@ -270,7 +348,7 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 						+ ", not enough to subtract " + quantity);
 			}
 			
-			valueToSubtractFromPrinciple = principle.multiply(
+			valueToSubtract = principle.multiply(
 					new BigDecimal(quantity / quantityOfShares));
 		}
 		
@@ -282,11 +360,11 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 		
 		LOGGER.logp(Level.FINEST, this.getClass().getName(), "decreaseShares()", 
 				symbol + ": Subtracted Quantity: " + quantity + " Value to Subtract From Principle: " 
-				+ moneyFormat.format(valueToSubtractFromPrinciple));
+				+ moneyFormat.format(valueToSubtract));
 		
 		synchronized(this){
 			quantityOfShares -= quantity;
-			principle = principle.subtract(valueToSubtractFromPrinciple);
+			principle = principle.compareTo(valueToSubtract) >= 0 ? principle.subtract(valueToSubtract) : new BigDecimal(0);
 		}
 		
 		setTotalValueAndNet();
@@ -313,14 +391,22 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 		BigDecimal tempNet = null;
 		BigDecimal currentPrice = getCurrentPrice(); //getCurrentPrice() is synchronized already
 		synchronized(this){
-			totalValue = currentPrice.multiply(new BigDecimal(quantityOfShares));
-			net = totalValue.subtract(principle);
+			//If quantity == 0, then there's no total value or net
+			if(quantityOfShares > 0){
+				totalValue = currentPrice.multiply(new BigDecimal(quantityOfShares));
+				net = totalValue.subtract(principle);
+			}
+			else{
+				totalValue = new BigDecimal(0);
+				net = new BigDecimal(0);
+			}
 			
 			tempQuantity = quantityOfShares;
 			tempTotalValue = totalValue;
 			tempNet = net;
 		}
 		
+		//TODO consider if this log entry is really worth creating all the temp variables for it
 		LOGGER.logp(Level.FINEST, this.getClass().getName(), "setTotalValueAndNet()", 
 				symbol + ": Quantity of Shares: " + tempQuantity + " Total Value: " 
 				+ moneyFormat.format(tempTotalValue) + " Net: " + moneyFormat.format(tempNet));

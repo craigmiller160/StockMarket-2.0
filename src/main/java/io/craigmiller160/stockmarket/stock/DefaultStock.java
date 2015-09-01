@@ -176,6 +176,59 @@ public class DefaultStock extends AbstractStock {
 		super(symbol);
 	}
 	
+	/**
+	 * Copy constructor for <tt>DefaultStock</tt>. Creates a 
+	 * deep copy of the stock parameter.
+	 * <p>
+	 * <b>NOTE:</b> This does NOT guarantee that all fields
+	 * of this class will have a value. Whether a field will
+	 * have a value or be null is determined entirely by
+	 * whether is has a value or is null in the stock
+	 * parameter being copied.
+	 * 
+	 * @param stock the stock to copy to this class.
+	 */
+	public DefaultStock(Stock stock){
+		super(stock.getSymbol());
+		copyStock(stock);
+	}
+	
+	/**
+	 * Stock deep copying method. Does several checks to confirm that
+	 * the fields of the stock parameter have values, and then copies
+	 * those values to the appropriate fields of this class.
+	 * 
+	 * @param stock the stock to copy.
+	 */
+	private void copyStock(Stock stock){
+		//If price == null, details not set. No values will exist, all should
+		//be set to defaults.
+		if(stock.getCurrentPrice() != null){
+			setCurrentPrice(stock.getCurrentPrice());
+			//If DefaultStock, set DefaultStock values
+			if(stock instanceof DefaultStock){
+				setCompanyName(((DefaultStock) stock).getCompanyName());
+				//If changeToday == null, fullDetails not set, so these values should be left null
+				if(((DefaultStock) stock).getChangeToday() != null){
+					setChangeToday(((DefaultStock) stock).getChangeToday());
+					setChangeTodayPercent(((DefaultStock) stock).getChangeTodayPercent());
+					setFiftyDayAvg(((DefaultStock) stock).getFiftyDayAvg());
+					setChange50DayAvg(((DefaultStock) stock).getChange50DayAvg());
+					setChange50DayAvgPercent(((DefaultStock) stock).getChange50DayAvgPercent());
+					setTwoHundredDayAvg(((DefaultStock) stock).getTwoHundredDayAvg());
+					setChange200DayAvg(((DefaultStock) stock).getChange200DayAvg());
+					setChange200DayAvgPercent(((DefaultStock) stock).getChange200DayAvgPercent());
+					setYearHigh(((DefaultStock) stock).getYearHigh());
+					setChangeYearHigh(((DefaultStock) stock).getChangeYearHigh());
+					setChangeYearHighPercent(((DefaultStock) stock).getChangeYearHighPercent());
+					setYearLow(((DefaultStock) stock).getYearLow());
+					setChangeYearLow(((DefaultStock) stock).getChangeYearLow());
+					setChangeYearLowPercent(((DefaultStock) stock).getChangeYearLowPercent());
+				}
+			}
+		}
+	}
+	
 	@Override
 	public void setStockDetails(StockDownloader downloader, boolean fullDetails) 
 			throws InvalidStockException, UnknownHostException, IOException {
@@ -222,7 +275,7 @@ public class DefaultStock extends AbstractStock {
 			setCurrentPrice(stockDataMap.get(CURRENT_PRICE));
 			if(fullDetails){
 				setChangeToday(stockDataMap.get(CHANGE_TODAY));
-				setChangeTodayInPercent(stockDataMap.get(CHANGE_TODAY_PERCENT));
+				setChangeTodayPercent(stockDataMap.get(CHANGE_TODAY_PERCENT));
 				setFiftyDayAvg(stockDataMap.get(FIFTY_DAY_AVG));
 				setChange50DayAvg(stockDataMap.get(CHANGE_50_DAY_AVG));
 				setChange50DayAvgPercent(stockDataMap.get(CHANGE_50_DAY_AVG_PERCENT));
@@ -256,8 +309,10 @@ public class DefaultStock extends AbstractStock {
 	 * 
 	 * @param rawText the raw text to be parsed and set to the field.
 	 */
-	private synchronized void setCompanyName(String rawText){
-		this.companyName = rawText;
+	private void setCompanyName(String rawText){
+		synchronized(this){
+			this.companyName = rawText;
+		}
 	}
 	
 	/**
@@ -270,7 +325,6 @@ public class DefaultStock extends AbstractStock {
 	 */
 	private void setChangeToday(String rawText){
 		double value = Double.parseDouble(rawText);
-		
 		synchronized(this){
 			this.changeToday = new BigDecimal(value);
 		}
@@ -284,8 +338,10 @@ public class DefaultStock extends AbstractStock {
 	 * 
 	 * @param changeToday the change in price today.
 	 */
-	protected synchronized void setChangeToday(BigDecimal changeToday){
-		this.changeToday = changeToday;
+	protected void setChangeToday(BigDecimal changeToday){
+		synchronized(this){
+			this.changeToday = changeToday;
+		}
 	}
 	
 	/**
@@ -296,9 +352,8 @@ public class DefaultStock extends AbstractStock {
 	 * @throws NumberFormatException if the raw text value wasn't properly
 	 * parsed and is not a number value.
 	 */
-	private void setChangeTodayInPercent(String rawText){
+	private void setChangeTodayPercent(String rawText){
 		double value = Double.parseDouble(rawText);
-		
 		synchronized(this){
 			this.changeTodayInPercent = new BigDecimal(value);
 		}
@@ -312,8 +367,10 @@ public class DefaultStock extends AbstractStock {
 	 * 
 	 * @param changeTodayPercent the percent change in price today.
 	 */
-	protected synchronized void setChangeTodayInPecent(BigDecimal changeTodayPercent){
-		this.changeTodayInPercent = changeTodayPercent;
+	protected void setChangeTodayPercent(BigDecimal changeTodayPercent){
+		synchronized(this){
+			this.changeTodayInPercent = changeTodayPercent;
+		}
 	}
 	
 	/**
@@ -323,10 +380,14 @@ public class DefaultStock extends AbstractStock {
 	 * @param rawText the raw text to be parsed and set to the field.
 	 * @throws NumberFormatException if the raw text value wasn't properly
 	 * parsed and is not a number value.
+	 * @throws IllegalArgumentException if the value passed to this method is 
+	 * less than 0.
 	 */
 	private void setFiftyDayAvg(String rawText){
 		double value = Double.parseDouble(rawText);
-		
+		if(value < 0){
+			throw new IllegalArgumentException("50 Day Avg cannot be less than 0: " + value);
+		}
 		synchronized(this){
 			this.fiftyDayAvg = new BigDecimal(value);
 		}
@@ -339,9 +400,16 @@ public class DefaultStock extends AbstractStock {
 	 * to update this stock.
 	 * 
 	 * @param fiftyDayAvg the 50 day average price.
+	 * @throws IllegalArgumentException if the value passed to this method is 
+	 * less than 0.
 	 */
-	protected synchronized void setFiftyDayAvg(BigDecimal fiftyDayAvg){
-		this.fiftyDayAvg = fiftyDayAvg;
+	protected void setFiftyDayAvg(BigDecimal fiftyDayAvg){
+		if(fiftyDayAvg.compareTo(new BigDecimal(0)) < 0){
+			throw new IllegalArgumentException("50 Day Avg cannot be less than 0: " + fiftyDayAvg);
+		}
+		synchronized(this){
+			this.fiftyDayAvg = fiftyDayAvg;
+		}
 	}
 	
 	/**
@@ -354,7 +422,6 @@ public class DefaultStock extends AbstractStock {
 	 */
 	private void setChange50DayAvg(String rawText){
 		double value = Double.parseDouble(rawText);
-		
 		synchronized(this){
 			this.change50DayAvg = new BigDecimal(value);
 		}
@@ -368,8 +435,10 @@ public class DefaultStock extends AbstractStock {
 	 * 
 	 * @param change50DayAvg the change from 50 day average price.
 	 */
-	protected synchronized void setChange50DayAvg(BigDecimal change50DayAvg){
-		this.change50DayAvg = change50DayAvg;
+	protected void setChange50DayAvg(BigDecimal change50DayAvg){
+		synchronized(this){
+			this.change50DayAvg = change50DayAvg;
+		}
 	}
 	
 	/**
@@ -381,9 +450,10 @@ public class DefaultStock extends AbstractStock {
 	 * parsed and is not a number value.
 	 */
 	private void setChange50DayAvgPercent(String rawText){
-		double value = 0;
-		value = Double.parseDouble(rawText);
-		this.change50DayAvgPercent = new BigDecimal(value);
+		double value = Double.parseDouble(rawText);
+		synchronized(this){
+			this.change50DayAvgPercent = new BigDecimal(value);
+		}
 	}
 	
 	/**
@@ -394,8 +464,10 @@ public class DefaultStock extends AbstractStock {
 	 * 
 	 * @param change50DayAvgPercent the percent change from 50 day average price.
 	 */
-	protected synchronized void setChange50DayAvgPercent(BigDecimal change50DayAvgPercent){
-		this.change50DayAvgPercent = change50DayAvgPercent;
+	protected void setChange50DayAvgPercent(BigDecimal change50DayAvgPercent){
+		synchronized(this){
+			this.change50DayAvgPercent = change50DayAvgPercent;
+		}
 	}
 	
 	/**
@@ -405,10 +477,14 @@ public class DefaultStock extends AbstractStock {
 	 * @param rawText the raw text to be parsed and set to the field.
 	 * @throws NumberFormatException if the raw text value wasn't properly
 	 * parsed and is not a number value.
+	 * @throws IllegalArgumentException if the value passed to this method is 
+	 * less than 0.
 	 */
 	private void setTwoHundredDayAvg(String rawText){
 		double value = Double.parseDouble(rawText);
-		
+		if(value < 0){
+			throw new IllegalArgumentException("200 Day Avg cannot be less than 0: " + value);
+		}
 		synchronized(this){
 			this.twoHundredDayAvg = new BigDecimal(value);
 		}
@@ -421,9 +497,16 @@ public class DefaultStock extends AbstractStock {
 	 * to update this stock.
 	 * 
 	 * @param twoHundredDayAvg the 200 day average price.
+	 * @throws IllegalArgumentException if the value passed to this method is 
+	 * less than 0.
 	 */
-	protected synchronized void setTwoHundredDayAvg(BigDecimal twoHundredDayAvg){
-		this.twoHundredDayAvg = twoHundredDayAvg;
+	protected void setTwoHundredDayAvg(BigDecimal twoHundredDayAvg){
+		if(twoHundredDayAvg.compareTo(new BigDecimal(0)) < 0){
+			throw new IllegalArgumentException("200 Day Avg cannot be less than 0: " + twoHundredDayAvg);
+		}
+		synchronized(this){
+			this.twoHundredDayAvg = twoHundredDayAvg;
+		}
 	}
 	
 	/**
@@ -436,7 +519,6 @@ public class DefaultStock extends AbstractStock {
 	 */
 	private void setChange200DayAvg(String rawText){
 		double value = Double.parseDouble(rawText);
-		
 		synchronized(this){
 			this.change200DayAvg = new BigDecimal(value);
 		}
@@ -450,8 +532,10 @@ public class DefaultStock extends AbstractStock {
 	 * 
 	 * @param change200DayAvg the change from 200 day average price.
 	 */
-	protected synchronized void setChang200DayAvg(BigDecimal change200DayAvg){
-		this.change200DayAvg = change200DayAvg;
+	protected void setChange200DayAvg(BigDecimal change200DayAvg){
+		synchronized(this){
+			this.change200DayAvg = change200DayAvg;
+		}
 	}
 	
 	/**
@@ -464,7 +548,6 @@ public class DefaultStock extends AbstractStock {
 	 */
 	private void setChange200DayAvgPercent(String rawText){
 		double value = Double.parseDouble(rawText);
-		
 		synchronized(this){
 			this.change200DayAvgPercent = new BigDecimal(value);
 		}
@@ -478,8 +561,10 @@ public class DefaultStock extends AbstractStock {
 	 * 
 	 * @param change200DayAvgPercent the percent change from 200 day average price.
 	 */
-	protected synchronized void setChang200DayAvgPercent(BigDecimal change200DayAvgPercent){
-		this.change200DayAvgPercent = change200DayAvgPercent;
+	protected void setChange200DayAvgPercent(BigDecimal change200DayAvgPercent){
+		synchronized(this){
+			this.change200DayAvgPercent = change200DayAvgPercent;
+		}
 	}
 	
 	/**
@@ -489,10 +574,14 @@ public class DefaultStock extends AbstractStock {
 	 * @param rawText the raw text to be parsed and set to the field.
 	 * @throws NumberFormatException if the raw text value wasn't properly
 	 * parsed and is not a number value.
+	 * @throws IllegalArgumentException if the value passed to this method is 
+	 * less than 0.
 	 */
 	private void setYearHigh(String rawText){
 		double value = Double.parseDouble(rawText);
-		
+		if(value < 0){
+			throw new IllegalArgumentException("Year High cannot be less than 0: " + value);
+		}
 		synchronized(this){
 			this.yearHigh = new BigDecimal(value);
 		}
@@ -505,9 +594,16 @@ public class DefaultStock extends AbstractStock {
 	 * to update this stock.
 	 * 
 	 * @param yearHigh the year high price.
+	 * @throws IllegalArgumentException if the value passed to this method is 
+	 * less than 0.
 	 */
-	protected synchronized void setYearHigh(BigDecimal yearHigh){
-		this.yearHigh = yearHigh;
+	protected void setYearHigh(BigDecimal yearHigh){
+		if(yearHigh.compareTo(new BigDecimal(0)) < 0){
+			throw new IllegalArgumentException("Year High cannot be less than 0: " + yearHigh);
+		}
+		synchronized(this){
+			this.yearHigh = yearHigh;
+		}
 	}
 	
 	/**
@@ -520,7 +616,6 @@ public class DefaultStock extends AbstractStock {
 	 */
 	private void setChangeYearHigh(String rawText){
 		double value = Double.parseDouble(rawText);
-		
 		synchronized(this){
 			this.changeYearHigh = new BigDecimal(value);
 		}
@@ -534,8 +629,10 @@ public class DefaultStock extends AbstractStock {
 	 * 
 	 * @param changeYearHigh the change from the year high price.
 	 */
-	protected synchronized void setChangeYearHigh(BigDecimal changeYearHigh){
-		this.changeYearHigh = changeYearHigh;
+	protected void setChangeYearHigh(BigDecimal changeYearHigh){
+		synchronized(this){
+			this.changeYearHigh = changeYearHigh;
+		}
 	}
 	
 	/**
@@ -548,7 +645,6 @@ public class DefaultStock extends AbstractStock {
 	 */
 	private void setChangeYearHighPercent(String rawText){
 		double value = Double.parseDouble(rawText);
-		
 		synchronized(this){
 			this.changeYearHighPercent = new BigDecimal(value);
 		}
@@ -562,8 +658,10 @@ public class DefaultStock extends AbstractStock {
 	 * 
 	 * @param changeYearHighPercent the percent change from the year high price.
 	 */
-	protected synchronized void setChangeYearHighPercent(BigDecimal changeYearHighPercent){
-		this.changeYearHighPercent = changeYearHighPercent;
+	protected void setChangeYearHighPercent(BigDecimal changeYearHighPercent){
+		synchronized(this){
+			this.changeYearHighPercent = changeYearHighPercent;
+		}
 	}
 	
 	/**
@@ -573,10 +671,14 @@ public class DefaultStock extends AbstractStock {
 	 * @param rawText the raw text to be parsed and set to the field.
 	 * @throws NumberFormatException if the raw text value wasn't properly
 	 * parsed and is not a number value.
+	 * @throws IllegalArgumentException if the value passed to this method is 
+	 * less than 0.
 	 */
 	private void setYearLow(String rawText){
 		double value = Double.parseDouble(rawText);
-		
+		if(value < 0){
+			throw new IllegalArgumentException("Year Low cannot be less than 0: " + value);
+		}
 		synchronized(this){
 			this.yearLow = new BigDecimal(value);
 		}
@@ -589,9 +691,16 @@ public class DefaultStock extends AbstractStock {
 	 * to update this stock.
 	 * 
 	 * @param yearLow the year low price.
+	 * @throws IllegalArgumentException if the value passed to this method is 
+	 * less than 0.
 	 */
-	protected synchronized void setYearLow(BigDecimal yearLow){
-		this.yearLow = yearLow;
+	protected void setYearLow(BigDecimal yearLow){
+		if(yearLow.compareTo(new BigDecimal(0)) < 0){
+			throw new IllegalArgumentException("Year Low cannot be less than 0: " + yearLow);
+		}
+		synchronized(this){
+			this.yearLow = yearLow;
+		}
 	}
 	
 	/**
@@ -604,7 +713,6 @@ public class DefaultStock extends AbstractStock {
 	 */
 	private void setChangeYearLow(String rawText){
 		double value = Double.parseDouble(rawText);
-		
 		synchronized(this){
 			this.changeYearLow = new BigDecimal(value);
 		}
@@ -618,8 +726,10 @@ public class DefaultStock extends AbstractStock {
 	 * 
 	 * @param changeYearLow the change from the year low price.
 	 */
-	protected synchronized void setChangeYearLow(BigDecimal changeYearLow){
-		this.changeYearLow = changeYearLow;
+	protected void setChangeYearLow(BigDecimal changeYearLow){
+		synchronized(this){
+			this.changeYearLow = changeYearLow;
+		}
 	}
 	
 	/**
@@ -632,7 +742,6 @@ public class DefaultStock extends AbstractStock {
 	 */
 	private void setChangeYearLowPercent(String rawText){
 		double value = Double.parseDouble(rawText);
-		
 		synchronized(this){
 			this.changeYearLowPercent = new BigDecimal(value);
 		}
@@ -646,8 +755,10 @@ public class DefaultStock extends AbstractStock {
 	 * 
 	 * @param changeYearLowPercent the percent change from the year low price.
 	 */
-	protected synchronized void setChangeYearLowPercent(BigDecimal changeYearLowPercent){
-		this.changeYearLowPercent = changeYearLowPercent;
+	protected void setChangeYearLowPercent(BigDecimal changeYearLowPercent){
+		synchronized(this){
+			this.changeYearLowPercent = changeYearLowPercent;
+		}
 	}
 	
 	/**
@@ -657,10 +768,14 @@ public class DefaultStock extends AbstractStock {
 	 * @param rawText the raw text to be parsed and set to the field.
 	 * @throws NumberFormatException if the raw text value wasn't properly
 	 * parsed and is not a number value.
+	 * @throws IllegalArgumentException if the value passed to this method is 
+	 * less than 0.
 	 */
 	private void setCurrentPrice(String rawText){
 		double value = Double.parseDouble(rawText);
-		
+		if(value < 0){
+			throw new IllegalArgumentException("Current Price cannot be less than 0: " + value);
+		}
 		synchronized(this){
 			this.currentPrice = new BigDecimal(value);
 		}
@@ -673,9 +788,16 @@ public class DefaultStock extends AbstractStock {
 	 * to update this stock.
 	 * 
 	 * @param currentPrice the current share price.
+	 * @throws IllegalArgumentException if the value passed to this method is 
+	 * less than 0.
 	 */
-	protected synchronized void setCurrentPrice(BigDecimal currentPrice){
-		this.currentPrice = currentPrice;
+	protected void setCurrentPrice(BigDecimal currentPrice){
+		if(currentPrice.compareTo(new BigDecimal(0)) < 0){
+			throw new IllegalArgumentException("Year Low cannot be less than 0: " + currentPrice);
+		}
+		synchronized(this){
+			this.currentPrice = currentPrice;
+		}
 	}
 	
 	/**
@@ -685,12 +807,25 @@ public class DefaultStock extends AbstractStock {
 	 * @param rawText the raw text to be parsed and set to the field.
 	 * @throws NumberFormatException if the raw text value wasn't properly
 	 * parsed and is not a number value.
+	 * @throws IllegalArgumentException if the value passed to this method
+	 * does not conform to a valid date.
+	 * @throws ArrayIndexOutOfBoundsException if the value passed to this 
+	 * method is not a date string with intervals split by "/", and the
+	 * resulting array is malformed compared with what is expected.
 	 */
 	private void setLastTradeDate(String rawText){
 		String[] dateArr = rawText.split("/");
 		int month = Integer.parseInt(dateArr[0]) - 1;
 		int day = Integer.parseInt(dateArr[1]);
 		int year = Integer.parseInt(dateArr[2]);
+		
+		if(month < 0 || month > 11 || 
+				day < 0 || day > 31 || 
+				year < 1000 || year > 3000){
+			throw new IllegalArgumentException(
+					String.format("Not a valid date: %1$02d-%2$02d-%3$04d", 
+							month, day, year));
+		}
 		
 		synchronized(this){
 			this.lastTradeDate = new GregorianCalendar(year, month, day);
@@ -705,8 +840,10 @@ public class DefaultStock extends AbstractStock {
 	 * 
 	 * @param lastTradeDate the last trade date.
 	 */
-	protected synchronized void setLastTradeDate(Calendar lastTradeDate){
-		this.lastTradeDate = lastTradeDate;
+	protected void setLastTradeDate(Calendar lastTradeDate){
+		synchronized(this){
+			this.lastTradeDate = lastTradeDate;
+		}
 	}
 	
 	/**
@@ -716,18 +853,30 @@ public class DefaultStock extends AbstractStock {
 	 * @param rawText the raw text to be parsed and set to the field.
 	 * @throws NumberFormatException if the raw text value wasn't properly
 	 * parsed and is not a number value.
+	 * @throws IllegalArgumentException if the value passed to this method
+	 * is not a valid time.
+	 * @throws ArrayIndexOutOfBoundsException if the value passed to this 
+	 * method is not a time string with intervals split by ":", and the
+	 * resulting array is malformed compared with what is expected.
 	 */
 	private void setLastTradeTime(String rawText){
-		int hours = 12, minutes = 0;
+		int hours = 0, minutes = 0;
 		String amPM = rawText.substring(rawText.length() - 2, rawText.length());
 		String[] timeArr = rawText.substring(0, rawText.length() - 2).split(":");
 		if(amPM.equalsIgnoreCase("pm")){
+			//TODO this won't work for 12 noon
 			hours = 12 + Integer.parseInt(timeArr[0]);
 		}
 		else{
 			hours = Integer.parseInt(timeArr[0]);
 		}
 		minutes = Integer.parseInt(timeArr[1]);
+		
+		if(hours < 0 || hours >= 24 || minutes < 0 || minutes >= 60){
+			throw new IllegalArgumentException(
+					String.format("Not a valid time: %1$02d:%2$02d", 
+							hours, minutes));
+		}
 		
 		synchronized(this){
 			this.lastTradeTime = new GregorianCalendar(1970, 0, 1, hours, minutes);
@@ -742,8 +891,10 @@ public class DefaultStock extends AbstractStock {
 	 * 
 	 * @param lastTradeTime the last trade time.
 	 */
-	protected synchronized void setLastTradeTime(Calendar lastTradeTime){
-		this.lastTradeTime = lastTradeTime;
+	protected void setLastTradeTime(Calendar lastTradeTime){
+		synchronized(this){
+			this.lastTradeTime = lastTradeTime;
+		}
 	}
 	
 	/**
@@ -769,7 +920,7 @@ public class DefaultStock extends AbstractStock {
 	 * 
 	 * @return the change in percent.
 	 */
-	public synchronized BigDecimal getChangeTodayInPercent(){
+	public synchronized BigDecimal getChangeTodayPercent(){
 		return changeTodayInPercent;
 	}
 	
@@ -924,7 +1075,7 @@ public class DefaultStock extends AbstractStock {
 			stockValues.put(SYMBOL, getSymbol());
 			if(fullDetails){
 				stockValues.put(CHANGE_TODAY, getChangeToday());
-				stockValues.put(CHANGE_TODAY_PERCENT, getChangeTodayInPercent());
+				stockValues.put(CHANGE_TODAY_PERCENT, getChangeTodayPercent());
 				stockValues.put(FIFTY_DAY_AVG, getFiftyDayAvg());
 				stockValues.put(CHANGE_50_DAY_AVG, getChange50DayAvg());
 				stockValues.put(CHANGE_50_DAY_AVG_PERCENT, getChange50DayAvgPercent());
