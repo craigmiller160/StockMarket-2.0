@@ -11,6 +11,9 @@ bin/
 # JUnit Test Directory
 src/test/
 
+# Maven Target Directory
+target/
+
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
