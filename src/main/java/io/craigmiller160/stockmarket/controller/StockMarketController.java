@@ -112,6 +112,11 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 	public static final String DIALOG_DISPLAYED_PROPERTY = "DialogDisplayed";
 	
 	/**
+	 * The property name for a stock in the stock list.
+	 */
+	public static final String STOCK_IN_LIST_PROPERTY = "StockInList";
+	
+	/**
 	 * The action command for creating a new portfolio.
 	 */
 	public static final String NEW_PORTFOLIO_ACTION = "NewPortfolio";
@@ -184,12 +189,12 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 	/**
 	 * The action command for displaying the buy stock dialog.
 	 */
-	public static final String BUY_STOCK_PREP_ACTION = "BuyStockPrep";
+	public static final String BUY_STOCK_DIALOG_ACTION = "BuyStockDialog";
 	
 	/**
 	 * The action command for displaying the sell stock dialog.
 	 */
-	public static final String SELL_STOCK_PREP_ACTION = "SellStockPrep";
+	public static final String SELL_STOCK_DIALOG_ACTION = "SellStockdIALOG";
 	
 	/**
 	 * The action command for buying shares of a stock.

@@ -85,6 +85,7 @@ public class StockDisplayModel extends AbstractPropertyModel {
 		firePropertyChange(SELECTED_STOCK_PROPERTY, oldValue, selectedStock);
 	}
 	
+	//TODO the event historyList reference needs to be made more thread-safe
 	/**
 	 * Sets the history of the selected and displayed stock. This is a bound 
 	 * property, and a <tt>PropertyChangeEvent</tt> is fired when it is
@@ -115,6 +116,7 @@ public class StockDisplayModel extends AbstractPropertyModel {
 		return selectedStock;
 	}
 	
+	//TODO stockHistory return method needs to be made more thread safe
 	/**
 	 * Returns the history of the selected stock.
 	 * 

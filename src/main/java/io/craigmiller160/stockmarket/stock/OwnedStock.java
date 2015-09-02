@@ -24,6 +24,13 @@ import java.math.BigDecimal;
  * Therefore <tt>increaseShares()</tt> and <tt>decreaseShares()</tt>
  * should be implemented to change all values of this stock when they
  * are called.
+ * <p>
+ * <b>THREAD SAFETY:</b> Interfaces can make no guarantee about the 
+ * thread safety of inheriting classes. However, <tt>OwnedStock</tt>
+ * implementations should ideally be thread safe, so they can be handled 
+ * concurrently by this program. Whether they are or not is ultimately
+ * determined by the implementing class, so the documentation for
+ * the implementation used by this program should be consulted.
  * 
  * @author craig
  * @version 2.0
@@ -117,6 +124,8 @@ public interface OwnedStock extends Stock{
 	 * stock as this one (symbols don't match).
 	 */
 	void addShares(OwnedStock stock);
+	
+	//TODO selling return value should return the amount the sold shares are worth, not a boolean
 	
 	/**
 	 * Subtract the specified number of shares from this stock. The number of shares subtracted is 

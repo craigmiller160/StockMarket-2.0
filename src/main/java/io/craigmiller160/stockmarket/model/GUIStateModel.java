@@ -58,7 +58,9 @@ public class GUIStateModel extends AbstractPropertyModel {
 	
 	/**
 	 * Sets the current state of the portfolio, which determines which
-	 * components should be enabled/disabled, shown/hidden, etc.
+	 * components should be enabled/disabled, shown/hidden, etc. This is a bound 
+	 * property, and a <tt>PropertyChangeEvent</tt> is fired when it is
+	 * changed.
 	 * 
 	 * @param portfolioState the state of the portfolio.
 	 */
@@ -89,7 +91,9 @@ public class GUIStateModel extends AbstractPropertyModel {
 	 * Set which dialog should be currently displayed. Note that this value
 	 * does not need to be changed when it is no longer being displayed.
 	 * Configuration information for the dialog is passed along as part of
-	 * the parameter array.
+	 * the parameter array. This is a bound 
+	 * property, and a <tt>PropertyChangeEvent</tt> is fired when it is
+	 * changed.
 	 * 
 	 * @param dialog the constant name for the dialog to display.
 	 * @param dialogConfig optional configuration information for displaying

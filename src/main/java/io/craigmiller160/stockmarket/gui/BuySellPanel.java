@@ -1,8 +1,8 @@
 package io.craigmiller160.stockmarket.gui;
 
-import static io.craigmiller160.stockmarket.controller.StockMarketController.BUY_STOCK_PREP_ACTION;
+import static io.craigmiller160.stockmarket.controller.StockMarketController.BUY_STOCK_DIALOG_ACTION;
 import static io.craigmiller160.stockmarket.controller.StockMarketController.PORTFOLIO_STATE_PROPERTY;
-import static io.craigmiller160.stockmarket.controller.StockMarketController.SELL_STOCK_PREP_ACTION;
+import static io.craigmiller160.stockmarket.controller.StockMarketController.SELL_STOCK_DIALOG_ACTION;
 import io.craigmiller160.mvp.listener.AbstractListenerView;
 import io.craigmiller160.stockmarket.util.Fonts;
 import io.craigmiller160.stockmarket.util.Language;
@@ -86,11 +86,11 @@ public class BuySellPanel extends AbstractListenerView {
 	private void initComponents(){
 		
 		buyButton = createButton(LANGUAGE.getString("buy_button_label"), "buy",
-				LANGUAGE.getString("buy_button_tooltip"), BUY_STOCK_PREP_ACTION);
+				LANGUAGE.getString("buy_button_tooltip"), BUY_STOCK_DIALOG_ACTION);
 		buyButton.setEnabled(false);
 		
 		sellButton = createButton(LANGUAGE.getString("sell_button_label"), "sell",
-				LANGUAGE.getString("sell_button_tooltip"), SELL_STOCK_PREP_ACTION);
+				LANGUAGE.getString("sell_button_tooltip"), SELL_STOCK_DIALOG_ACTION);
 		sellButton.setEnabled(false);
 	}
 	

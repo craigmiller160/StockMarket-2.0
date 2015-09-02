@@ -42,6 +42,10 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 	//TODO this model needs default values to avoid exceptions occuring when attempting
 	//to save values to database.
 	
+	//TODO maybe stockList should be a set? It shouldn't accept duplicate values, but
+	//it should throw an exception if a duplicate is submitted. Or some sort of warning,
+	//rather than loose the values.
+	
 	/**
 	 * SerialVersionUID for serialization support.
 	 */
@@ -90,20 +94,22 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 	private static final Logger LOGGER = Logger.getLogger("stockmarket.model.PortfolioModel");
 	
 	/**
-	 * Create a new instance of this model. All fields are initially
-	 * left as <tt>null</tt>.
+	 * Create a new instance of this model.
 	 */
 	public PortfolioModel() {
 		super();
 		stockList = new ArrayList<>();
+		portfolioName = "";
+		cashBalance = new BigDecimal(0);
+		totalStockValue = new BigDecimal(0);
+		netWorth = new BigDecimal(0);
+		changeInNetWorth = new BigDecimal(0);
 	}
 	
 	/**
 	 * {@inheritDoc} This is a bound 
 	 * property, and a <tt>PropertyChangeEvent</tt> is fired when it is
-	 * changed. Because a reference to the stock list is released with 
-	 * the event, <tt>PropertyChangeListener</tt>s should handle it with
-	 * care.
+	 * changed.
 	 */
 	@Override
 	public void setStockList(List<OwnedStock> stockList){
@@ -118,7 +124,7 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 				this.stockList = new ArrayList<>();
 			}
 			else{
-				this.stockList = stockList;
+				this.stockList = new ArrayList<>(stockList);
 			}
 		}
 		
@@ -172,7 +178,7 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 	 * changed.
 	 */
 	@Override
-	public synchronized void setNetWorth(BigDecimal netWorth){
+	public void setNetWorth(BigDecimal netWorth){
 		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
 				"setNetWorth", "Entering method", 
 				new Object[] {"Net Worth: " + netWorth});
@@ -213,7 +219,7 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 	 * changed.
 	 */
 	@Override
-	public synchronized void setCashBalance(BigDecimal cashBalance){
+	public void setCashBalance(BigDecimal cashBalance){
 		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
 				"setCashBalance", "Entering method", 
 				new Object[] {"Cash Balance: " + cashBalance});
@@ -226,15 +232,53 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 		
 		firePropertyChange(CASH_BALANCE_PROPERTY, oldValue, cashBalance);
 	}
+
+	//TODO need a more descriptive name here
+	public void setStockInList(OwnedStock stock){
+		List<OwnedStock> copyList = null;
+		synchronized(this){
+			int index = stockList.indexOf(stock);
+			if(index >= 0){
+				if(stock.getQuantityOfShares() > 0){
+					stockList.set(index, stock);
+				}
+				else{
+					stockList.remove(stock);
+				}
+			}
+			else{
+				stockList.add(stock);
+			}
+			copyList = new ArrayList<>(stockList);
+		}
+		
+		firePropertyChange(STOCK_LIST_PROPERTY, null, copyList);
+	}
+	
+	public OwnedStock getStockInList(OwnedStock stock){
+		OwnedStock result = null;
+		synchronized(this){
+			int index = stockList.indexOf(stock);
+			result = index >= 0 ? stockList.get(index) : null;
+		}
+		
+		return result;
+	}
 	
 	/**
-	 * {@inheritDoc} The stock list reference
-	 * returned should be used in as few places as possible to minimize potential
-	 * areas where multiple threads could make concurrent modifications to this list.
+	 * {@inheritDoc}
+	 * <p>
+	 * To maintain thread safety, the stock list returned is
+	 * a shallow copy of the one guarded by this class's lock.
+	 * The elements in the list are shared references, though.
+	 * If the <tt>OwnedStock</tt> implementation is not thread
+	 * safe, then additional synchronization measures will be
+	 * needed.
 	 */
 	@Override
 	public synchronized List<OwnedStock> getStockList(){
-		return stockList;
+		List<OwnedStock> copyList = new ArrayList<>(stockList);
+		return copyList;
 	}
 	
 	@Override
