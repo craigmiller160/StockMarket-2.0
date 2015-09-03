@@ -29,7 +29,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -404,18 +406,48 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 		
 	}
 	
+	/**
+	 * Refresh all stocks in the portfolio.
+	 */
 	public void refreshPortfolio(){
 		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
 				"refreshPortfolio", "Entering method");
 		
+		//TODO needs a progress bar
+		
 		try {
 			@SuppressWarnings("unchecked") //The getter method being called returns the correct type
-			List<OwnedStock> oldStockList = (List<OwnedStock>) getModelProperty(STOCK_LIST_PROPERTY);
-			List<OwnedStock> newStockList = new ArrayList<>();
+			List<OwnedStock> stockList = (List<OwnedStock>) getModelProperty(STOCK_LIST_PROPERTY);
+			StockDownloader downloader = new YahooStockDownloader();
 			
-			OwnedStock downloadedStock = null;
+			List<FutureTask<Stock>> downloadTasks = new ArrayList<>();
+			for(OwnedStock s : stockList){
+				downloadTasks.add(getDownloadStockTask(s, downloader));
+			}
 			
-		} 
+			//Use a new executor here to be able to await termination of all threads
+			//before proceeding
+			ExecutorService refreshExecutor = Executors.newCachedThreadPool();
+			
+			for(FutureTask<Stock> task : downloadTasks){
+				refreshExecutor.submit(task);
+			}
+			
+			refreshExecutor.awaitTermination(1, TimeUnit.MINUTES);
+			
+			setModelProperty(STOCK_LIST_PROPERTY, stockList);
+			setModelProperty(PORTFOLIO_STATE_PROPERTY, PortfolioState.OPEN_NO_STOCK);
+			
+			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
+					"refreshPortfolio", "Refresh successful");
+			
+		}
+		catch(InterruptedException ex){
+			//TODO visual feedback? full pro-con in stock search method
+			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
+					"refreshPortfolio", 
+					"Exception", ex);
+		}
 		catch (NoSuchMethodException ex) {
 			displayExceptionDialog(ex);
 			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
@@ -774,8 +806,14 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 				OwnedStock stock = (OwnedStock) getModelProperty(STOCK_IN_LIST_PROPERTY, index);
 				
 				if(stock != null){
-					Stock downloadedStock = downloadStock(stock, downloader);
-					List<HistoricalQuote> historyList = downloadStockHistory(stock, downloader);
+					FutureTask<Stock> downloadStock = getDownloadStockTask(stock, downloader);
+					FutureTask<List<HistoricalQuote>> downloadHistory = getDownloadHistoryTask(stock, downloader);
+					
+					eventExecutor.submit(downloadStock);
+					eventExecutor.submit(downloadHistory);
+					
+					Stock downloadedStock = downloadStock.get();
+					List<HistoricalQuote> historyList = downloadHistory.get();
 					
 					setModelProperty(PORTFOLIO_STATE_PROPERTY, PortfolioState.OPEN_OWNED_STOCK);
 					setModelProperty(SELECTED_STOCK_PROPERTY, downloadedStock);
@@ -854,8 +892,14 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 				stock = new DefaultStock(symbol);
 			}
 			
-			Stock downloadedStock = downloadStock(stock, downloader);
-			List<HistoricalQuote> historyList = downloadStockHistory(stock, downloader);
+			FutureTask<Stock> downloadStock = getDownloadStockTask(stock, downloader);
+			FutureTask<List<HistoricalQuote>> downloadHistory = getDownloadHistoryTask(stock, downloader);
+			
+			eventExecutor.submit(downloadStock);
+			eventExecutor.submit(downloadHistory);
+			
+			Stock downloadedStock = downloadStock.get();
+			List<HistoricalQuote> historyList = downloadHistory.get();
 			
 			if(stock instanceof OwnedStock){
 				setModelProperty(PORTFOLIO_STATE_PROPERTY, PortfolioState.OPEN_OWNED_STOCK);
@@ -911,63 +955,54 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 	}
 	
 	/**
-	 * Download the details of the specified stock.
+	 * Returns a <tt>FutureTask</tt> to download the specified stock using
+	 * the downloader.
 	 * 
 	 * @param stock the stock to download details for.
 	 * @param downloader the downloader.
-	 * @return the downloaded stock.
-	 * @throws ExecutionException if an exception occurs during the execution of the download.
-	 * @throws InterruptedException if the thread is interrupted during the download process.
+	 * @return the task to download the specified stock.
 	 */
-	private Stock downloadStock(final Stock stock, final StockDownloader downloader) 
-			throws ExecutionException, InterruptedException{
-		Future<Stock> downloadStock = 
-				eventExecutor.submit(new Callable<Stock>(){
-					@Override
-					public Stock call() throws Exception {
-						Thread.currentThread().setName("StockSearch");
-						
-						stock.setStockDetails(downloader, true);
-						
-						Thread.currentThread().setName("EventActionThread");
-						
-						return stock;
-					}
-				});
+	private FutureTask<Stock> getDownloadStockTask(final Stock stock, final StockDownloader downloader){
+		Callable<Stock> callable = new Callable<Stock>(){
+			@Override
+			public Stock call() throws Exception {
+				Thread.currentThread().setName("StockSearch");
+				stock.setStockDetails(downloader, true);
+				Thread.currentThread().setName("EventActionThread");
+				
+				return stock;
+			}
+		};
 		
-		return downloadStock.get();
+		FutureTask<Stock> downloadStock = new FutureTask<>(callable);
+		return downloadStock;
 	}
 	
 	/**
-	 * Download the history of the specified stock.
+	 * Returns the <tt>FutureTask</tt> for downloading the specified
+	 * stock's history using the specified downloader.
 	 * 
 	 * @param stock the stock to download history for.
 	 * @param downloader the downloader.
-	 * @return the downloaded stock history.
-	 * @throws ExecutionException if an exception occurs during the execution of the download.
-	 * @throws InterruptedException if the thread is interrupted during the download process.
+	 * @return the task to download the stock's history.
 	 */
-	private List<HistoricalQuote> downloadStockHistory(final Stock stock, final StockDownloader downloader) 
-			throws ExecutionException, InterruptedException{
-		Future<List<HistoricalQuote>> downloadHistory = 
-				eventExecutor.submit(new Callable<List<HistoricalQuote>>(){
-					@Override
-					public List<HistoricalQuote> call() throws Exception {
-						Thread.currentThread().setName("StockSearch");
-						
-						List<HistoricalQuote> list = 
-								stock.getStockHistory(
-										downloader, 
-										INITIAL_HISTORY_LENGTH_MONTHS);
-						
-						Thread.currentThread().setName("EventActionThread");
-						
-						return list;
-					}
-					
-				});
+	private FutureTask<List<HistoricalQuote>> getDownloadHistoryTask(final Stock stock, final StockDownloader downloader){
+		Callable<List<HistoricalQuote>> callable = new Callable<List<HistoricalQuote>>(){
+			@Override
+			public List<HistoricalQuote> call() throws Exception {
+				Thread.currentThread().setName("StockSearch");
+				List<HistoricalQuote> list = 
+						stock.getStockHistory(
+								downloader, 
+								INITIAL_HISTORY_LENGTH_MONTHS);
+				Thread.currentThread().setName("EventActionThread");
+				
+				return list;
+			}
+		};
 		
-		return downloadHistory.get();
+		FutureTask<List<HistoricalQuote>> downloadHistory = new FutureTask<>(callable);
+		return downloadHistory;
 	}
 	
 	/**
