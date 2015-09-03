@@ -379,14 +379,14 @@ public class SQLPortfolioDAO implements
 		
 		SQLPortfolioModel portfolioModel = (SQLPortfolioModel) portfolio;
 		int userid = portfolioModel.getUserID();
-		String portfolioName = portfolioModel.getPortfolioName();
-		BigDecimal cashBalance = portfolioModel.getCashBalance();
-		BigDecimal netWorth = portfolioModel.getNetWorth();
-		BigDecimal netChange = portfolioModel.getChangeInNetWorth();
-		BigDecimal totalStockValue = portfolioModel.getTotalStockValue();
+		String portfolioName = portfolioModel.getPortfolioName() != null ? portfolioModel.getPortfolioName() : "";
+		BigDecimal cashBalance = portfolioModel.getCashBalance() != null ? portfolioModel.getCashBalance() : new BigDecimal(0);
+		BigDecimal netWorth = portfolioModel.getNetWorth() != null ? portfolioModel.getNetWorth() : new BigDecimal(0);
+		BigDecimal netChange = portfolioModel.getChangeInNetWorth() != null ? portfolioModel.getChangeInNetWorth() : new BigDecimal(0);
+		BigDecimal totalStockValue = portfolioModel.getTotalStockValue() != null ? portfolioModel.getTotalStockValue() : new BigDecimal(0);
 		
 		//Shallow copy of list, avoids interfering with model list consistency
-		//but still has shared references to contents. 
+		//but still has shared references to contents.
 		List<OwnedStock> stockList = new ArrayList<>(portfolioModel.getStockList());
 		
 		String portfolioQuery = "select * from portfolio where userid=" + userid + ";";

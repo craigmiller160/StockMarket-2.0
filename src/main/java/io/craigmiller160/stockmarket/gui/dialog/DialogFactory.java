@@ -1,8 +1,11 @@
 package io.craigmiller160.stockmarket.gui.dialog;
 
 import io.craigmiller160.mvp.listener.ListenerDialog;
+import io.craigmiller160.stockmarket.stock.OwnedStock;
+import io.craigmiller160.stockmarket.stock.Stock;
 
 import java.awt.Frame;
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -100,6 +103,40 @@ public class DialogFactory {
 			List<String> portfolioNameList){
 		OpenPortfolioDialog dialog = new OpenPortfolioDialog(parentFrame, true);
 		dialog.setSavedPortfolioList(portfolioNameList);
+		
+		return dialog;
+	}
+	
+	/**
+	 * Create a dialog for buying shares of the specified stock. The dialog is created
+	 * by specifying the stock to buy shares of and the amount of cash available to spend
+	 * on the stock.
+	 * 
+	 * @param parentFrame the frame that own's this dialog.
+	 * @param stock the stock to buy shares of.
+	 * @param cashBalance the cash available to spend on the stock.
+	 * @return the buy stock dialog.
+	 */
+	public static ListenerDialog createBuyStockDialog(Frame parentFrame, Stock stock, BigDecimal cashBalance){
+		BuyDialog dialog = new BuyDialog(parentFrame, true);
+		dialog.setStock(stock);
+		dialog.setCashBalance(cashBalance);
+		
+		return dialog;
+	}
+	
+	/**
+	 * Create a dialog for selling shares of an owned stock. The dialog is created
+	 * by specifying the stock in the portfolio that shares are going to be sold 
+	 * of.
+	 * 
+	 * @param parentFrame the frame that owns this dialog.
+	 * @param stock the stock to sell shares of.
+	 * @return the sell stock dialog.
+	 */
+	public static ListenerDialog createSellStockDialog(Frame parentFrame, OwnedStock stock){
+		SellDialog dialog = new SellDialog(parentFrame, true);
+		dialog.setStock(stock);
 		
 		return dialog;
 	}

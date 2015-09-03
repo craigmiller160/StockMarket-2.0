@@ -6,10 +6,13 @@ import io.craigmiller160.mvp.listener.ListenerDialog;
 import io.craigmiller160.stockmarket.gui.PortfolioState;
 import io.craigmiller160.stockmarket.gui.dialog.Dialog;
 import io.craigmiller160.stockmarket.gui.dialog.DialogFactory;
+import io.craigmiller160.stockmarket.model.InsufficientFundsException;
 import io.craigmiller160.stockmarket.model.PortfolioModel;
+import io.craigmiller160.stockmarket.stock.DefaultOwnedStock;
 import io.craigmiller160.stockmarket.stock.DefaultStock;
 import io.craigmiller160.stockmarket.stock.HistoricalQuote;
 import io.craigmiller160.stockmarket.stock.InvalidStockException;
+import io.craigmiller160.stockmarket.stock.OwnedStock;
 import io.craigmiller160.stockmarket.stock.Stock;
 import io.craigmiller160.stockmarket.stock.StockDownloader;
 import io.craigmiller160.stockmarket.stock.YahooStockDownloader;
@@ -327,7 +330,15 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 
 	@Override
 	protected void processEvent(final String actionCommand, final Object valueFromView) {
-		if(actionCommand == EDIT_PORTFOLIO_NAME_ACTION){
+		if(actionCommand == BUY_STOCK_DIALOG_ACTION){
+			Thread.currentThread().setName("ShowBuyStockDialog");
+			showBuyStockDialog();
+		}
+		else if(actionCommand == BUY_STOCK_ACTION){
+			Thread.currentThread().setName("BuyStock");
+			buyStock(valueFromView);
+		}
+		else if(actionCommand == EDIT_PORTFOLIO_NAME_ACTION){
 			Thread.currentThread().setName("EditPortfolioName");
 			showPortfolioNameDialog();
 		}
@@ -367,6 +378,123 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 		
 		Thread.currentThread().setName("EventActionThread");
 		
+	}
+	
+	/**
+	 * Purchase shares of the selected stock, based on the value
+	 * provided from the view.
+	 * 
+	 * @param valueFromView the quantity of shares purchased.
+	 * @throws IllegalArgumentException if the value from the view
+	 * is not a valid integer.
+	 * @throws InsufficientFundsException if the number of shares
+	 * selected costs more than the value of the cash balance.
+	 */
+	public void buyStock(Object valueFromView){
+		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
+				"buyStock", "Entering method");
+		
+		int quantityToBuy;
+		if(valueFromView instanceof Integer){
+			quantityToBuy = (Integer) valueFromView;
+		}
+		else{
+			throw new IllegalArgumentException("Not a valid Integer: " + valueFromView);
+		}
+		
+		try {
+			Stock selectedStock = (Stock) getModelProperty(SELECTED_STOCK_PROPERTY);
+			BigDecimal cashBalance = (BigDecimal) getModelProperty(CASH_BALANCE_PROPERTY);
+			
+			BigDecimal cost = selectedStock.getCurrentPrice().multiply(new BigDecimal(quantityToBuy));
+			if(cost.compareTo(cashBalance) > 0){
+				throw new InsufficientFundsException("Cash: " + cashBalance + " Cost: " + cost);
+			}
+			cashBalance = cashBalance.subtract(cost);
+			setModelProperty(CASH_BALANCE_PROPERTY, cashBalance);
+			
+			if(selectedStock instanceof OwnedStock){
+				((OwnedStock) selectedStock).addShares(quantityToBuy);
+				setModelProperty(STOCK_IN_LIST_PROPERTY, selectedStock);
+			}
+			else{
+				OwnedStock ownedStock = new DefaultOwnedStock(selectedStock);
+				ownedStock.addShares(quantityToBuy);
+				setModelProperty(STOCK_IN_LIST_PROPERTY, ownedStock);
+			}
+			
+			//TODO total value of stocks, net worth, change in net worth, etc. Need to have those be set too
+			//TODO this needs to change the gui state so the owned stock info is displayed.
+			//TODO the new owned stock with its share count needs to be set as the selected stock
+		} 
+		catch (NoSuchMethodException ex) {
+			displayExceptionDialog(ex);
+			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
+					"buyStock", 
+					"Exception", ex);
+		} 
+		catch (IllegalAccessException ex) {
+			displayExceptionDialog(ex);
+			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
+					"buyStock", 
+					"Exception", ex);
+		} 
+		catch (ReflectiveOperationException ex) {
+			displayExceptionDialog(ex);
+			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
+					"buyStock", 
+					"Exception", ex);
+		} 
+		catch (Exception ex) {
+			displayExceptionDialog(ex);
+			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
+					"buyStock", 
+					"Exception", ex);
+		}
+		
+	}
+	
+	/**
+	 * Get the selected stock and cash balance, and then show the buy stock dialog.
+	 */
+	public void showBuyStockDialog(){
+		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
+				"showBuyStockDialog", "Entering method");
+		
+		try {
+			Stock selectedStock = (Stock) getModelProperty(SELECTED_STOCK_PROPERTY);
+			BigDecimal cashBalance = (BigDecimal) getModelProperty(CASH_BALANCE_PROPERTY);
+			
+			setModelProperty(DIALOG_DISPLAYED_PROPERTY, 
+					Dialog.BUY_STOCK_DIALOG, selectedStock, cashBalance);
+			
+			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
+					"showBuyStockDialog", "Buy Stock Dialog Displayed");
+		} 
+		catch (NoSuchMethodException ex) {
+			displayExceptionDialog(ex);
+			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
+					"showBuyStockDialog", 
+					"Exception", ex);
+		} 
+		catch (IllegalAccessException ex) {
+			displayExceptionDialog(ex);
+			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
+					"showBuyStockDialog", 
+					"Exception", ex);
+		} 
+		catch (ReflectiveOperationException ex) {
+			displayExceptionDialog(ex);
+			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
+					"showBuyStockDialog", 
+					"Exception", ex);
+		} 
+		catch (Exception ex) {
+			displayExceptionDialog(ex);
+			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
+					"showBuyStockDialog", 
+					"Exception", ex);
+		}
 	}
 	
 	/**
@@ -414,12 +542,9 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 					"changeStockHistoryInterval", "Exception", ex);
 		}
 		catch(InvalidStockException ex){
-			String[] messageArr = ex.getMessage().split(" ");
-			String symbol = messageArr[messageArr.length - 1];
-			
 			displayExceptionDialog(
 					LANGUAGE.getString("invalid_stock_title"), 
-					"\"" + symbol + "\" " 
+					"\"" + ex.getMessage() + "\" " 
 					+ LANGUAGE.getString("invalid_stock_message"));
 			LOGGER.logp(Level.SEVERE, this.getClass().getName(),
 					"changeStockHistoryInterval", "Exception", ex);

@@ -331,9 +331,7 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 	}
 	
 	@Override
-	public boolean subtractShares(int quantity){
-		boolean sharesRemaining = true;
-		
+	public BigDecimal subtractShares(int quantity){
 		if(getCurrentPrice() == null){
 			throw new IllegalStateException(
 					"Stock details must be set before "
@@ -341,6 +339,7 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 		}
 		
 		BigDecimal valueToSubtract = null;
+		BigDecimal valueOfShares = null;
 		synchronized(this){
 			if(quantity > quantityOfShares){
 				throw new InsufficientSharesException(
@@ -350,6 +349,9 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 			
 			valueToSubtract = principle.multiply(
 					new BigDecimal(quantity / quantityOfShares));
+			
+			//TODO this should be added to the log entry
+			valueOfShares = getCurrentPrice().multiply(new BigDecimal(quantity));
 		}
 		
 		//TODO might be able to get rid of this value here, I don't think I need it. Setting
@@ -369,16 +371,7 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 		
 		setTotalValueAndNet();
 		
-		synchronized(this){
-			if(quantityOfShares > 0){
-				sharesRemaining = true;
-			}
-			else{
-				sharesRemaining = false;
-			}
-		}
-		
-		return sharesRemaining;
+		return valueOfShares;
 	}
 	
 	/**
@@ -495,9 +488,8 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 	}
 
 	@Override
-	public boolean subtractShares(OwnedStock stock) {
-		boolean sharesRemaining = true;
-		
+	public BigDecimal subtractShares(OwnedStock stock) {
+		BigDecimal valueOfShares = null;
 		if(!this.equals(stock)){
 			throw new IllegalArgumentException(this.getSymbol() 
 					+ " != " + stock.getSymbol());
@@ -509,9 +501,9 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 		}
 		
 		setCurrentPrice(stock.getCurrentPrice());
-		sharesRemaining = subtractShares(stock.getQuantityOfShares());
+		valueOfShares = subtractShares(stock.getQuantityOfShares());
 		
-		return sharesRemaining;
+		return valueOfShares;
 	}
 
 }

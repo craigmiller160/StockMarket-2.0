@@ -298,13 +298,6 @@ public abstract class TransactionDialog extends AbstractDefaultDialog {
 		quantityField.getActionMap().put(CANCEL_ACTION, cancelAction);
 		quantityField.getActionMap().put(TRANSACTION_ACTION, transactionAction);
 		
-		transactionButton.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), 
-				CANCEL_ACTION);
-		transactionButton.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), 
-				TRANSACTION_ACTION);
-		transactionButton.getActionMap().put(CANCEL_ACTION, cancelAction);
-		transactionButton.getActionMap().put(TRANSACTION_ACTION, transactionAction);
-		
 		cancelButton.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), 
 				CANCEL_ACTION);
 		cancelButton.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), 
@@ -542,8 +535,28 @@ public abstract class TransactionDialog extends AbstractDefaultDialog {
 		
 		transactionButton = new JButton(transactionAction);
 		transactionButton.setFont(tempButton.getFont());
+		setButtonInputActionMaps(transactionButton);
 		
 		return new JButton[] {transactionButton, cancelButton};
+	}
+	
+	/**
+	 * Set the input and action maps for keyboard shortcuts with the transaction
+	 * button. Needs to be done separately because the transaction button
+	 * is created late during assembly based on subclass specifications.
+	 * 
+	 * @param transactionButton the button to perform the transaction.
+	 */
+	private void setButtonInputActionMaps(JButton transactionButton){
+		DialogAction cancelAction = new DialogAction();
+		cancelAction.setActionCommand(CANCEL_ACTION);
+		
+		transactionButton.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), 
+				CANCEL_ACTION);
+		transactionButton.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), 
+				TRANSACTION_ACTION);
+		transactionButton.getActionMap().put(CANCEL_ACTION, cancelAction);
+		transactionButton.getActionMap().put(TRANSACTION_ACTION, transactionAction);
 	}
 	
 	@Override

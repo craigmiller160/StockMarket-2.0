@@ -5,9 +5,11 @@ import io.craigmiller160.mvp.listener.AbstractListenerView;
 import io.craigmiller160.mvp.listener.ListenerDialog;
 import io.craigmiller160.stockmarket.gui.dialog.Dialog;
 import io.craigmiller160.stockmarket.gui.dialog.DialogFactory;
+import io.craigmiller160.stockmarket.stock.Stock;
 import io.craigmiller160.stockmarket.util.Language;
 
 import java.beans.PropertyChangeEvent;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -258,6 +260,8 @@ public class Frame extends AbstractListenerView {
 	 * @param dialogConfig the dialog configuration parameters.
 	 * @throws IllegalArgumentException if any of the dialog config parameters
 	 * are not the correct types for the specified dialog.
+	 * @throws ArrayIndexOutOfBoundsException if the dialogConfig array does
+	 * not have the expected number of parameters for the dialog.
 	 */
 	@SuppressWarnings("unchecked") //Because it can't verify the type parameter on the list due to type erasure
 	public void displayDialog(Object[] dialogConfig){
@@ -290,6 +294,25 @@ public class Frame extends AbstractListenerView {
 				}
 				
 				dialog = DialogFactory.createOpenPortfolioDialog(frame, portfolioNameList);
+			}
+			else if((Dialog) dialogConfig[0] == Dialog.BUY_STOCK_DIALOG){
+				Stock selectedStock = null;
+				if(dialogConfig[1] != null && dialogConfig[1] instanceof Stock){
+					selectedStock = (Stock) dialogConfig[1];
+				}
+				else{
+					throw new IllegalArgumentException("Not a valid Stock: " + dialogConfig[1]);
+				}
+				
+				BigDecimal cashBalance = null;
+				if(dialogConfig[2] != null && dialogConfig[2] instanceof BigDecimal){
+					cashBalance = (BigDecimal) dialogConfig[2];
+				}
+				else{
+					throw new IllegalArgumentException("Not a valid BigDecimal: " + dialogConfig[2]);
+				}
+				
+				dialog = DialogFactory.createBuyStockDialog(frame, selectedStock, cashBalance);
 			}
 		}
 		else{

@@ -148,7 +148,8 @@ public interface OwnedStock extends Stock{
 	 * @throws IllegalStateException if the stock details have not been set before
 	 * invoking this method.
 	 */
-	boolean subtractShares(int quantity);
+	//TODO redo the documentation here if this change sticks, boolean to BigDecimal return type
+	BigDecimal subtractShares(int quantity);
 	
 	/**
 	 * Subtract the shares of the <tt>OwnedStock</tt> parameter to this stock, only if the
@@ -181,6 +182,7 @@ public interface OwnedStock extends Stock{
 	 * @throws IllegalArgumentException if the stock parameter is not the same
 	 * stock as this one (symbols don't match).
 	 */
-	boolean subtractShares(OwnedStock stock);
+	//TODO redo the documentation here if this change sticks, boolean to BigDecimal return type
+	BigDecimal subtractShares(OwnedStock stock);
 	
 }

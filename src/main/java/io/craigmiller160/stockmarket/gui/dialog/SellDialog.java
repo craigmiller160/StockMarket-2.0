@@ -145,7 +145,7 @@ public class SellDialog extends TransactionDialog {
 
 	@Override
 	protected String createTitleBarText() {
-		return LANGUAGE.getString("sell_button_text");
+		return LANGUAGE.getString("sell_button_label");
 	}
 
 	@Override

@@ -39,12 +39,12 @@ import net.jcip.annotations.ThreadSafe;
 @ThreadSafe
 public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 
-	//TODO this model needs default values to avoid exceptions occuring when attempting
-	//to save values to database.
+	//TODO need to make sure that the new values are always set in the view, no matter
+	//what. probably should null out all old values.
 	
-	//TODO maybe stockList should be a set? It shouldn't accept duplicate values, but
-	//it should throw an exception if a duplicate is submitted. Or some sort of warning,
-	//rather than loose the values.
+	//TODO one major part here hasn't been figured out: getting the total value of all stocks
+	
+	//TODO there's no way to track the original net worth, to calculate the change
 	
 	/**
 	 * SerialVersionUID for serialization support.
@@ -100,10 +100,6 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 		super();
 		stockList = new ArrayList<>();
 		portfolioName = "";
-		cashBalance = new BigDecimal(0);
-		totalStockValue = new BigDecimal(0);
-		netWorth = new BigDecimal(0);
-		changeInNetWorth = new BigDecimal(0);
 	}
 	
 	/**
@@ -127,6 +123,8 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 				this.stockList = new ArrayList<>(stockList);
 			}
 		}
+		
+		calculateTotalStockValue();
 		
 		firePropertyChange(STOCK_LIST_PROPERTY, oldValue, stockList);
 	}
@@ -235,9 +233,14 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 
 	//TODO need a more descriptive name here
 	public void setStockInList(OwnedStock stock){
+		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
+				"setStockInList", "Entering method", 
+				new Object[] {"Stock: " + stock});
+		
 		List<OwnedStock> copyList = null;
+		int index;
 		synchronized(this){
-			int index = stockList.indexOf(stock);
+			index = stockList.indexOf(stock);
 			if(index >= 0){
 				if(stock.getQuantityOfShares() > 0){
 					stockList.set(index, stock);
@@ -252,6 +255,11 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 			copyList = new ArrayList<>(stockList);
 		}
 		
+		calculateTotalStockValue();
+		
+		LOGGER.logp(Level.INFO, this.getClass().getName(), 
+				"setSTockInList", "Completed. Index: " + index);
+		
 		firePropertyChange(STOCK_LIST_PROPERTY, null, copyList);
 	}
 	
@@ -263,6 +271,20 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 		}
 		
 		return result;
+	}
+	
+	//TODO this method runs every time the stock list is changed
+	//via adding/removing stocks, or on setting the stock list property via
+	//its main setter method
+	private void calculateTotalStockValue(){
+		BigDecimal total = new BigDecimal(0);
+		synchronized(this){
+			for(OwnedStock s : stockList){
+				total = total.add(s.getTotalValue());
+			}
+		}
+		
+		setTotalStockValue(total);
 	}
 	
 	/**
@@ -305,10 +327,5 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 	public synchronized BigDecimal getCashBalance(){
 		return cashBalance;
 	}
-	
-	//TODO the handling of the stock list needs to be improved for thread-safety purposes.
-		//The stock history list has the same issue. Need to figure out the most thread-safe
-		//way to share handling these lists between threads. They don't need to be accessed
-		//concurrently, but their data needs to be passed between classes safely.
 
 }
