@@ -224,6 +224,8 @@ public class DefaultStock extends AbstractStock {
 					setYearLow(((DefaultStock) stock).getYearLow());
 					setChangeYearLow(((DefaultStock) stock).getChangeYearLow());
 					setChangeYearLowPercent(((DefaultStock) stock).getChangeYearLowPercent());
+					setLastTradeDate(((DefaultStock) stock).getLastTradeDate());
+					setLastTradeTime(((DefaultStock) stock).getLastTradeTime());
 				}
 			}
 		}
@@ -866,6 +868,9 @@ public class DefaultStock extends AbstractStock {
 		if(amPM.equalsIgnoreCase("pm")){
 			//TODO this won't work for 12 noon
 			hours = 12 + Integer.parseInt(timeArr[0]);
+			if(hours == 24){
+				hours = 12;
+			}
 		}
 		else{
 			hours = Integer.parseInt(timeArr[0]);

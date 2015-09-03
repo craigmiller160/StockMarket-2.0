@@ -347,8 +347,11 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 						+ ", not enough to subtract " + quantity);
 			}
 			
+			double quantityD = quantity;
+			double quantityOfSharesD = quantityOfShares;
+			
 			valueToSubtract = principle.multiply(
-					new BigDecimal(quantity / quantityOfShares));
+					new BigDecimal(quantityD / quantityOfSharesD));
 			
 			//TODO this should be added to the log entry
 			valueOfShares = getCurrentPrice().multiply(new BigDecimal(quantity));

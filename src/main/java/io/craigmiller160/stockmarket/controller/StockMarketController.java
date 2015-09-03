@@ -25,6 +25,7 @@ import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -58,6 +59,8 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 public class StockMarketController extends AbstractConcurrentListenerController {
+	
+	//TODO for refreshing the portfolio, make sure it takes individual stock lookup/refreshes into account
 	
 	/**
 	 * The property name for the stock list.
@@ -183,6 +186,11 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 	 * The action command for searching the web for a stock. 
 	 */
 	public static final String STOCK_SEARCH_ACTION = "StockSearch";
+	
+	/**
+	 * The action command for looking up the details of a stock in the portfolio.
+	 */
+	public static final String LOOKUP_PORTFOLIO_STOCK_ACTION = "LookupPortfolioStock";
 	
 	/**
 	 * The action command for changing the stock history interval.
@@ -342,6 +350,10 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 			Thread.currentThread().setName("EditPortfolioName");
 			showPortfolioNameDialog();
 		}
+		else if(actionCommand == LOOKUP_PORTFOLIO_STOCK_ACTION){
+			Thread.currentThread().setName("LookupPortfolioStock");
+			lookupPortfolioStock(valueFromView);
+		}
 		else if(actionCommand == MARKET_DATA_ACTION){
 			Thread.currentThread().setName("MarketWebData");
 			marketDataWebpage();
@@ -359,6 +371,10 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 			Thread.currentThread().setName("OpenPortfolio");
 			openPortfolio(valueFromView);
 		}
+		else if(actionCommand == REFRESH_PORTFOLIO_ACTION){
+			Thread.currentThread().setName("RefreshPortfolio");
+			refreshPortfolio();
+		}
 		else if(actionCommand == SAVE_PORTFOLIO_ACTION){
 			Thread.currentThread().setName("SavePortfolio");
 			savePortfolio();
@@ -366,6 +382,14 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 		else if(actionCommand == SAVE_PORTFOLIO_NAME_ACTION){
 			Thread.currentThread().setName("SavePortfolioName");
 			savePortfolioName(valueFromView);
+		}
+		else if(actionCommand == SELL_STOCK_ACTION){
+			Thread.currentThread().setName("SellStock");
+			sellStock(valueFromView);
+		}
+		else if(actionCommand == SELL_STOCK_DIALOG_ACTION){
+			Thread.currentThread().setName("ShowSellStockDialog");
+			showSellStockDialog();
 		}
 		else if(actionCommand == STOCK_HISTORY_INTERVAL_ACTION){
 			Thread.currentThread().setName("StockHistoryInterval");
@@ -378,6 +402,149 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 		
 		Thread.currentThread().setName("EventActionThread");
 		
+	}
+	
+	public void refreshPortfolio(){
+		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
+				"refreshPortfolio", "Entering method");
+		
+		try {
+			@SuppressWarnings("unchecked") //The getter method being called returns the correct type
+			List<OwnedStock> oldStockList = (List<OwnedStock>) getModelProperty(STOCK_LIST_PROPERTY);
+			List<OwnedStock> newStockList = new ArrayList<>();
+			
+			OwnedStock downloadedStock = null;
+			
+		} 
+		catch (NoSuchMethodException ex) {
+			displayExceptionDialog(ex);
+			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
+					"refreshPortfolio", 
+					"Exception", ex);
+		} 
+		catch (IllegalAccessException ex) {
+			displayExceptionDialog(ex);
+			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
+					"refreshPortfolio", 
+					"Exception", ex);
+		} 
+		catch (ReflectiveOperationException ex) {
+			displayExceptionDialog(ex);
+			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
+					"refreshPortfolio", 
+					"Exception", ex);
+		} 
+		catch (Exception ex) {
+			displayExceptionDialog(ex);
+			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
+					"refreshPortfolio", 
+					"Exception", ex);
+		}
+	}
+	
+	/**
+	 * Show the sell stock dialog.
+	 */
+	public void showSellStockDialog(){
+		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
+				"showSellStockDialog", "Entering method");
+		
+		try {
+			Stock selectedStock = (Stock) getModelProperty(SELECTED_STOCK_PROPERTY);
+			
+			setModelProperty(DIALOG_DISPLAYED_PROPERTY, 
+					Dialog.SELL_STOCK_DIALOG, selectedStock);
+			
+			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
+					"showSellStockDialog", "Sell Stock Dialog Displayed");
+		} 
+		catch (NoSuchMethodException ex) {
+			displayExceptionDialog(ex);
+			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
+					"showSellStockDialog", 
+					"Exception", ex);
+		} 
+		catch (IllegalAccessException ex) {
+			displayExceptionDialog(ex);
+			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
+					"showSellStockDialog", 
+					"Exception", ex);
+		} 
+		catch (ReflectiveOperationException ex) {
+			displayExceptionDialog(ex);
+			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
+					"showSellStockDialog", 
+					"Exception", ex);
+		} 
+		catch (Exception ex) {
+			displayExceptionDialog(ex);
+			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
+					"showSellStockDialog", 
+					"Exception", ex);
+		}
+	}
+	
+	/**
+	 * Sell shares of the selected stock.
+	 * 
+	 * @param valueFromView the number of shares to sell.
+	 */
+	public void sellStock(Object valueFromView){
+		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
+				"sellStock", "Entering method");
+		
+		int quantityToSell;
+		if(valueFromView instanceof Integer){
+			quantityToSell = (Integer) valueFromView;
+		}
+		else{
+			throw new IllegalArgumentException("Not a valid Integer: " + valueFromView);
+		}
+		
+		try {
+			OwnedStock selectedStock = (OwnedStock) getModelProperty(SELECTED_STOCK_PROPERTY);
+			BigDecimal profit = selectedStock.subtractShares(quantityToSell);
+			BigDecimal cashBalance = (BigDecimal) getModelProperty(CASH_BALANCE_PROPERTY);
+			cashBalance = cashBalance.add(profit);
+			
+			if(selectedStock.getQuantityOfShares() == 0){
+				setModelProperty(PORTFOLIO_STATE_PROPERTY, PortfolioState.OPEN_STOCK);
+			}
+			else{
+				setModelProperty(PORTFOLIO_STATE_PROPERTY, PortfolioState.OPEN_OWNED_STOCK);
+			}
+			setModelProperty(SELECTED_STOCK_PROPERTY, selectedStock);
+			setModelProperty(STOCK_IN_LIST_PROPERTY, selectedStock);
+			setModelProperty(CASH_BALANCE_PROPERTY, cashBalance);
+			
+			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
+					"sellStock", selectedStock.getSymbol() 
+					+ " Shares sold: " + quantityToSell);
+		} 
+		catch (NoSuchMethodException ex) {
+			displayExceptionDialog(ex);
+			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
+					"sellStock", 
+					"Exception", ex);
+		} 
+		catch (IllegalAccessException ex) {
+			displayExceptionDialog(ex);
+			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
+					"sellStock", 
+					"Exception", ex);
+		} 
+		catch (ReflectiveOperationException ex) {
+			displayExceptionDialog(ex);
+			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
+					"sellStock", 
+					"Exception", ex);
+		} 
+		catch (Exception ex) {
+			displayExceptionDialog(ex);
+			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
+					"sellStock", 
+					"Exception", ex);
+		}
 	}
 	
 	/**
@@ -413,19 +580,19 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 			cashBalance = cashBalance.subtract(cost);
 			setModelProperty(CASH_BALANCE_PROPERTY, cashBalance);
 			
+			OwnedStock ownedStock = null;
 			if(selectedStock instanceof OwnedStock){
-				((OwnedStock) selectedStock).addShares(quantityToBuy);
-				setModelProperty(STOCK_IN_LIST_PROPERTY, selectedStock);
+				ownedStock = (OwnedStock) selectedStock;
+				ownedStock.addShares(quantityToBuy);
 			}
 			else{
-				OwnedStock ownedStock = new DefaultOwnedStock(selectedStock);
+				ownedStock = new DefaultOwnedStock(selectedStock);
 				ownedStock.addShares(quantityToBuy);
-				setModelProperty(STOCK_IN_LIST_PROPERTY, ownedStock);
 			}
 			
-			//TODO total value of stocks, net worth, change in net worth, etc. Need to have those be set too
-			//TODO this needs to change the gui state so the owned stock info is displayed.
-			//TODO the new owned stock with its share count needs to be set as the selected stock
+			setModelProperty(STOCK_IN_LIST_PROPERTY, ownedStock);
+			setModelProperty(PORTFOLIO_STATE_PROPERTY, PortfolioState.OPEN_OWNED_STOCK);
+			setModelProperty(SELECTED_STOCK_PROPERTY, ownedStock);
 		} 
 		catch (NoSuchMethodException ex) {
 			displayExceptionDialog(ex);
@@ -583,6 +750,82 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 	}
 	
 	/**
+	 * Lookup and download the details for a stock currently
+	 * owned in the stock portfolio.
+	 * 
+	 * @param valueFromView the index of the stock in the portfolio.
+	 */
+	public void lookupPortfolioStock(Object valueFromView){
+		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
+				"lookupPortfolioStock", "Entering method", 
+				new Object[] {"Symbol: " + valueFromView});
+		
+		Integer index = null;
+		if(valueFromView instanceof Integer){
+			index = (Integer) valueFromView;
+		}
+		else{
+			throw new IllegalArgumentException("Not a valid Integer: " + valueFromView);
+		}
+		
+		try {
+			if(index != null && index.compareTo(new Integer(0)) >= 0){
+				StockDownloader downloader = new YahooStockDownloader();
+				OwnedStock stock = (OwnedStock) getModelProperty(STOCK_IN_LIST_PROPERTY, index);
+				
+				if(stock != null){
+					Stock downloadedStock = downloadStock(stock, downloader);
+					List<HistoricalQuote> historyList = downloadStockHistory(stock, downloader);
+					
+					setModelProperty(PORTFOLIO_STATE_PROPERTY, PortfolioState.OPEN_OWNED_STOCK);
+					setModelProperty(SELECTED_STOCK_PROPERTY, downloadedStock);
+					setModelProperty(SELECTED_STOCK_HISTORY_PROPERTY, historyList);
+					setModelProperty(STOCK_IN_LIST_PROPERTY, downloadedStock);
+					
+					LOGGER.logp(Level.INFO, this.getClass().getName(), 
+							"lookupPortfolioStock", "Stock Found: " + stock.getSymbol());
+				}
+			}
+		}
+		catch(InterruptedException ex){
+			Thread.currentThread().interrupt();
+			//TODO consider whether or not to have a dialog here
+			//Pro: visual feedback on interrupt
+			//Con: interrupts are probably deliberately being done, so no need for the visual
+			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
+					"lookupPortfolioStock", 
+					"Exception", ex);
+		}
+		catch(ExecutionException ex){
+			launderStockExecutionException(ex);
+		}
+		catch (NoSuchMethodException ex) {
+			displayExceptionDialog(ex);
+			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
+					"lookupPortfolioStock", 
+					"Exception", ex);
+		} 
+		catch (IllegalAccessException ex) {
+			displayExceptionDialog(ex);
+			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
+					"lookupPortfolioStock", 
+					"Exception", ex);
+		} 
+		catch (ReflectiveOperationException ex) {
+			displayExceptionDialog(ex);
+			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
+					"lookupPortfolioStock", 
+					"Exception", ex);
+		} 
+		catch (Exception ex) {
+			displayExceptionDialog(ex);
+			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
+					"lookupPortfolioStock", 
+					"Exception", ex);
+		}
+	}
+	
+	/**
 	 * Search the web for information about the selected stock.
 	 * 
 	 * @param valueFromView the symbol of the selected stock.
@@ -605,46 +848,23 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 		
 		try {
 			
-			final StockDownloader downloader = new YahooStockDownloader();
-			final Stock stock = new DefaultStock(symbol);
+			StockDownloader downloader = new YahooStockDownloader();
+			Stock stock = (Stock) getModelProperty(STOCK_IN_LIST_PROPERTY, symbol);
+			if(stock == null){
+				stock = new DefaultStock(symbol);
+			}
 			
+			Stock downloadedStock = downloadStock(stock, downloader);
+			List<HistoricalQuote> historyList = downloadStockHistory(stock, downloader);
 			
-			Future<Stock> downloadStock = 
-					eventExecutor.submit(new Callable<Stock>(){
-						@Override
-						public Stock call() throws Exception {
-							Thread.currentThread().setName("StockSearch");
-							
-							stock.setStockDetails(downloader, true);
-							
-							Thread.currentThread().setName("EventActionThread");
-							
-							return stock;
-						}
-					});
+			if(stock instanceof OwnedStock){
+				setModelProperty(PORTFOLIO_STATE_PROPERTY, PortfolioState.OPEN_OWNED_STOCK);
+				setModelProperty(STOCK_IN_LIST_PROPERTY, stock);
+			}
+			else{
+				setModelProperty(PORTFOLIO_STATE_PROPERTY, PortfolioState.OPEN_STOCK);
+			}
 			
-			Future<List<HistoricalQuote>> downloadHistory = 
-					eventExecutor.submit(new Callable<List<HistoricalQuote>>(){
-						@Override
-						public List<HistoricalQuote> call() throws Exception {
-							Thread.currentThread().setName("StockSearch");
-							
-							List<HistoricalQuote> list = 
-									stock.getStockHistory(
-											downloader, 
-											INITIAL_HISTORY_LENGTH_MONTHS);
-							
-							Thread.currentThread().setName("EventActionThread");
-							
-							return list;
-						}
-						
-					});
-			
-			Stock downloadedStock = downloadStock.get();
-			List<HistoricalQuote> historyList = downloadHistory.get();
-			
-			setModelProperty(PORTFOLIO_STATE_PROPERTY, PortfolioState.OPEN_STOCK);
 			setModelProperty(SELECTED_STOCK_PROPERTY, downloadedStock);
 			setModelProperty(SELECTED_STOCK_HISTORY_PROPERTY, historyList);
 			
@@ -688,6 +908,66 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 					"Exception", ex);
 		}
 		
+	}
+	
+	/**
+	 * Download the details of the specified stock.
+	 * 
+	 * @param stock the stock to download details for.
+	 * @param downloader the downloader.
+	 * @return the downloaded stock.
+	 * @throws ExecutionException if an exception occurs during the execution of the download.
+	 * @throws InterruptedException if the thread is interrupted during the download process.
+	 */
+	private Stock downloadStock(final Stock stock, final StockDownloader downloader) 
+			throws ExecutionException, InterruptedException{
+		Future<Stock> downloadStock = 
+				eventExecutor.submit(new Callable<Stock>(){
+					@Override
+					public Stock call() throws Exception {
+						Thread.currentThread().setName("StockSearch");
+						
+						stock.setStockDetails(downloader, true);
+						
+						Thread.currentThread().setName("EventActionThread");
+						
+						return stock;
+					}
+				});
+		
+		return downloadStock.get();
+	}
+	
+	/**
+	 * Download the history of the specified stock.
+	 * 
+	 * @param stock the stock to download history for.
+	 * @param downloader the downloader.
+	 * @return the downloaded stock history.
+	 * @throws ExecutionException if an exception occurs during the execution of the download.
+	 * @throws InterruptedException if the thread is interrupted during the download process.
+	 */
+	private List<HistoricalQuote> downloadStockHistory(final Stock stock, final StockDownloader downloader) 
+			throws ExecutionException, InterruptedException{
+		Future<List<HistoricalQuote>> downloadHistory = 
+				eventExecutor.submit(new Callable<List<HistoricalQuote>>(){
+					@Override
+					public List<HistoricalQuote> call() throws Exception {
+						Thread.currentThread().setName("StockSearch");
+						
+						List<HistoricalQuote> list = 
+								stock.getStockHistory(
+										downloader, 
+										INITIAL_HISTORY_LENGTH_MONTHS);
+						
+						Thread.currentThread().setName("EventActionThread");
+						
+						return list;
+					}
+					
+				});
+		
+		return downloadHistory.get();
 	}
 	
 	/**
@@ -999,12 +1279,11 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 			}
 			else{
 				portfolioModel = new PortfolioModel();
+				portfolioModel.addPropertyChangeListener(this);
 				portfolioModel.setPortfolioName(LANGUAGE.getString("new_portfolio_name"));
-				portfolioModel.setCashBalance(new BigDecimal(INITIAL_CASH_BALANCE_VALUE));
-				portfolioModel.setNetWorth(new BigDecimal(INITIAL_CASH_BALANCE_VALUE));
+				portfolioModel.setInitialValue(new BigDecimal(INITIAL_CASH_BALANCE_VALUE));
 				portfolioModel.setStockList(null);
-				portfolioModel.setChangeInNetWorth(new BigDecimal(0));
-				portfolioModel.setTotalStockValue(new BigDecimal(0));
+				portfolioModel.removePropertyChangeListener(this);
 				displayExceptionDialog(LANGUAGE.getString("database_failed_title"),
 						LANGUAGE.getString("database_failed_text"));
 			}

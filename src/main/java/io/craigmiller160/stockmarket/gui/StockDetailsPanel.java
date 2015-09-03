@@ -21,6 +21,7 @@ import static io.craigmiller160.stockmarket.stock.Stock.SYMBOL;
 import static io.craigmiller160.stockmarket.stock.Stock.TWO_HUNDRED_DAY_AVG;
 import static io.craigmiller160.stockmarket.stock.Stock.YEAR_HIGH;
 import static io.craigmiller160.stockmarket.stock.Stock.YEAR_LOW;
+import static io.craigmiller160.stockmarket.stock.OwnedStock.*;
 import io.craigmiller160.mvp.listener.AbstractListenerView;
 import io.craigmiller160.stockmarket.stock.OwnedStock;
 import io.craigmiller160.stockmarket.stock.Stock;
@@ -625,6 +626,31 @@ public class StockDetailsPanel extends AbstractListenerView {
 		BigDecimal change200DayAvgPercent = (BigDecimal) valueMap.get(CHANGE_200_DAY_AVG_PERCENT);
 		setChange200DayAvg(change200DayAvg, change200DayAvgPercent);
 		
+		if(stock instanceof OwnedStock){
+			int quantity = (Integer) valueMap.get(QUANTITY_OF_SHARES);
+			setStockQuantity(quantity);
+			
+			BigDecimal value = (BigDecimal) valueMap.get(TOTAL_VALUE);
+			setTotalValue(value);
+			
+			BigDecimal net = (BigDecimal) valueMap.get(NET);
+			setNet(net);
+		}
+		
+	}
+	
+	//TODO document all of these setter methods
+	
+	public void setStockQuantity(int quantity){
+		shareQuantityValue.setText("" + quantity);
+	}
+	
+	public void setTotalValue(BigDecimal value){
+		totalValue.setText(moneyFormat.format(value));
+	}
+	
+	public void setNet(BigDecimal net){
+		netValue.setText(moneyFormat.format(net));
 	}
 	
 	public void setStockSymbol(String symbol){
@@ -648,8 +674,6 @@ public class StockDetailsPanel extends AbstractListenerView {
 	}
 	
 	public void setChangeToday(BigDecimal changeToday, BigDecimal changeTodayPercent){
-		
-		
 		dayChangeValue.setText(
 				moneyFormat.format(changeToday)
 				+ " (" + percentFormat.format(changeTodayPercent.divide(new BigDecimal(100))) + ")");
@@ -713,10 +737,10 @@ public class StockDetailsPanel extends AbstractListenerView {
 			
 		}
 		else if(portfolioState == PortfolioState.OPEN_STOCK){
-			//TODO this one matters, switch off owned stock information
+			ownershipSwitchLayout.show(ownershipSwitchPanel, NOT_OWNED_PANEL);
 		}
 		else if(portfolioState == PortfolioState.OPEN_OWNED_STOCK){
-			//TODO this one matters, switch on owned stock information
+			ownershipSwitchLayout.show(ownershipSwitchPanel, OWNED_PANEL);
 		}
 	}
 

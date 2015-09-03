@@ -167,11 +167,7 @@ public class SQLPortfolioDAO implements
 		portfolio.addPropertyChangeListener(this);
 		
 		portfolio.setPortfolioName(portfolioName);
-		portfolio.setCashBalance(startingCashBalance);
-		portfolio.setNetWorth(startingCashBalance);
-		portfolio.setChangeInNetWorth(new BigDecimal(0.00));
-		portfolio.setTotalStockValue(new BigDecimal(0.00));
-		
+		portfolio.setInitialValue(startingCashBalance);
 		portfolio.setStockList(null);
 		
 		int userid = 0;
@@ -184,6 +180,7 @@ public class SQLPortfolioDAO implements
 			resultSet.updateString(2, portfolioName); //portfolio_name
 			resultSet.updateBigDecimal(3, portfolio.getCashBalance()); //cash_balance
 			resultSet.updateBigDecimal(4, portfolio.getNetWorth()); //net_worth
+			resultSet.updateBigDecimal(5, portfolio.getInitialValue());
 			
 			Timestamp now = new Timestamp(
 					GregorianCalendar.getInstance().getTimeInMillis());
@@ -300,9 +297,9 @@ public class SQLPortfolioDAO implements
 			
 			while(resultSet.next()){
 				portfolio.setPortfolioName(resultSet.getString(2)); //portfolio_name
+				portfolio.setInitialValue(resultSet.getBigDecimal(5)); //initial_value
 				portfolio.setCashBalance(resultSet.getBigDecimal(3)); //cash_balance
 				portfolio.setNetWorth(resultSet.getBigDecimal(4)); //net_worth
-				portfolio.setChangeInNetWorth(resultSet.getBigDecimal(5)); //net_change
 				portfolio.setTotalStockValue(resultSet.getBigDecimal(6)); //total_stock_value
 			}
 			
@@ -382,7 +379,7 @@ public class SQLPortfolioDAO implements
 		String portfolioName = portfolioModel.getPortfolioName() != null ? portfolioModel.getPortfolioName() : "";
 		BigDecimal cashBalance = portfolioModel.getCashBalance() != null ? portfolioModel.getCashBalance() : new BigDecimal(0);
 		BigDecimal netWorth = portfolioModel.getNetWorth() != null ? portfolioModel.getNetWorth() : new BigDecimal(0);
-		BigDecimal netChange = portfolioModel.getChangeInNetWorth() != null ? portfolioModel.getChangeInNetWorth() : new BigDecimal(0);
+		BigDecimal initialValue = portfolioModel.getInitialValue() != null ? portfolioModel.getInitialValue() : new BigDecimal(0);
 		BigDecimal totalStockValue = portfolioModel.getTotalStockValue() != null ? portfolioModel.getTotalStockValue() : new BigDecimal(0);
 		
 		//Shallow copy of list, avoids interfering with model list consistency
@@ -409,7 +406,7 @@ public class SQLPortfolioDAO implements
 				resultSet.updateString(2, portfolioName); //portfolio_name
 				resultSet.updateBigDecimal(3, cashBalance); //cash_balance
 				resultSet.updateBigDecimal(4, netWorth); //net_worth
-				resultSet.updateBigDecimal(5, netChange); //net_change
+				resultSet.updateBigDecimal(5, initialValue); //initial_value
 				resultSet.updateBigDecimal(6, totalStockValue); //total_stock_value
 				
 				Timestamp now = new Timestamp(

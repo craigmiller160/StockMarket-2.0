@@ -5,6 +5,7 @@ import io.craigmiller160.mvp.listener.AbstractListenerView;
 import io.craigmiller160.mvp.listener.ListenerDialog;
 import io.craigmiller160.stockmarket.gui.dialog.Dialog;
 import io.craigmiller160.stockmarket.gui.dialog.DialogFactory;
+import io.craigmiller160.stockmarket.stock.OwnedStock;
 import io.craigmiller160.stockmarket.stock.Stock;
 import io.craigmiller160.stockmarket.util.Language;
 
@@ -313,6 +314,17 @@ public class Frame extends AbstractListenerView {
 				}
 				
 				dialog = DialogFactory.createBuyStockDialog(frame, selectedStock, cashBalance);
+			}
+			else if((Dialog) dialogConfig[0] == Dialog.SELL_STOCK_DIALOG){
+				OwnedStock selectedStock = null;
+				if(dialogConfig[1] != null && dialogConfig[1] instanceof OwnedStock){
+					selectedStock = (OwnedStock) dialogConfig[1];
+				}
+				else{
+					throw new IllegalArgumentException("Not a valid OwnedStock: " + dialogConfig[1]);
+				}
+				
+				dialog = DialogFactory.createSellStockDialog(frame, selectedStock);
 			}
 		}
 		else{

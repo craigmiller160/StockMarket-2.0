@@ -24,7 +24,7 @@
 		<dependency>
 			<groupId>io.craigmiller160.mvp</groupId>
 			<artifactId>mvp-framework</artifactId>
-			<version>2.1</version>
+			<version>2.1.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.miglayout</groupId>

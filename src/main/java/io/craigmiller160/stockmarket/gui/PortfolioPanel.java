@@ -7,7 +7,7 @@ import static io.craigmiller160.stockmarket.controller.StockMarketController.POR
 import static io.craigmiller160.stockmarket.controller.StockMarketController.REFRESH_PORTFOLIO_ACTION;
 import static io.craigmiller160.stockmarket.controller.StockMarketController.STOCK_DETAILS_ACTION;
 import static io.craigmiller160.stockmarket.controller.StockMarketController.STOCK_LIST_PROPERTY;
-import static io.craigmiller160.stockmarket.controller.StockMarketController.TOTAL_STOCK_VALUE_PROPERTY;
+import static io.craigmiller160.stockmarket.controller.StockMarketController.*;
 import io.craigmiller160.mvp.listener.AbstractListenerView;
 import io.craigmiller160.stockmarket.stock.OwnedStock;
 import io.craigmiller160.stockmarket.stock.Stock;
@@ -17,6 +17,9 @@ import io.craigmiller160.stockmarket.util.Language;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -181,6 +184,7 @@ public class PortfolioPanel extends AbstractListenerView {
 		ownedStockList.setToolTipText(LANGUAGE.getString("stock_list_tooltip"));
 		ownedStockList.setCellRenderer(new PortfolioListCellRenderer());
 		ownedStockList.setVisibleRowCount(3);
+		ownedStockList.addMouseListener(new PortfolioMouseListener());
 		
 		stockListScrollPane = new JScrollPane(ownedStockList);
 		stockListScrollPane.getVerticalScrollBar().setUnitIncrement(15);
@@ -215,16 +219,16 @@ public class PortfolioPanel extends AbstractListenerView {
 		changeInNetWorthLabel = createLabel(LANGUAGE.getString("net_worth_change_label") + ": ", 
 				Fonts.LABEL_FONT, LANGUAGE.getString("net_worth_change_tooltip"));
 		
-		cashBalanceValue = createLabel("", Fonts.FIELD_FONT, 
+		cashBalanceValue = createLabel("$0.00", Fonts.FIELD_FONT, 
 				LANGUAGE.getString("cash_balance_tooltip"));
 		
-		totalStockValue = createLabel("", Fonts.FIELD_FONT,
+		totalStockValue = createLabel("$0.00", Fonts.FIELD_FONT,
 				LANGUAGE.getString("total_stock_value_tooltip"));
 		
-		netWorthValue = createLabel("", Fonts.FIELD_FONT,
+		netWorthValue = createLabel("$0.00", Fonts.FIELD_FONT,
 				LANGUAGE.getString("net_worth_tooltip"));
 		
-		changeInNetWorthValue = createLabel("", Fonts.FIELD_FONT,
+		changeInNetWorthValue = createLabel("$0.00", Fonts.FIELD_FONT,
 				LANGUAGE.getString("net_worth_change_tooltip"));
 		
 		summaryPanel = new JPanel();
@@ -556,13 +560,38 @@ public class PortfolioPanel extends AbstractListenerView {
 
 	@Override
 	public Object getValueForAction(String actionCommand) {
-		//LOGGER.logp(Level.FINEST, this.getClass().getName(), "getValue", 
-				//"Entering method", new Object[] {"Command: " + valueToGet});
+		Object result = null;
+		if(actionCommand == LOOKUP_PORTFOLIO_STOCK_ACTION){
+			LOGGER.logp(Level.FINEST, this.getClass().getName(), "getValue", 
+					"Entering method", new Object[] {"Command: " + actionCommand});
+			
+			result = ownedStockList.getSelectedIndex();
+		}
 		
+		return result;
+	}
+	
+	/**
+	 * The mouse listener for the portfolio list, to register
+	 * double-click selections.
+	 * 
+	 * @author craig
+	 * @version 2.0
+	 */
+	private class PortfolioMouseListener extends MouseAdapter{
 		
-		// TODO Will be filled out if any values are ultimately needed
-		//from this class.
-		return null;
+		@Override
+		public void mouseClicked(MouseEvent event){
+			if(event.getClickCount() == 2){
+				ActionEvent newEvent = new ActionEvent(
+						PortfolioPanel.this,
+						ActionEvent.ACTION_PERFORMED, 
+						LOOKUP_PORTFOLIO_STOCK_ACTION);
+				
+				PortfolioPanel.this.actionPerformed(newEvent);
+			}
+		}
+		
 	}
 	
 	/**

@@ -76,9 +76,10 @@ public class StockDisplayModel extends AbstractPropertyModel {
 				"setSelectedStock", "Entering method", 
 				new Object[] {"Selected Stock: " + selectedStock});
 		
+		//Old value stays null here because otherwise re-setting the stock
+		//after changing its type to OwnedStock won't fire a new event
 		AbstractStock oldValue = null;
 		synchronized(this){
-			oldValue = this.selectedStock;
 			this.selectedStock = selectedStock;
 		}
 		

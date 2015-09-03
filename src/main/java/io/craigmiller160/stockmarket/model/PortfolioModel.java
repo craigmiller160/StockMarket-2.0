@@ -7,6 +7,7 @@ import static io.craigmiller160.stockmarket.controller.StockMarketController.POR
 import static io.craigmiller160.stockmarket.controller.StockMarketController.STOCK_LIST_PROPERTY;
 import static io.craigmiller160.stockmarket.controller.StockMarketController.TOTAL_STOCK_VALUE_PROPERTY;
 import io.craigmiller160.mvp.core.AbstractPropertyModel;
+import io.craigmiller160.stockmarket.stock.DefaultOwnedStock;
 import io.craigmiller160.stockmarket.stock.OwnedStock;
 
 import java.math.BigDecimal;
@@ -46,6 +47,9 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 	
 	//TODO there's no way to track the original net worth, to calculate the change
 	
+	//TODO all old values are null, because otherwise updates won't always fire for 0 values
+	//initial value 0, need the change event to fire for 0... 
+	
 	/**
 	 * SerialVersionUID for serialization support.
 	 */
@@ -77,6 +81,13 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 	private BigDecimal netWorth;
 	
 	/**
+	 * The initial value of this portfolio. Used to calculate
+	 * the change in net worth over time.
+	 */
+	@GuardedBy("this")
+	private BigDecimal initialValue;
+	
+	/**
 	 * The change in net worth since the creation of this portfolio.
 	 */
 	@GuardedBy("this")
@@ -100,6 +111,30 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 		super();
 		stockList = new ArrayList<>();
 		portfolioName = "";
+		initialValue = new BigDecimal(0);
+		cashBalance = new BigDecimal(0);
+		netWorth = new BigDecimal(0);
+		changeInNetWorth = new BigDecimal(0);
+		totalStockValue = new BigDecimal(0);
+	}
+	
+	/**
+	 * Set the initial values of this portfolio. This method should be
+	 * invoked immediately after creating a new portfolio model instance,
+	 * as it overwrites all other values based on the starting amount
+	 * of cash provided as a parameter.
+	 * 
+	 * @param startingCash the starting amount of cash for the portfolio.
+	 */
+	public void setInitialValue(BigDecimal startingCash){
+		synchronized(this){
+			this.initialValue = startingCash;
+		}
+		setCashBalance(startingCash); //TODO calculations need to check if this is null
+		setTotalStockValue(new BigDecimal(0)); //TODO calculations need to check if this is null
+		setNetWorth(startingCash); //TODO calculations need to check if this is null
+		//TODO changeInNetWorth
+		
 	}
 	
 	/**
@@ -124,9 +159,10 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 			}
 		}
 		
-		calculateTotalStockValue();
-		
 		firePropertyChange(STOCK_LIST_PROPERTY, oldValue, stockList);
+		
+		calculateTotalStockValue();
+		calculateNetWorth();
 	}
 	
 	/**
@@ -188,6 +224,8 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 		}
 		
 		firePropertyChange(NET_WORTH_PROPERTY, oldValue, netWorth);
+		
+		calculateChangeInNetWorth();
 	}
 	
 	/**
@@ -229,6 +267,8 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 		}
 		
 		firePropertyChange(CASH_BALANCE_PROPERTY, oldValue, cashBalance);
+		
+		calculateNetWorth();
 	}
 
 	//TODO need a more descriptive name here
@@ -255,19 +295,38 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 			copyList = new ArrayList<>(stockList);
 		}
 		
-		calculateTotalStockValue();
-		
 		LOGGER.logp(Level.INFO, this.getClass().getName(), 
 				"setSTockInList", "Completed. Index: " + index);
 		
 		firePropertyChange(STOCK_LIST_PROPERTY, null, copyList);
+		
+		calculateTotalStockValue();
+		calculateNetWorth();
 	}
 	
+	//TODO document this
 	public OwnedStock getStockInList(OwnedStock stock){
 		OwnedStock result = null;
 		synchronized(this){
 			int index = stockList.indexOf(stock);
 			result = index >= 0 ? stockList.get(index) : null;
+		}
+		
+		return result;
+	}
+	
+	//TODO document this
+	public OwnedStock getStockInList(String symbol){
+		OwnedStock oStock = new DefaultOwnedStock(symbol);
+		return getStockInList(oStock);
+	}
+	
+	//TODO document this
+	//TODO include a check for IndexOutOfBounds, or just let it fly?
+	public OwnedStock getStockInList(int index){
+		OwnedStock result = null;
+		synchronized(this){
+			result = stockList.get(index);
 		}
 		
 		return result;
@@ -279,12 +338,39 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 	private void calculateTotalStockValue(){
 		BigDecimal total = new BigDecimal(0);
 		synchronized(this){
-			for(OwnedStock s : stockList){
-				total = total.add(s.getTotalValue());
+			if(stockList != null){
+				for(OwnedStock s : stockList){
+					total = total.add(s.getTotalValue());
+				}
 			}
 		}
 		
 		setTotalStockValue(total);
+	}
+	
+	//TODO this method runs every time the total stock value
+	//or cash balance amounts change
+	private void calculateNetWorth(){
+		BigDecimal net = null;
+		synchronized(this){
+			net = cashBalance.add(totalStockValue);
+		}
+		
+		if(net != null){
+			setNetWorth(net);
+		}
+	}
+	
+	//TODO this method runs every time the net worth is set
+	private void calculateChangeInNetWorth(){
+		BigDecimal change = null;
+		synchronized(this){
+			change = netWorth.subtract(initialValue);
+		}
+		
+		if(change != null){
+			setChangeInNetWorth(change);
+		}
 	}
 	
 	/**
@@ -326,6 +412,15 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 	@Override
 	public synchronized BigDecimal getCashBalance(){
 		return cashBalance;
+	}
+	
+	/**
+	 * Get the initial value of this portfolio.
+	 * 
+	 * @return the initial value of this portfolio.
+	 */
+	public synchronized BigDecimal getInitialValue(){
+		return initialValue;
 	}
 
 }
