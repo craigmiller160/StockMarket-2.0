@@ -40,16 +40,6 @@ import net.jcip.annotations.ThreadSafe;
 @ThreadSafe
 public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 
-	//TODO need to make sure that the new values are always set in the view, no matter
-	//what. probably should null out all old values.
-	
-	//TODO one major part here hasn't been figured out: getting the total value of all stocks
-	
-	//TODO there's no way to track the original net worth, to calculate the change
-	
-	//TODO all old values are null, because otherwise updates won't always fire for 0 values
-	//initial value 0, need the change event to fire for 0... 
-	
 	/**
 	 * SerialVersionUID for serialization support.
 	 */
@@ -130,10 +120,9 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 		synchronized(this){
 			this.initialValue = startingCash;
 		}
-		setCashBalance(startingCash); //TODO calculations need to check if this is null
-		setTotalStockValue(new BigDecimal(0)); //TODO calculations need to check if this is null
-		setNetWorth(startingCash); //TODO calculations need to check if this is null
-		//TODO changeInNetWorth
+		setCashBalance(startingCash);
+		setTotalStockValue(new BigDecimal(0));
+		setNetWorth(startingCash);
 		
 	}
 	
@@ -271,7 +260,16 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 		calculateNetWorth();
 	}
 
-	//TODO need a more descriptive name here
+	/**
+	 * Sets the specified stock in the list. If the stock
+	 * parameter is not in the list, it's added to it.
+	 * If the stock is in the list, it replaces the existing
+	 * instance in the list. If, however, the stock parameter
+	 * has 0 shares and matches a stock in the list, then its
+	 * match is simply removed.
+	 * 
+	 * @param stock the stock to be set in the list.
+	 */
 	public void setStockInList(OwnedStock stock){
 		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
 				"setStockInList", "Entering method", 
@@ -304,7 +302,15 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 		calculateNetWorth();
 	}
 	
-	//TODO document this
+	/**
+	 * Get a stock from the list, a match for the stock 
+	 * passed to this method.
+	 * 
+	 * @param stock a stock with the same symbol as the stock to 
+	 * retrieve.
+	 * @return the stock that matches the stock parameter, or
+	 * null if there is no match.
+	 */
 	public OwnedStock getStockInList(OwnedStock stock){
 		OwnedStock result = null;
 		synchronized(this){
@@ -315,14 +321,26 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 		return result;
 	}
 	
-	//TODO document this
+	/**
+	 * Get a stock from the list, based on its symbol.
+	 * 
+	 * @param symbol the symbol of the stock.
+	 * @return the stock from the list, based on its symbol, or
+	 * null if the stock doesn't exist.
+	 */
 	public OwnedStock getStockInList(String symbol){
 		OwnedStock oStock = new DefaultOwnedStock(symbol);
 		return getStockInList(oStock);
 	}
 	
-	//TODO document this
-	//TODO include a check for IndexOutOfBounds, or just let it fly?
+	/**
+	 * Get a stock from the list, based on the index number.
+	 * 
+	 * @param index the index number of the stock in the list.
+	 * @return the stock from the list.
+	 * @throws IndexOutOfBoundsException if the index parameter is not a valid
+	 * index for the stock list.
+	 */
 	public OwnedStock getStockInList(int index){
 		OwnedStock result = null;
 		synchronized(this){
@@ -332,9 +350,10 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 		return result;
 	}
 	
-	//TODO this method runs every time the stock list is changed
-	//via adding/removing stocks, or on setting the stock list property via
-	//its main setter method
+	/**
+	 * Calculate the total value of all stocks. This
+	 * method is called every time the stock list is changed.
+	 */
 	private void calculateTotalStockValue(){
 		BigDecimal total = new BigDecimal(0);
 		synchronized(this){
@@ -348,12 +367,17 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 		setTotalStockValue(total);
 	}
 	
-	//TODO this method runs every time the total stock value
-	//or cash balance amounts change
+	/**
+	 * Calculate the net worth of the portfolio. This
+	 * method is called any time a value that affects 
+	 * the net worth is changed.
+	 */
 	private void calculateNetWorth(){
 		BigDecimal net = null;
 		synchronized(this){
-			net = cashBalance.add(totalStockValue);
+			if(cashBalance != null && totalStockValue != null){
+				net = cashBalance.add(totalStockValue);
+			}
 		}
 		
 		if(net != null){
@@ -361,11 +385,16 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 		}
 	}
 	
-	//TODO this method runs every time the net worth is set
+	/**
+	 * Calculate the change in the net worth of this portfolio.
+	 * This method is invoked every time the net worth changes.
+	 */
 	private void calculateChangeInNetWorth(){
 		BigDecimal change = null;
 		synchronized(this){
-			change = netWorth.subtract(initialValue);
+			if(netWorth!= null && initialValue != null){
+				change = netWorth.subtract(initialValue);
+			}
 		}
 		
 		if(change != null){

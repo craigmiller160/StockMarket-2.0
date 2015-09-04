@@ -59,11 +59,6 @@ import net.miginfocom.swing.MigLayout;
 @NotThreadSafe
 public class PortfolioPanel extends AbstractListenerView {
 	
-	/*
-	 * TODO once adding/removing stocks from the list function is
-	 * complete, add a mouse listener for double click actions
-	 */
-	
 	/**
 	 * Shared <tt>Language</tt> module for locale-specific text.
 	 */
@@ -468,9 +463,6 @@ public class PortfolioPanel extends AbstractListenerView {
 						"Not instance of Big Decimal " + event.getNewValue());
 			}
 		}
-		
-		//TODO add +/- or fancy up/down icons to the labels after the value
-		//is added.
 	}
 	
 	/**
@@ -646,8 +638,6 @@ public class PortfolioPanel extends AbstractListenerView {
 					Fonts.SMALL_LABEL_FONT);
 			JLabel netValue = createLabel(moneyFormat.format(net), 
 					Fonts.SMALL_FIELD_FONT);
-			
-			//TODO add +/- and/or icon for increase/decrease in value.
 			
 			//Assemble the cell
 			cellPanel.add(symbolLabel, "split 2");

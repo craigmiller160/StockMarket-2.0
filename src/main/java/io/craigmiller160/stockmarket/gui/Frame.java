@@ -46,9 +46,6 @@ import net.miginfocom.swing.MigLayout;
 @NotThreadSafe
 public class Frame extends AbstractListenerView {
 
-	//TODO work on frame split pane, need to make sure the divider resizes properly when portfolio
-	//panel contents change
-	
 	/**
 	 * Shared logger for the program.
 	 */
@@ -151,7 +148,6 @@ public class Frame extends AbstractListenerView {
 		
 		splitPane.setLeftComponent(portfolioPanel);
 		splitPane.setRightComponent(stockDisplayPanel);
-		//TODO make sure this is setting the divider to the propper location
 		splitPane.setDividerLocation(-1);
 		frame.getContentPane().add(splitPane, "grow, push, dock center");
 		
@@ -352,8 +348,6 @@ public class Frame extends AbstractListenerView {
 		//LOGGER.logp(Level.FINEST, this.getClass().getName(), "getValue", 
 				//"Entering method", new Object[] {"Command: " + valueToGet});
 		
-		// TODO Will be filled out if any values are ultimately needed
-		//from this class.
 		return null;
 	}
 

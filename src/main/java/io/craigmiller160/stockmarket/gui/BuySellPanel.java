@@ -191,8 +191,6 @@ public class BuySellPanel extends AbstractListenerView {
 		//LOGGER.logp(Level.FINEST, this.getClass().getName(), "getValue", 
 				//"Entering method", new Object[] {"Command: " + valueToGet});
 		
-		// TODO Will be filled out if any values are ultimately needed
-		//from this class.
 		return null;
 	}
 

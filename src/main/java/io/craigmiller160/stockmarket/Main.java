@@ -52,8 +52,6 @@ import net.jcip.annotations.NotThreadSafe;
 public class Main {
 
 	
-	//TODO when everything else is done, create a splash image
-	
 	/**
 	 * The logger for this program. With the exception of the default
 	 * root logger, this is the top of the logger hierarchy. It needs
@@ -194,9 +192,7 @@ public class Main {
 	 * entire program.
 	 */
 	private static void configureLogger(){
-		//TODO set level to INFO as the default setting after
-		//development is done.
-		LOGGER.setLevel(Level.FINEST);
+		LOGGER.setLevel(Level.INFO);
 		
 		try{
 			FileHandler fileHandler = new FileHandler(
@@ -473,9 +469,5 @@ public class Main {
 		}
 		
 	}
-	
-	//TODO the exception catching/logging system is great for tracking issues, but
-		//it appears to be working a bit too well. Critical exceptions that should crash the program
-		//are leaving background processes running. Go through, identify, and eliminate them.
 	
 }

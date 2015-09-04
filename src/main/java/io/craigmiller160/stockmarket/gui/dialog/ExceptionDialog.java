@@ -129,9 +129,6 @@ public class ExceptionDialog extends AbstractDefaultDialog {
 		//LOGGER.logp(Level.FINEST, this.getClass().getName(), "getValue", 
 				//"Entering method", new Object[] {"Command: " + valueToGet});
 		
-		
-		// TODO Not sure this method actually needs to return
-		//anything from this dialog.
 		return null;
 	}
 	

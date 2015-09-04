@@ -258,8 +258,6 @@ public class StockHistoryPanel extends AbstractListenerView {
 	 * @return the created chart.
 	 */
 	private JFreeChart createChart(XYDataset dataset, String chartName){
-		//TODO in the future, explore the tooltips option, it's one of the 
-		//boolean params. See JFreeChart documentation
 		JFreeChart chart = ChartFactory.createTimeSeriesChart(
 				chartName, 
 				LANGUAGE.getString("chart_date"), 

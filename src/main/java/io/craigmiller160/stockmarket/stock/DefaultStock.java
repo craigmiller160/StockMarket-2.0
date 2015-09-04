@@ -46,9 +46,6 @@ import net.jcip.annotations.ThreadSafe;
 @ThreadSafe
 public class DefaultStock extends AbstractStock {
 
-	//TODO occasionally Yahoo! Finance screws up the download, and provides an "N/A"
-	//for a value that needs a number. Work on a response for this.
-	
 	/**
 	 * SerialVersionUID for serialization support.
 	 */
@@ -269,8 +266,6 @@ public class DefaultStock extends AbstractStock {
 				symbol + ": Downloading stock details. Full download: " + fullDetails);
 		
 		Map<String,String> stockDataMap = downloader.downloadStockDetails(symbol, fields);
-		
-		//TODO what happens if fullDetails is true, but all the values are not available?
 		
 		synchronized(this){
 			setCompanyName(stockDataMap.get(NAME));
@@ -866,7 +861,6 @@ public class DefaultStock extends AbstractStock {
 		String amPM = rawText.substring(rawText.length() - 2, rawText.length());
 		String[] timeArr = rawText.substring(0, rawText.length() - 2).split(":");
 		if(amPM.equalsIgnoreCase("pm")){
-			//TODO this won't work for 12 noon
 			hours = 12 + Integer.parseInt(timeArr[0]);
 			if(hours == 24){
 				hours = 12;

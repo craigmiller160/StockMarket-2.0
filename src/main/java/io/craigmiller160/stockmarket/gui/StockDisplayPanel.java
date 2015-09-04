@@ -94,7 +94,7 @@ public class StockDisplayPanel extends AbstractListenerView {
 	/**
 	 * The panel to be shown when the tabbed pane is hidden.
 	 */
-	private JPanel nothingSelectedPanel; //TODO in the end, add some sort of decoration to this panel
+	private JPanel nothingSelectedPanel;
 	
 	/**
 	 * Shared <tt>Language</tt> module for locale-specific text.
@@ -340,8 +340,6 @@ public class StockDisplayPanel extends AbstractListenerView {
 		//LOGGER.logp(Level.FINEST, this.getClass().getName(), "getValue", 
 				//"Entering method", new Object[] {"Command: " + valueToGet});
 		
-		
-		// TODO Will be filled out if a value is needed from this view
 		return null;
 	}
 

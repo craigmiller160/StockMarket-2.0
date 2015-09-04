@@ -813,7 +813,6 @@ public abstract class TransactionDialog extends AbstractDefaultDialog {
 				//First test if the string only has numbers, and if it doesn't it
 				//doesn't get added
 				
-				//TODO work on some sort of visual response as well
 				result = false;
 				Toolkit.getDefaultToolkit().beep();
 			}
@@ -824,7 +823,6 @@ public abstract class TransactionDialog extends AbstractDefaultDialog {
 				
 				//If it is greater than the max, the new text doesn't get added
 				if(quantity > getShareLimit()){
-					//TODO work on some sort of visual response as well
 					result = false;
 					Toolkit.getDefaultToolkit().beep();
 				}

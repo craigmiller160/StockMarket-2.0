@@ -125,30 +125,24 @@ public interface OwnedStock extends Stock{
 	 */
 	void addShares(OwnedStock stock);
 	
-	//TODO selling return value should return the amount the sold shares are worth, not a boolean
-	
 	/**
 	 * Subtract the specified number of shares from this stock. The number of shares subtracted is 
 	 * multiplied by the current share price to get the amount to decrease the
 	 * total value by. The principle and net are also updated accordingly.
+	 * Finally, the method returns the value of the shares that were subtracted,
+	 * the "profit" from a sale.
 	 * <p>
 	 * The stock details must be set before adding/subtracting any shares. 
 	 * If they have not been set, an exception is thrown.
 	 * <p>
-	 * This method returns true if there are shares remaining in this stock
-	 * after the subtraction. If it returns false, then there are no shares
-	 * remaining, and the program may want to remove this <tt>OwnedStoc</tt>
-	 * from the portfolio.
 	 * 
 	 * @param quantity the quantity of shares to decrease by.
-	 * @return true if there are shares remaining of the stock, false if there are
-	 * not shares remaining.
+	 * @return the value of the shares that were subtracted.
 	 * @throws InsufficientSharesException if the quantity of shares to be subtracted
 	 * is greater than the total quantity that this stock has.
 	 * @throws IllegalStateException if the stock details have not been set before
 	 * invoking this method.
 	 */
-	//TODO redo the documentation here if this change sticks, boolean to BigDecimal return type
 	BigDecimal subtractShares(int quantity);
 	
 	/**
@@ -156,7 +150,8 @@ public interface OwnedStock extends Stock{
 	 * parameter is the same stock as this one (ie, has the same symbol). If it
 	 * is not the same stock as this one, an exception is thrown. This method is
 	 * a helper method for subtracting shares, and should be used with a more recently updated
-	 * OwnedStock object as its parameter.
+	 * OwnedStock object as its parameter. Finally, the method returns the value of the shares that were subtracted,
+	 * the "profit" from a sale.
 	 * <p>
 	 * The stock details must be set before adding/subtracting any shares. 
 	 * If they have not been set, an exception is thrown.
@@ -167,14 +162,9 @@ public interface OwnedStock extends Stock{
 	 * price of the parameter as the current price of this whole object. This is
 	 * done prior to the operations to update the principle, total value, and net.
 	 * <p>
-	 * This method returns true if there are shares remaining in this stock
-	 * after the subtraction. If it returns false, then there are no shares
-	 * remaining, and the program may want to remove this <tt>OwnedStoc</tt>
-	 * from the portfolio.
 	 * 
 	 * @param stock the stock who's shares are to be added to this one.
-	 * @return true if there are shares remaining of the stock, false if there are
-	 * not shares remaining.
+	 * @return the value of the shares that were subtracted.
 	 * @throws InsufficientSharesException if the quantity of shares to be subtracted
 	 * is greater than the total quantity that this stock has.
 	 * @throws IllegalStateException if the stock details have not been set before
@@ -182,7 +172,6 @@ public interface OwnedStock extends Stock{
 	 * @throws IllegalArgumentException if the stock parameter is not the same
 	 * stock as this one (symbols don't match).
 	 */
-	//TODO redo the documentation here if this change sticks, boolean to BigDecimal return type
 	BigDecimal subtractShares(OwnedStock stock);
 	
 }

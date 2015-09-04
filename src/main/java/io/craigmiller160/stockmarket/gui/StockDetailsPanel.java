@@ -572,11 +572,6 @@ public class StockDetailsPanel extends AbstractListenerView {
 				new Object[] {"Stock: " + stock});
 		
 		
-		//TODO special response needed for OwnedStock once the purchasing
-		//mechanism has been finalized.
-		
-		//TODO make sure that +/- or up/down icon is displayed for added decoration
-		
 		Map<String,Object> valueMap = stock.getValueMap(true);
 		
 		String symbol = (String) valueMap.get(SYMBOL);
@@ -639,16 +634,29 @@ public class StockDetailsPanel extends AbstractListenerView {
 		
 	}
 	
-	//TODO document all of these setter methods
-	
+	/**
+	 * Set the share quantity label.
+	 * 
+	 * @param quantity the quantity of shares.
+	 */
 	public void setStockQuantity(int quantity){
 		shareQuantityValue.setText("" + quantity);
 	}
 	
+	/**
+	 * Set the total value label.
+	 * 
+	 * @param value the total value of all shares of the stock.
+	 */
 	public void setTotalValue(BigDecimal value){
 		totalValue.setText(moneyFormat.format(value));
 	}
 	
+	/**
+	 * Set the net gain/loss on the stock label.
+	 * 
+	 * @param net the net gain/loss on the stock.
+	 */
 	public void setNet(BigDecimal net){
 		netValue.setText(moneyFormat.format(net));
 	}
@@ -657,62 +665,132 @@ public class StockDetailsPanel extends AbstractListenerView {
 		symbolLabel.setText(symbol + ": ");
 	}
 	
+	/**
+	 * Set the company name label.
+	 * 
+	 * @param name the company name.
+	 */
 	public void setStockName(String name){
 		nameLabel.setText(name);
 	}
 	
+	/**
+	 * Set the current price label.
+	 * 
+	 * @param currentPrice the current price.
+	 */
 	public void setCurrentPrice(BigDecimal currentPrice){
 		currentPriceValue.setText(moneyFormat.format(currentPrice));
 	}
 	
+	/**
+	 * Set the last trade date label.
+	 * 
+	 * @param lastTradeDate the last trade date.
+	 */
 	public void setLastTradeDate(Calendar lastTradeDate){
 		lastTradeDateValue.setText(dateFormat.format(lastTradeDate.getTime()));
 	}
 	
+	/**
+	 * Set the last trade time label.
+	 * 
+	 * @param lastTradeTime the last trade time.
+	 */
 	public void setLastTradeTime(Calendar lastTradeTime){
 		lastTradeTimeValue.setText(timeFormat.format(lastTradeTime.getTime()));
 	}
 	
+	/**
+	 * Set the change in price today label.
+	 * 
+	 * @param changeToday the change in price today.
+	 * @param changeTodayPercent the change in price today in percent.
+	 */
 	public void setChangeToday(BigDecimal changeToday, BigDecimal changeTodayPercent){
 		dayChangeValue.setText(
 				moneyFormat.format(changeToday)
 				+ " (" + percentFormat.format(changeTodayPercent.divide(new BigDecimal(100))) + ")");
 	}
 	
+	/**
+	 * Set the year high label.
+	 * 
+	 * @param yearHigh the year high.
+	 */
 	public void setYearHigh(BigDecimal yearHigh){
 		yearHighValue.setText(moneyFormat.format(yearHigh));
 	}
 	
+	/**
+	 * Set the change in year high label.
+	 * 
+	 * @param changeYearHigh the change in year high.
+	 * @param changeYearHighPercent the change in year high in percent.
+	 */
 	public void setChangeYearHigh(BigDecimal changeYearHigh, BigDecimal changeYearHighPercent){
 		changeYearHighValue.setText(
 				moneyFormat.format(changeYearHigh)
 				+ " (" + percentFormat.format(changeYearHighPercent.divide(new BigDecimal(100))) + ")");
 	}
 	
+	/**
+	 * Set the year low label.
+	 * 
+	 * @param yearLow the year low.
+	 */
 	public void setYearLow(BigDecimal yearLow){
 		yearLowValue.setText(moneyFormat.format(yearLow));
 	}
 	
+	/**
+	 * Set the change in year low label.
+	 * 
+	 * @param changeYearLow the change in year low.
+	 * @param changeYearLowPercent the change in year low in percent.
+	 */
 	public void setChangeYearLow(BigDecimal changeYearLow, BigDecimal changeYearLowPercent){
 		changeYearLowValue.setText(
 				moneyFormat.format(changeYearLow)
 				+ " (" + percentFormat.format(changeYearLowPercent.divide(new BigDecimal(100))) + ")");
 	}
 	
+	/**
+	 * Set the 50 day average label.
+	 * 
+	 * @param fiftyDayAvg the 50 day average.
+	 */
 	public void set50DayAvg(BigDecimal fiftyDayAvg){
 		fiftyDayAvgValue.setText(moneyFormat.format(fiftyDayAvg));
 	}
 	
+	/**
+	 * Set the change in 50 day average label.
+	 * 
+	 * @param change50DayAvg the change in 50 day average.
+	 * @param change50DayAvgPercent the change in 50 day average in percent.
+	 */
 	public void setChange50DayAvg(BigDecimal change50DayAvg, BigDecimal change50DayAvgPercent){
 		change50DayAvgValue.setText(
 				moneyFormat.format(change50DayAvg)
 				+ " (" + percentFormat.format(change50DayAvgPercent.divide(new BigDecimal(100))) + ")");
 	}
 	
+	/**
+	 * Set the 200 day average label.
+	 * 
+	 * @param twoHundredDayAvg the 200 day average.
+	 */
 	public void set200DayAvg(BigDecimal twoHundredDayAvg){
 		twoHundredDayAvgValue.setText(moneyFormat.format(twoHundredDayAvg));
 	}
 	
+	/**
+	 * Set the change in 200 day average label.
+	 * 
+	 * @param change200DayAvg the change in 200 day average.
+	 * @param change200DayAvgPercent the change in 200 day average in percent.
+	 */
 	public void setChange200DayAvg(BigDecimal change200DayAvg, BigDecimal change200DayAvgPercent){
 		change200DayAvgValue.setText(
 				moneyFormat.format(change200DayAvg)
@@ -749,8 +827,6 @@ public class StockDetailsPanel extends AbstractListenerView {
 		//LOGGER.logp(Level.FINEST, this.getClass().getName(), "getValue", 
 				//"Entering method", new Object[] {"Command: " + valueToGet});
 		
-		
-		// TODO Will be filled out if values are needed from this view
 		return null;
 	}
 

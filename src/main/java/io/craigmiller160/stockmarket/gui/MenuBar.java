@@ -338,7 +338,6 @@ public class MenuBar extends AbstractListenerView {
 		//LOGGER.logp(Level.FINEST, this.getClass().getName(), "getValue", 
 				//"Entering method", new Object[] {"Command: " + valueToGet});
 		
-		// TODO Will be filled out if values are needed from this view
 		return null;
 	}
 

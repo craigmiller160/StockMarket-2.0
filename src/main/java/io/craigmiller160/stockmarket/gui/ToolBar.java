@@ -313,7 +313,6 @@ public class ToolBar extends AbstractListenerView {
 				//"Entering method", new Object[] {"Command: " + valueToGet});
 		
 		
-		// TODO Will be filled out if values are needed from this view
 		return null;
 	}
 

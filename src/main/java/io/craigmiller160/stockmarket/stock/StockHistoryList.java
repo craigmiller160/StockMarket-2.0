@@ -226,8 +226,5 @@ public class StockHistoryList extends AbstractList<HistoricalQuote> {
 	public <T> T[] toArray(T[] array){
 		return historyList.toArray(array);
 	}
-	
-	//TODO work on the thread safety of this list, along with the other
-		//list in the PortfolioModel
 
 }

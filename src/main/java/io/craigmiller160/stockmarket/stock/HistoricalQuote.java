@@ -48,9 +48,6 @@ public class HistoricalQuote implements Comparable<HistoricalQuote>, Serializabl
 		this.CLOSE_VALUE = closeValue;
 	}
 	
-	//TODO consider changing the hashCode/equals to be purely
-	//based on the date, rather than the date & close.
-	
 	@Override
 	public int hashCode(){
 		int calCode = DATE.hashCode();

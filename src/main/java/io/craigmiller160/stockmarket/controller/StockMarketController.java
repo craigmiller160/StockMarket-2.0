@@ -62,8 +62,6 @@ import net.jcip.annotations.ThreadSafe;
 @ThreadSafe
 public class StockMarketController extends AbstractConcurrentListenerController {
 	
-	//TODO for refreshing the portfolio, make sure it takes individual stock lookup/refreshes into account
-	
 	/**
 	 * The property name for the stock list.
 	 */
@@ -413,8 +411,6 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
 				"refreshPortfolio", "Entering method");
 		
-		//TODO needs a progress bar
-		
 		try {
 			@SuppressWarnings("unchecked") //The getter method being called returns the correct type
 			List<OwnedStock> stockList = (List<OwnedStock>) getModelProperty(STOCK_LIST_PROPERTY);
@@ -443,7 +439,6 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 			
 		}
 		catch(InterruptedException ex){
-			//TODO visual feedback? full pro-con in stock search method
 			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
 					"refreshPortfolio", 
 					"Exception", ex);
@@ -827,9 +822,6 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 		}
 		catch(InterruptedException ex){
 			Thread.currentThread().interrupt();
-			//TODO consider whether or not to have a dialog here
-			//Pro: visual feedback on interrupt
-			//Con: interrupts are probably deliberately being done, so no need for the visual
 			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
 					"lookupPortfolioStock", 
 					"Exception", ex);
@@ -917,9 +909,6 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 		}
 		catch(InterruptedException ex){
 			Thread.currentThread().interrupt();
-			//TODO consider whether or not to have a dialog here
-			//Pro: visual feedback on interrupt
-			//Con: interrupts are probably deliberately being done, so no need for the visual
 			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
 					"searchForStock", 
 					"Exception", ex);
@@ -1168,7 +1157,6 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 			}
 			catch(InterruptedException ex){
 				Thread.currentThread().interrupt();
-				//TODO do I need a dialog here? see stock search method for pros and cons
 				LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
 						"openPortfolio", 
 						"Exception", ex);
@@ -1228,7 +1216,6 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 			}
 			catch(InterruptedException ex){
 				Thread.currentThread().interrupt();
-				//TODO visual or not? see stock search method for pros and cons
 				LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
 						"showPortfolioNameDialog()", 
 						"Exception", ex);
@@ -1362,7 +1349,6 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 		}
 		catch(InterruptedException ex){
 			Thread.currentThread().interrupt();
-			//TODO show dialog? see stock search method for pros and cons
 			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
 					"newPortfolio", "Exception", ex);
 		}
@@ -1420,7 +1406,6 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 		}
 		catch(InterruptedException ex){
 			Thread.currentThread().interrupt();
-			//TODO gui dialog? see stock search method for pros and cons
 			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
 					"savePortfolioName", "Exception", ex);
 		}
@@ -1461,7 +1446,6 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 				}
 				catch(InterruptedException ex){
 					Thread.currentThread().interrupt();
-					//TODO gui dialog? see stock search method for pros and cons
 					LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
 							"savePortfolio", "Exception", ex);
 				}

@@ -353,15 +353,8 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 			valueToSubtract = principle.multiply(
 					new BigDecimal(quantityD / quantityOfSharesD));
 			
-			//TODO this should be added to the log entry
 			valueOfShares = getCurrentPrice().multiply(new BigDecimal(quantity));
 		}
-		
-		//TODO might be able to get rid of this value here, I don't think I need it. Setting
-		//the total in a completely separate way. If the method words with this commented out,
-		//then remove it.
-		//getCurrentPrice() method is synchronized, no need for additional synchronization here
-		//BigDecimal valueToSubtractFromTotal = getCurrentPrice().multiply(new BigDecimal(quantity));
 		
 		LOGGER.logp(Level.FINEST, this.getClass().getName(), "decreaseShares()", 
 				symbol + ": Subtracted Quantity: " + quantity + " Value to Subtract From Principle: " 
@@ -382,9 +375,6 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 	 * of an increase/decrease operation.
 	 */
 	private void setTotalValueAndNet(){
-		BigDecimal tempTotalValue = null;
-		int tempQuantity = 0;
-		BigDecimal tempNet = null;
 		BigDecimal currentPrice = getCurrentPrice(); //getCurrentPrice() is synchronized already
 		synchronized(this){
 			//If quantity == 0, then there's no total value or net
@@ -396,16 +386,7 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 				totalValue = new BigDecimal(0);
 				net = new BigDecimal(0);
 			}
-			
-			tempQuantity = quantityOfShares;
-			tempTotalValue = totalValue;
-			tempNet = net;
 		}
-		
-		//TODO consider if this log entry is really worth creating all the temp variables for it
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), "setTotalValueAndNet()", 
-				symbol + ": Quantity of Shares: " + tempQuantity + " Total Value: " 
-				+ moneyFormat.format(tempTotalValue) + " Net: " + moneyFormat.format(tempNet));
 	}
 	
 	@Override

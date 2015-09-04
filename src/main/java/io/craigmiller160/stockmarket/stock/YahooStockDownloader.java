@@ -171,7 +171,6 @@ public final class YahooStockDownloader implements StockDownloader {
 			}
 		}
 		
-		//TODO find a way to fix the way this log entry appears in the logger csv file
 		LOGGER.logp(Level.FINEST, this.getClass().getName(), "downloadStockDetails()", 
 				"\"" + symbol + ": CSV: " + csvFile.toString() + "\"");
 		
@@ -342,9 +341,6 @@ public final class YahooStockDownloader implements StockDownloader {
 			historyList = parseHistoryCSV(csvFile.toString(), symbol);
 		}
 
-		//TODO still some concerns about the thread-safety of this list and
-		//how it's used. Review this, and change if necessary.
-		
 		return historyList;
 	}
 	

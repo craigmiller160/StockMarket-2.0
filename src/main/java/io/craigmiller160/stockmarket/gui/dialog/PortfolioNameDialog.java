@@ -137,10 +137,17 @@ public class PortfolioNameDialog extends AbstractDefaultDialog {
 		dialog.addWindowListener(new WindowAdapter(){
 			@Override
 			public void windowOpened(WindowEvent event){
-				//TODO unsafe access to field in inner class
-				portfolioNameField.requestFocus();
+				nameFieldRequestFocus();
 			}
 		});
+	}
+	
+	/**
+	 * Request focus for the name field. Used by the
+	 * Window Listener.
+	 */
+	private void nameFieldRequestFocus(){
+		portfolioNameField.requestFocus();
 	}
 	
 	/**
