@@ -125,9 +125,6 @@ public class Main {
 		//Set the LookAndFeel of the GUI
 		setLookAndFeel();
 		
-		//Initialize the models and configure the controller
-		init();
-		
 		//Initialize the gui and link to the controller
 		initGUI();
 		
@@ -337,14 +334,6 @@ public class Main {
     		LOGGER.logp(Level.SEVERE, Main.class.getName(), 
     				"setLookAndFeel()", "Exception", ex);
     	}
-	}
-	
-	/**
-	 * Initialize key components of this program that it needs
-	 * to run.
-	 */
-	private static void init(){
-		//TODO this method can be removed
 	}
 	
 	/**
