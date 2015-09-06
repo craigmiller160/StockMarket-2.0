@@ -1,28 +1,11 @@
 package io.craigmiller160.stockmarket;
 
-import io.craigmiller160.stockmarket.controller.StockMarketController;
-import io.craigmiller160.stockmarket.gui.BuySellPanel;
-import io.craigmiller160.stockmarket.gui.Frame;
-import io.craigmiller160.stockmarket.gui.MenuBar;
-import io.craigmiller160.stockmarket.gui.PortfolioPanel;
-import io.craigmiller160.stockmarket.gui.SearchPanel;
-import io.craigmiller160.stockmarket.gui.StockDetailsPanel;
-import io.craigmiller160.stockmarket.gui.StockDisplayPanel;
-import io.craigmiller160.stockmarket.gui.StockHistoryPanel;
-import io.craigmiller160.stockmarket.gui.ToolBar;
-import io.craigmiller160.stockmarket.gui.dialog.DialogFactory;
-import io.craigmiller160.stockmarket.model.GUIStateModel;
-import io.craigmiller160.stockmarket.model.StockDisplayModel;
-import io.craigmiller160.stockmarket.util.Language;
-import io.craigmiller160.stockmarket.util.LoggerCSVFormat;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,7 +14,14 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
 import io.craigmiller160.mvp.listener.ListenerDialog;
+import io.craigmiller160.stockmarket.gui.dialog.DialogFactory;
+import io.craigmiller160.stockmarket.util.Language;
+import io.craigmiller160.stockmarket.util.LoggerCSVFormat;
 import net.jcip.annotations.NotThreadSafe;
 
 
@@ -46,7 +36,7 @@ import net.jcip.annotations.NotThreadSafe;
  * the program, and should not be accessed by any other threads during runtime.
  * 
  * @author Craig
- * @version 2.0
+ * @version 2.1
  */
 @NotThreadSafe
 public class Main {
@@ -95,10 +85,6 @@ public class Main {
 	 */
 	private static final String PROPERTIES_DIRECTORY = PROGRAM_DIRECTORY + "/Properties";
 	
-	/**
-	 * The controller that manages this program.
-	 */
-	private static final StockMarketController stockMarketController = new StockMarketController();
 	
 	/**
 	 * Main method to begin running the <tt>StockMarket</tt> program. Calls 
@@ -358,14 +344,7 @@ public class Main {
 	 * to run.
 	 */
 	private static void init(){
-		GUIStateModel guiStateModel = new GUIStateModel();
-		StockDisplayModel stockDisplayModel = new StockDisplayModel();
-		
-		stockMarketController.setThreadPoolProperties(5, 20, 60L, 
-				TimeUnit.MILLISECONDS);
-		
-		stockMarketController.addPropertyModel(guiStateModel);
-		stockMarketController.addPropertyModel(stockDisplayModel);
+		//TODO this method can be removed
 	}
 	
 	/**
@@ -378,33 +357,9 @@ public class Main {
 				Thread.currentThread().setUncaughtExceptionHandler(
 						new GUIUncaughtExceptionHandler());
 				
-				SearchPanel searchPanel = new SearchPanel();
-				StockDetailsPanel stockDetailsPanel = new StockDetailsPanel();
-				StockHistoryPanel stockHistoryPanel = new StockHistoryPanel();
-				BuySellPanel buySellPanel = new BuySellPanel();
+				ApplicationContext context = new ClassPathXmlApplicationContext("spring.xml");
 				
-				StockDisplayPanel stockDisplayPanel = new StockDisplayPanel();
-				stockDisplayPanel.setAllComponents(searchPanel.getPanel(), 
-						stockDetailsPanel.getPanel(), stockHistoryPanel.getPanel(), 
-						buySellPanel.getPanel());
-				
-				MenuBar menuBar = new MenuBar();
-				ToolBar toolBar = new ToolBar();
-				PortfolioPanel portfolioPanel = new PortfolioPanel();
-				
-				Frame frame = new Frame();
-				frame.setAllComponents(menuBar.getMenuBar(), toolBar.getToolBar(), 
-						portfolioPanel.getPanel(), stockDisplayPanel.getPanel());
-				
-				stockMarketController.addView(frame);
-				stockMarketController.addView(menuBar);
-				stockMarketController.addView(toolBar);
-				stockMarketController.addView(portfolioPanel);
-				stockMarketController.addView(stockDisplayPanel);
-				stockMarketController.addView(searchPanel);
-				stockMarketController.addView(buySellPanel);
-				stockMarketController.addView(stockDetailsPanel);
-				stockMarketController.addView(stockHistoryPanel);
+				((AbstractApplicationContext)context).close();
 			}
 		});
 	}

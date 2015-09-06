@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+    
+    <bean id="controller" class="io.craigmiller160.stockmarket.controller.StockMarketController">
+    	<constructor-arg value="5"/>
+    	<constructor-arg value="20"/>
+    	<constructor-arg value="60"/>
+    	<constructor-arg type="java.util.concurrent.TimeUnit" value="MILLISECONDS"/>
+    </bean>
+    
+    <bean id="stockDisplayPanel" class="io.craigmiller160.stockmarket.gui.StockDisplayPanel">
+    	<property name="SearchPanel" value="#{searchPanel.getPanel()}"/>
+    	<property name="StockDetailsPanel" value="#{stockDetailsPanel.getPanel()}"/>
+    	<property name="StockHistoryPanel" value="#{stockHistoryPanel.getPanel()}"/>
+    	<property name="BuySellPanel" value="#{buySellPanel.getPanel()}"/>
+    </bean>
+    
+    <bean id="frame" class="io.craigmiller160.stockmarket.gui.Frame">
+    	<property name="MenuBar" value="#{menuBar.getMenuBar()}"/>
+    	<property name="ToolBar" value="#{toolBar.getToolBar()}"/>
+    	<property name="PortfolioPanel" value="#{portfolioPanel.getPanel()}"/>
+    	<property name="StockDisplayPanel" value="#{stockDisplayPanel.getPanel()}"/>
+    </bean>
+    
+    <bean id="searchPanel" class="io.craigmiller160.stockmarket.gui.SearchPanel"/>
+    
+    <bean id="stockDetailsPanel" class="io.craigmiller160.stockmarket.gui.StockDetailsPanel"/>
+    
+    <bean id="stockHistoryPanel" class="io.craigmiller160.stockmarket.gui.StockHistoryPanel"/>
+    
+    <bean id="buySellPanel" class="io.craigmiller160.stockmarket.gui.BuySellPanel"/>
+    
+    <bean id="menuBar" class="io.craigmiller160.stockmarket.gui.MenuBar"/>
+    
+    <bean id="toolBar" class="io.craigmiller160.stockmarket.gui.ToolBar"/>
+    
+    <bean id="portfolioPanel" class="io.craigmiller160.stockmarket.gui.PortfolioPanel"/>
+    
+    <bean id="guiStateModel" class="io.craigmiller160.stockmarket.model.GUIStateModel"/>
+    
+    <bean id="stockDisplayModel" class="io.craigmiller160.stockmarket.model.StockDisplayModel"/>
+    
+    <bean class="io.craigmiller160.stockmarket.InitController"/>
+    
+</beans>
