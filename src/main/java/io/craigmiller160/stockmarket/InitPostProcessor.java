@@ -17,7 +17,7 @@ import io.craigmiller160.stockmarket.controller.StockMarketController;
  * @author craig
  * @version 2.1
  */
-public class InitController implements BeanPostProcessor, ApplicationContextAware {
+public class InitPostProcessor implements BeanPostProcessor, ApplicationContextAware {
 
 	/**
 	 * The <tt>ApplicationContext</tt> object, used to access the Spring container
