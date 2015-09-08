@@ -4,7 +4,7 @@
     xsi:schemaLocation="http://www.springframework.org/schema/beans
     http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
     
-    <bean id="controller" class="io.craigmiller160.stockmarket.controller.StockMarketController">
+    <bean id="controller" class="io.craigmiller160.stockmarket.controller.StockMarketController" destroy-method="savePortfolio">
     	<constructor-arg value="5"/>
     	<constructor-arg value="20"/>
     	<constructor-arg value="60"/>

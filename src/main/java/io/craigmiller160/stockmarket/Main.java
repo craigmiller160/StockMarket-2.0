@@ -346,9 +346,10 @@ public class Main {
 				Thread.currentThread().setUncaughtExceptionHandler(
 						new GUIUncaughtExceptionHandler());
 				
+				@SuppressWarnings("resource") //Shutdown hook is registered, it'll be closed when VM shuts down
 				ApplicationContext context = new ClassPathXmlApplicationContext("spring.xml");
 				
-				((AbstractApplicationContext)context).close();
+				((AbstractApplicationContext)context).registerShutdownHook();
 			}
 		});
 	}

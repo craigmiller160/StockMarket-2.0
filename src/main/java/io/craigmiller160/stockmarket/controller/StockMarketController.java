@@ -581,8 +581,6 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 	 * @param valueFromView the quantity of shares purchased.
 	 * @throws IllegalArgumentException if the value from the view
 	 * is not a valid integer.
-	 * @throws InsufficientFundsException if the number of shares
-	 * selected costs more than the value of the cash balance.
 	 */
 	public void buyStock(Object valueFromView){
 		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
@@ -638,7 +636,11 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
 					"buyStock", 
 					"Exception", ex);
-		} 
+		}
+		catch(InsufficientFundsException ex){
+			displayExceptionDialog(LANGUAGE.getString("insufficient_funds_title"), 
+					LANGUAGE.getString("insufficient_funds_cash_message"));
+		}
 		catch (Exception ex) {
 			displayExceptionDialog(ex);
 			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 

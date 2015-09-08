@@ -32,6 +32,7 @@ public class InitController implements BeanPostProcessor, ApplicationContextAwar
 
 	@Override
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+		//If bean is controller, add models and views to it.
 		if(bean instanceof StockMarketController){
 			StockMarketController controller = (StockMarketController) bean;
 			controller.addPropertyModel((AbstractPropertyModel) context.getBean("guiStateModel"));
