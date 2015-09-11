@@ -58,7 +58,14 @@ public class HistoricalQuote implements Comparable<HistoricalQuote>, Serializabl
 	@Override
 	public boolean equals(Object obj){
 		if(obj instanceof HistoricalQuote){
-			return this.hashCode() == obj.hashCode();
+			int dateCompare = this.DATE.compareTo(((HistoricalQuote)obj).DATE);
+			int closeCompare = this.CLOSE_VALUE.compareTo(((HistoricalQuote)obj).CLOSE_VALUE);
+			if(dateCompare == 0 && closeCompare == 0){
+				return true;
+			}
+			else{
+				return false;
+			}
 		}
 		else{
 			return false;

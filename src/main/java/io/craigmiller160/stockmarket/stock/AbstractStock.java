@@ -139,7 +139,7 @@ public abstract class AbstractStock implements Stock, Comparable<AbstractStock>,
 	@Override
 	public boolean equals(Object obj){
 		if(obj instanceof AbstractStock){
-			return this.hashCode() == obj.hashCode();
+			return this.getSymbol().equals(((AbstractStock)obj).getSymbol());
 		}
 		else{
 			return false;
