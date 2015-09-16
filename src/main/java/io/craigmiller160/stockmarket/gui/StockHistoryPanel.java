@@ -3,12 +3,7 @@ package io.craigmiller160.stockmarket.gui;
 import static io.craigmiller160.stockmarket.controller.StockMarketController.INITIAL_HISTORY_LENGTH_MONTHS;
 import static io.craigmiller160.stockmarket.controller.StockMarketController.PORTFOLIO_STATE_PROPERTY;
 import static io.craigmiller160.stockmarket.controller.StockMarketController.SELECTED_STOCK_HISTORY_PROPERTY;
-import static io.craigmiller160.stockmarket.controller.StockMarketController.STOCK_HISTORY_INTERVAL_ACTION;
-import io.craigmiller160.mvp.listener.AbstractListenerView;
-import io.craigmiller160.stockmarket.stock.HistoricalQuote;
-import io.craigmiller160.stockmarket.stock.StockHistoryList;
-import io.craigmiller160.stockmarket.util.Fonts;
-import io.craigmiller160.stockmarket.util.Language;
+import static io.craigmiller160.stockmarket.controller.StockMarketController.*;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -26,8 +21,6 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import net.miginfocom.swing.MigLayout;
-
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -36,6 +29,13 @@ import org.jfree.data.time.Day;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.XYDataset;
+
+import io.craigmiller160.mvp.listener.AbstractListenerView;
+import io.craigmiller160.stockmarket.stock.HistoricalQuote;
+import io.craigmiller160.stockmarket.stock.StockHistoryList;
+import io.craigmiller160.stockmarket.util.Fonts;
+import io.craigmiller160.stockmarket.util.Language;
+import net.miginfocom.swing.MigLayout;
 
 /**
  * Utilizes the <tt>JFreeChart</tt> library to display a chart of the 
@@ -116,6 +116,7 @@ public class StockHistoryPanel extends AbstractListenerView {
 		
 		historyLengthCombo = createComboBox(timeInterval, Fonts.FIELD_FONT, 
 				LANGUAGE.getString("history_combo_tooltip"));
+		historyLengthCombo.setSelectedIndex(INITIAL_HISTORY_LENGTH_MONTHS - 1);
 	}
 	
 	/**
@@ -187,6 +188,10 @@ public class StockHistoryPanel extends AbstractListenerView {
 		return stockHistoryPanel;
 	}
 	
+	public void resetCombo(){
+		historyLengthCombo.setSelectedIndex(INITIAL_HISTORY_LENGTH_MONTHS - 1);
+	}
+	
 	/**
 	 * Set the stock history to be displayed in the chart.
 	 * 
@@ -197,7 +202,6 @@ public class StockHistoryPanel extends AbstractListenerView {
 				"setStockHistory", "Entering", 
 				new Object[]{"History List: " + historyList});
 		
-		historyLengthCombo.setSelectedIndex(INITIAL_HISTORY_LENGTH_MONTHS - 1);
 		String chartName = "";
 		if(historyList instanceof StockHistoryList){
 			chartName = ((StockHistoryList) historyList).getSymbol();
@@ -281,7 +285,14 @@ public class StockHistoryPanel extends AbstractListenerView {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void changeProperty(PropertyChangeEvent event) {
-		if(event.getPropertyName() == SELECTED_STOCK_HISTORY_PROPERTY){
+		if(event.getPropertyName() == SELECTED_STOCK_PROPERTY){
+			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
+					"changeProperty", "Changing Property", 
+					new Object[]{"Property: " + event.getPropertyName()});
+			
+			resetCombo();
+		}
+		else if(event.getPropertyName() == SELECTED_STOCK_HISTORY_PROPERTY){
 			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
 					"changeProperty", "Changing Property", 
 					new Object[]{"Property: " + event.getPropertyName()});
