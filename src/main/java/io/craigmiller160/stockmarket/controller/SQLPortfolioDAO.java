@@ -172,27 +172,39 @@ public class SQLPortfolioDAO implements
 		
 		int userid = 0;
 		semaphore.acquire();
-		try(Statement statement = getConnection().createStatement(
-				ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)){
-			ResultSet resultSet = statement.executeQuery(query);
-			
-			resultSet.moveToInsertRow();
-			resultSet.updateString(2, portfolioName); //portfolio_name
-			resultSet.updateBigDecimal(3, portfolio.getCashBalance()); //cash_balance
-			resultSet.updateBigDecimal(4, portfolio.getNetWorth()); //net_worth
-			resultSet.updateBigDecimal(5, portfolio.getInitialValue());
-			
-			Timestamp now = new Timestamp(
-					GregorianCalendar.getInstance().getTimeInMillis());
-			resultSet.updateTimestamp(7, now); //timestamp
-			
-			resultSet.insertRow();
-			
-			resultSet.last();
-			portfolio.setUserID(resultSet.getInt(1));
-			
-			userid = resultSet.getInt(1);
+		try(Connection con = getConnection()){
+			try(Statement statement = con.createStatement(
+					ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE)){
+				con.setAutoCommit(false);
+				
+				ResultSet resultSet = statement.executeQuery(query);
+				
+				resultSet.moveToInsertRow();
+				resultSet.updateString(2, portfolioName); //portfolio_name
+				resultSet.updateBigDecimal(3, portfolio.getCashBalance()); //cash_balance
+				resultSet.updateBigDecimal(4, portfolio.getNetWorth()); //net_worth
+				resultSet.updateBigDecimal(5, portfolio.getInitialValue());
+				
+				Timestamp now = new Timestamp(
+						GregorianCalendar.getInstance().getTimeInMillis());
+				resultSet.updateTimestamp(7, now); //timestamp
+				
+				resultSet.insertRow();
+				
+				resultSet.last();
+				portfolio.setUserID(resultSet.getInt(1));
+				
+				userid = resultSet.getInt(1);
+				
+				con.commit();
+			}
+			catch(SQLException ex){
+				//Rollback transaction if error occurs and propagate exception
+				con.rollback();
+				throw ex;
+			}
 		}
+		
 		semaphore.release();
 		
 		LOGGER.logp(Level.INFO, this.getClass().getName(), 
@@ -394,30 +406,39 @@ public class SQLPortfolioDAO implements
 				"saveStocks()", "SQL: Save Stocks Query: " + stocksQuery);
 		
 		semaphore.acquire();
-		try(Statement portfolioStatement = getConnection().createStatement(
-				ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE); 
-			PreparedStatement stockStatement = getConnection().prepareStatement(
-				stocksQuery, ResultSet.TYPE_SCROLL_INSENSITIVE, 
-				ResultSet.CONCUR_UPDATABLE);){
-			
-			ResultSet resultSet = portfolioStatement.executeQuery(portfolioQuery);
-			
-			while(resultSet.next()){
-				resultSet.updateString(2, portfolioName); //portfolio_name
-				resultSet.updateBigDecimal(3, cashBalance); //cash_balance
-				resultSet.updateBigDecimal(4, netWorth); //net_worth
-				resultSet.updateBigDecimal(5, initialValue); //initial_value
-				resultSet.updateBigDecimal(6, totalStockValue); //total_stock_value
+		try(Connection con = getConnection()){
+			try(Statement portfolioStatement = getConnection().createStatement(
+					ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE); 
+				PreparedStatement stockStatement = getConnection().prepareStatement(
+					stocksQuery, ResultSet.TYPE_SCROLL_INSENSITIVE, 
+					ResultSet.CONCUR_UPDATABLE);){
 				
-				Timestamp now = new Timestamp(
-						GregorianCalendar.getInstance().getTimeInMillis());
-				resultSet.updateTimestamp(7,  now); //timestamp
+				con.setAutoCommit(false);
+				ResultSet resultSet = portfolioStatement.executeQuery(portfolioQuery);
 				
-				resultSet.updateRow();
+				while(resultSet.next()){
+					resultSet.updateString(2, portfolioName); //portfolio_name
+					resultSet.updateBigDecimal(3, cashBalance); //cash_balance
+					resultSet.updateBigDecimal(4, netWorth); //net_worth
+					resultSet.updateBigDecimal(5, initialValue); //initial_value
+					resultSet.updateBigDecimal(6, totalStockValue); //total_stock_value
+					
+					Timestamp now = new Timestamp(
+							GregorianCalendar.getInstance().getTimeInMillis());
+					resultSet.updateTimestamp(7,  now); //timestamp
+					
+					resultSet.updateRow();
+				}
+				
+				//Currently re-using portfolioStatement here for the sake of simplicity
+				saveStocks(stockStatement, portfolioStatement, stockList, userid);
+				
+				con.commit();
 			}
-			
-			//Currently re-using portfolioStatement here for the sake of simplicity
-			saveStocks(stockStatement, portfolioStatement, stockList, userid);
+			catch(SQLException ex){
+				con.rollback();
+				throw ex;
+			}
 		}
 		semaphore.release();
 		LOGGER.logp(Level.FINEST, this.getClass().getName(), "savePortfolio()",

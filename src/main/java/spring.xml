@@ -43,6 +43,6 @@
     
     <bean id="stockDisplayModel" class="io.craigmiller160.stockmarket.model.StockDisplayModel"/>
     
-    <bean class="io.craigmiller160.stockmarket.InitController"/>
+    <bean class="io.craigmiller160.stockmarket.InitPostProcessor"/>
     
 </beans>
