@@ -1,9 +1,10 @@
 package io.craigmiller160.stockmarket.controller;
 
-import io.craigmiller160.stockmarket.model.PortfolioModel;
-
+import java.beans.PropertyChangeListener;
 import java.math.BigDecimal;
 import java.util.List;
+
+import io.craigmiller160.stockmarket.model.PortfolioModel;
 
 /**
  * Interface that defines a data access object for accessing the datasource
@@ -17,6 +18,22 @@ import java.util.List;
  */
 public interface PortfolioDAO {
 
+	/**
+	 * Add an external <tt>PropertyChangeListener</tt> to pass events to as the
+	 * model is being constructed.
+	 * 
+	 * @param listener the external listener.
+	 */
+	void addPropertyChangeListener(PropertyChangeListener listener);
+	
+	/**
+	 * Removes an external <tt>PropertyChangeListener</tt> so that events
+	 * are no longer passed to it as the model is being constructed.
+	 * 
+	 * @param listener the external listener.
+	 */
+	void removePropertyChangeListener(PropertyChangeListener listener);
+	
 	/**
 	 * Create a new stock portfolio, with the specified name and starting 
 	 * cash balance.

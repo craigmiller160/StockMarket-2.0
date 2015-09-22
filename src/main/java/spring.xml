@@ -9,6 +9,7 @@
     	<constructor-arg value="20"/>
     	<constructor-arg value="60"/>
     	<constructor-arg type="java.util.concurrent.TimeUnit" value="MILLISECONDS"/>
+    	<property name="PortfolioDAO" ref="portfolioDao"/>
     </bean>
     
     <bean id="stockDisplayPanel" class="io.craigmiller160.stockmarket.gui.StockDisplayPanel">
@@ -44,5 +45,7 @@
     <bean id="stockDisplayModel" class="io.craigmiller160.stockmarket.model.StockDisplayModel"/>
     
     <bean class="io.craigmiller160.stockmarket.InitPostProcessor"/>
+    
+    <bean id="portfolioDao" class="io.craigmiller160.stockmarket.controller.SQLPortfolioDAO"/>
     
 </beans>

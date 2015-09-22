@@ -137,9 +137,7 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 				"setStockList", "Entering method", 
 				new Object[] {"Stock List: " + stockList});
 		
-		List<OwnedStock> oldValue = null;
 		synchronized(this){
-			oldValue = this.stockList;
 			if(stockList == null){
 				this.stockList = new ArrayList<>();
 			}
@@ -148,7 +146,7 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 			}
 		}
 		
-		firePropertyChange(STOCK_LIST_PROPERTY, oldValue, stockList);
+		firePropertyChange(STOCK_LIST_PROPERTY, null, stockList);
 		
 		calculateTotalStockValue();
 		calculateNetWorth();
@@ -186,13 +184,11 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 				"setTotalStockValue", "Entering method", 
 				new Object[] {"Total Stock Value: " + portfolioValue});
 		
-		BigDecimal oldValue = null;
 		synchronized(this){
-			oldValue = this.totalStockValue;
 			this.totalStockValue = portfolioValue;
 		}
 		
-		firePropertyChange(TOTAL_STOCK_VALUE_PROPERTY, oldValue, portfolioValue);
+		firePropertyChange(TOTAL_STOCK_VALUE_PROPERTY, null, portfolioValue);
 	}
 	
 	/**

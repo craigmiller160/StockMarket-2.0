@@ -51,13 +51,17 @@ import net.jcip.annotations.ThreadSafe;
  * constants in this class, allowing them to be managed in a centralized location.
  * All views and models should import these values to ensure consistency across the 
  * program.
+ * <p>As of version 2.2, the DAO for handling database access is not generated
+ * inside this class. Rather, it is injected via a setter method. If this setter
+ * is not used to set this value at program startup, this controller will be
+ * unable to save/load to and from the database.
  * <p>
  * <b>THREAD SAFETY:</b> This class is thread safe. All methods invoked by 
  * <tt>processEvent(String,Object)</tt> are properly constructed so that they 
  * can be accessed by multiple threads simultaneously.
  * 
  * @author craig
- * @version 2.0
+ * @version 2.2
  */
 @ThreadSafe
 public class StockMarketController extends AbstractConcurrentListenerController {
@@ -265,17 +269,6 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 	 */
 	public StockMarketController() {
 		super();
-		try{
-			this.portfolioDAO = new SQLPortfolioDAO();
-			((SQLPortfolioDAO) portfolioDAO).addPropertyChangeListener(this);
-		}
-		catch(IOException ex){
-			ex = new IOException(
-					"Database connection failed: " + ex.getMessage(), ex);
-			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), "Constructor",
-					"Exception", ex);
-		}
 		
 		setThreadFactory(new EventThreadFactory());
 		
@@ -292,17 +285,6 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 	 */
 	public StockMarketController(int threadPoolSize){
 		super(threadPoolSize);
-		try{
-			this.portfolioDAO = new SQLPortfolioDAO();
-			((SQLPortfolioDAO) portfolioDAO).addPropertyChangeListener(this);
-		}
-		catch(IOException ex){
-			ex = new IOException(
-					"Database connection failed: " + ex.getMessage(), ex);
-			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), "Constructor",
-					"Exception", ex);
-		}
 		setThreadFactory(new EventThreadFactory());
 	}
 
@@ -322,18 +304,30 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 	public StockMarketController(int corePoolSize, int maximumPoolSize,
 			long keepAliveTime, TimeUnit unit){
 		super(corePoolSize, maximumPoolSize, keepAliveTime, unit);
-		try{
-			this.portfolioDAO = new SQLPortfolioDAO();
-			((SQLPortfolioDAO) portfolioDAO).addPropertyChangeListener(this);
-		}
-		catch(IOException ex){
-			ex = new IOException(
-					"Database connection failed: " + ex.getMessage(), ex);
-			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), "Constructor",
-					"Exception", ex);
-		}
 		setThreadFactory(new EventThreadFactory());
+	}
+	
+	/**
+	 * Set the <tt>PortfolioDAO</tt> object for saving and loading
+	 * portfolios to and from the database. If this property is not
+	 * set at the start of the program, the program will be unable
+	 * to access the database.
+	 * 
+	 * @param dao the DAO to handle database access.
+	 */
+	public void setPortfolioDAO(PortfolioDAO dao){
+		this.portfolioDAO = dao;
+		this.portfolioDAO.addPropertyChangeListener(this);
+	}
+	
+	/**
+	 * Get the <tt>PortfolioDAO</tt> object currently
+	 * set in this class.
+	 * 
+	 * @return the DAO to handle database access.
+	 */
+	public PortfolioDAO getPortfolioDAO(){
+		return portfolioDAO;
 	}
 
 	@Override
