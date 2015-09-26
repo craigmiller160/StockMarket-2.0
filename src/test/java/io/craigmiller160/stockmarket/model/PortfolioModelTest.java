@@ -49,6 +49,8 @@ public class PortfolioModelTest {
 	 */
 	private void testInitialValue(){
 		portfolio.setInitialValue(new BigDecimal(5000));
+		portfolio.setCashBalance(new BigDecimal(5000));
+		portfolio.setNetWorth(new BigDecimal(5000));
 		assertEquals("Initial Value Test: initialValue failed", 
 				portfolio.getInitialValue(), new BigDecimal(5000));
 		assertEquals("Initial Value Test: cashBalance failed", 
@@ -57,6 +59,8 @@ public class PortfolioModelTest {
 				portfolio.getTotalStockValue(), new BigDecimal(0));
 		assertEquals("Initial Value Test: netWorth failed", 
 				portfolio.getNetWorth(), new BigDecimal(5000));
+		assertEquals("Initial Value Test: changeInNetWorth failed", 
+				portfolio.getChangeInNetWorth(), new BigDecimal(0));
 	}
 	
 	/**

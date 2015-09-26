@@ -100,6 +100,9 @@ public class HibernatePortfolioDAO implements PortfolioDAO {
 	@Override
 	public PortfolioModel createNewPortfolio(String portfolioName, BigDecimal startingCashBalance) throws Exception {
 		SQLPortfolioModel portfolio = new SQLPortfolioModel();
+		portfolio.setInitialValue(startingCashBalance);
+		portfolio.setCashBalance(startingCashBalance);
+		portfolio.setNetWorth(startingCashBalance);
 		
 		Session session = null;
 		try{

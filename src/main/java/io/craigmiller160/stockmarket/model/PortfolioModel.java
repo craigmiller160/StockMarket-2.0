@@ -139,10 +139,7 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 		synchronized(this){
 			this.initialValue = startingCash;
 		}
-		setCashBalance(startingCash);
-		setTotalStockValue(new BigDecimal(0));
-		setNetWorth(startingCash);
-		
+		calculateChangeInNetWorth();
 	}
 	
 	/**
