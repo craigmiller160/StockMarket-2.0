@@ -2,14 +2,18 @@ package io.craigmiller160.stockmarket.model;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
 
 import io.craigmiller160.stockmarket.stock.DefaultOwnedStock;
+import io.craigmiller160.stockmarket.stock.InvalidStockException;
 import io.craigmiller160.stockmarket.stock.OwnedStock;
+import io.craigmiller160.stockmarket.stock.StockFileDownloader;
 
 /**
  * JUnit test case for the <tt>PortfolioModel</tt> class. It tests
@@ -83,9 +87,7 @@ public class PortfolioModelTest {
 	 * how the other fields are updated.
 	 */
 	private void testAddNewStock(){
-		DefaultOwnedStock stock = new DefaultOwnedStock("AAPL");
-		stock.setCompanyName("Apple");
-		stock.setCurrentPrice(new BigDecimal(45));
+		OwnedStock stock = getStock("AAPL", "Apple", new BigDecimal(45));
 		stock.addShares(20);
 		
 		portfolio.setStockInList(stock);
@@ -109,9 +111,7 @@ public class PortfolioModelTest {
 	 * fields are updated.
 	 */
 	private void testAddExistingStock(){
-		DefaultOwnedStock stock = new DefaultOwnedStock("AAPL");
-		stock.setCompanyName("Apple");
-		stock.setCurrentPrice(new BigDecimal(45));
+		OwnedStock stock = getStock("AAPL", "Apple", new BigDecimal(45));
 		stock.addShares(25);
 		
 		portfolio.setStockInList(stock);
@@ -135,9 +135,7 @@ public class PortfolioModelTest {
 	 * how the other fields are updated.
 	 */
 	private void testAddEmptyStock(){
-		DefaultOwnedStock stock = new DefaultOwnedStock("AAPL");
-		stock.setCompanyName("Apple");
-		stock.setCurrentPrice(new BigDecimal(45));
+		OwnedStock stock = getStock("AAPL", "Apple", new BigDecimal(45));
 		stock.addShares(0);
 		
 		portfolio.setStockInList(stock);
@@ -158,9 +156,7 @@ public class PortfolioModelTest {
 	 */
 	private void testSetStockList(){
 		List<OwnedStock> stockList = new ArrayList<>();
-		DefaultOwnedStock stock = new DefaultOwnedStock("GOOG");
-		stock.setCompanyName("Google");
-		stock.setCurrentPrice(new BigDecimal(222));
+		OwnedStock stock = getStock("GOOG", "Google", new BigDecimal(222));
 		stock.addShares(5);
 		stockList.add(stock);
 		
@@ -174,6 +170,29 @@ public class PortfolioModelTest {
 				portfolio.getNetWorth(), new BigDecimal(4110));
 		assertEquals("Set Stock List Test: changeInNetWorth failed", 
 				portfolio.getChangeInNetWorth(), new BigDecimal(-890));
+	}
+	
+	private OwnedStock getStock(String symbol, String name, BigDecimal price){
+		DefaultOwnedStock stock = new DefaultOwnedStock(symbol);
+		StockFileDownloader downloader = new StockFileDownloader();
+		downloader.setSymbol(symbol);
+		downloader.setName(name);
+		downloader.setCurrentPrice(price.toString());
+		downloader.setQuantityOfShares("0");
+		downloader.setPrinciple("0");
+		downloader.setTotalValue("0");
+		downloader.setNet("0");
+		try {
+			stock.setStockDetails(downloader, false);
+		} catch (UnknownHostException e) {
+			//Won't be thrown in this dummy test class
+		} catch (InvalidStockException e) {
+			//Won't be thrown in this dummy test class
+		} catch (IOException e) {
+			//Won't be thrown in this dummy test class
+		}
+		
+		return stock;
 	}
 	
 	
