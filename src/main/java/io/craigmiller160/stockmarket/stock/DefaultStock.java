@@ -327,14 +327,13 @@ public class DefaultStock extends AbstractStock {
 	
 	
 	/**
-	 * Sets the company name field. This method is only public so that 
-	 * it can be used with Hibernate. It should NOT be invoked directly
-	 * by the program in any other way. This value should always be set
-	 * by the downloader (and the downloader can be allowed to use this method).
+	 * Sets the company name field. This method is for Hibernate to use, or
+	 * as a convenience method for subclasses. It should NOT be used in any
+	 * other way by this program.
 	 * 
 	 * @param name the name of the company.
 	 */
-	public void setCompanyName(String name){
+	protected void setCompanyName(String name){
 		synchronized(this){
 			this.companyName = name;
 		}
@@ -807,14 +806,14 @@ public class DefaultStock extends AbstractStock {
 	}
 	
 	/**
-	 * Sets the current share price field. This method is only public so it
-	 * can be used with Hibernate. It should NOT be used directly by the program.
+	 * Sets the current share price field. This should NOT be used directly by the program,
+	 * and is only here for Hibernate to use, or for internal use by this class or subclasses.
 	 * 
 	 * @param currentPrice the current share price.
 	 * @throws IllegalArgumentException if the value passed to this method is 
 	 * less than 0.
 	 */
-	public void setCurrentPrice(BigDecimal currentPrice){
+	protected void setCurrentPrice(BigDecimal currentPrice){
 		if(currentPrice.compareTo(new BigDecimal(0)) < 0){
 			throw new IllegalArgumentException("Year Low cannot be less than 0: " + currentPrice);
 		}

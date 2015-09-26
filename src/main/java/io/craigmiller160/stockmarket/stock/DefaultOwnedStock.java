@@ -126,10 +126,11 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 	
 	/**
 	 * No argument constructor for use with Hibernate.
-	 * This constructor should NOT be used by any other
-	 * part of the program.
+	 * This constructor is set to package-private because
+	 * it should not be used by any part of the program, and
+	 * is purely here for Hibernate to use.
 	 */
-	public DefaultOwnedStock(){
+	DefaultOwnedStock(){
 		super("");
 		principle = new BigDecimal(0);
 		totalValue = new BigDecimal(0);
@@ -269,15 +270,15 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 	}
 	
 	/**
-	 * Sets the quantity field. This method is public so that it can be used with
-	 * Hibernate. It's also available for use by subclasses. It should NOT be
-	 * used in any other way by this program.
+	 * Sets the quantity field. This method is for Hibernate to use, or
+	 * as a convenience method for subclasses. It should NOT be used in any
+	 * other way by this program.
 	 * 
 	 * @param quantity the quantity of shares owned of this stock.
 	 * @throws IllegalArgumentException if the value passed to this method is 
 	 * less than 0.
 	 */
-	public void setQuantityOfShares(int quantity){
+	protected void setQuantityOfShares(int quantity){
 		if(quantity < 0){
 			throw new IllegalArgumentException("Quantity can't be less than 0: " + quantity);
 		}
@@ -307,15 +308,15 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 	}
 	
 	/**
-	 * Sets the principle field. This method is public so that it can be used with
-	 * Hibernate. It's also available for use by subclasses. It should NOT be
-	 * used in any other way by this program.
+	 * Sets the principle field. This method is for Hibernate to use, or
+	 * as a convenience method for subclasses. It should NOT be used in any
+	 * other way by this program.
 	 * 
 	 * @param principle the principle, the initial amount spent on the stock.
 	 * @throws IllegalArgumentException if the value passed to this method is 
 	 * less than 0.
 	 */
-	public void setPrinciple(BigDecimal principle){
+	protected void setPrinciple(BigDecimal principle){
 		if(principle.compareTo(new BigDecimal(0)) < 0){
 			throw new IllegalArgumentException("Principle can't be less than 0: " + principle);
 		}
@@ -345,15 +346,15 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 	}
 	
 	/**
-	 * Sets the total value field. This method is public so that it can be used with
-	 * Hibernate. It's also available for use by subclasses. It should NOT be
-	 * used in any other way by this program.
+	 * Sets the total value field. This method is for Hibernate to use, or
+	 * as a convenience method for subclasses. It should NOT be used in any
+	 * other way by this program.
 	 * 
 	 * @param totalValue the totalValue of all shares of the stock.
 	 * @throws IllegalArgumentException if the value passed to this method is 
 	 * less than 0.
 	 */
-	public void setTotalValue(BigDecimal totalValue){
+	protected void setTotalValue(BigDecimal totalValue){
 		if(totalValue.compareTo(new BigDecimal(0)) < 0){
 			throw new IllegalArgumentException("Total Value can't be less than 0: " + totalValue);
 		}
@@ -376,13 +377,13 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 	}
 	
 	/**
-	 * Sets the net field. This method is public so that it can be used with
-	 * Hibernate. It's also available for use by subclasses. It should NOT be
-	 * used in any other way by this program.
+	 * Sets the net field. This method is for Hibernate to use, or
+	 * as a convenience method for subclasses. It should NOT be used in any
+	 * other way by this program.
 	 * 
 	 * @param net the net gains/losses on this stock.
 	 */
-	public void setNet(BigDecimal net){
+	protected void setNet(BigDecimal net){
 		synchronized(this){
 			this.net = net;
 		}

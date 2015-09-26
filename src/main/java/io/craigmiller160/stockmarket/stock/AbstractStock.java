@@ -91,12 +91,12 @@ public abstract class AbstractStock implements Stock, Comparable<AbstractStock>,
 	/**
 	 * Sets the symbol of this stock. This method is provided as a 
 	 * tool for Hibernate to update the values of this class.
-	 * It should NOT be invoked in the program, as the symbol of a
-	 * stock object should never be changed after it is created.
+	 * It is set to package-private to minimize access, and should
+	 * NOT be used by any other part of this program.
 	 * 
 	 * @param symbol the symbol of the stock.
 	 */
-	public synchronized void setSymbol(String symbol){
+	synchronized void setSymbol(String symbol){
 		this.symbol = symbol.toUpperCase();
 	}
 	
