@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration xmlns="http://logging.apache.org/log4j/2.0/config">
+
+	<appenders>
+		<file name="fileAppender" fileName="${sys:user.dir}/logpractice/log4j.csv"
+			append="false">
+			<patternlayout>
+				<pattern>%n%c, %t, %M, %p, %m</pattern>
+				<header>first,second,third </header>
+			</patternlayout>
+		</file>
+	</appenders>
+	
+	
+	<loggers>
+		<root level="TRACE">
+			<appender-ref ref="fileAppender"/>
+		</root>
+	</loggers>
+</Configuration>

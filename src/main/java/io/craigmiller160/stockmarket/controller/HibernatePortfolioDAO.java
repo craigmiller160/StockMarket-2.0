@@ -117,6 +117,8 @@ public class HibernatePortfolioDAO implements PortfolioDAO {
 			}
 		}
 		
+		
+		
 		LOGGER.logp(Level.INFO, this.getClass().getName(), 
 				"createNewPortfolio", "New Portfolio Created");
 		
