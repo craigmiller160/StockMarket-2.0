@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration SYSTEM 
+"http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+
+	<session-factory>
+		
+		<!-- Database connection driver -->
+		<property name="connection.driver_class">com.mysql.jdbc.Driver</property>
+		
+		<!-- SQL dialect -->
+		<property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+		
+		<!-- Connection URL -->
+		<!-- <property name="hibernate.connection.url">jdbc:mysql://localhost/stockmarket</property>-->
+		
+		<!-- User Name -->
+		<!-- <property name="hibernate.connection.username">stockmarket</property>-->
+		
+		<!-- Password -->
+		<!-- <property name="hibernate.connection.password">stockmarket</property>-->
+		
+		<!-- Connection Pool Size -->
+		<property name="connection.pool_size">1</property>
+		
+		<!-- Echo all executed SQL to stdout -->
+		<property name="show_sql">true</property>
+		
+		<mapping class="io.craigmiller160.stockmarket.stock.AbstractStock"/>
+		<mapping class="io.craigmiller160.stockmarket.stock.OwnedStock"/>
+		<mapping class="io.craigmiller160.stockmarket.stock.DefaultStock"/>
+		<mapping class="io.craigmiller160.stockmarket.stock.DefaultOwnedStock"/>
+		<mapping class="io.craigmiller160.stockmarket.model.PortfolioModel"/>
+		<mapping class="io.craigmiller160.stockmarket.model.SQLPortfolioModel"/>
+		
+		
+		
+	</session-factory>
+
+</hibernate-configuration>

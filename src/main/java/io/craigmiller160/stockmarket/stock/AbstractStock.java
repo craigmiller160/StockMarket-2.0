@@ -7,6 +7,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.MappedSuperclass;
+import javax.persistence.Transient;
+
 import net.jcip.annotations.NotThreadSafe;
 
 /**
@@ -56,18 +59,20 @@ import net.jcip.annotations.NotThreadSafe;
  *
  */
 @NotThreadSafe
+@MappedSuperclass
 public abstract class AbstractStock implements Stock, Comparable<AbstractStock>, Serializable{
 	
 	
 	/**
 	 * SerialVersionUID for serialization support.
 	 */
+	@Transient
 	private static final long serialVersionUID = -1499524743557875615L;
 	
 	/**
 	 * The symbol code for this stock.
 	 */
-	protected final String symbol;
+	protected String symbol;
 	
 	/**
 	 * Constructs a stock based on the provided symbol.
@@ -79,8 +84,20 @@ public abstract class AbstractStock implements Stock, Comparable<AbstractStock>,
 	}
 	
 	@Override
-	public String getSymbol(){
+	public synchronized String getSymbol(){
 		return symbol;
+	}
+	
+	/**
+	 * Sets the symbol of this stock. This method is provided as a 
+	 * tool for Hibernate to update the values of this class.
+	 * It should NOT be invoked in the program, as the symbol of a
+	 * stock object should never be changed after it is created.
+	 * 
+	 * @param symbol the symbol of the stock.
+	 */
+	public synchronized void setSymbol(String symbol){
+		this.symbol = symbol.toUpperCase();
 	}
 	
 	@Override

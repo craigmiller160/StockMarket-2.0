@@ -16,7 +16,7 @@ import io.craigmiller160.stockmarket.model.PortfolioModel;
  * @author craig
  * @version 2.0
  */
-public interface PortfolioDAO {
+public interface PortfolioDAO extends PropertyChangeListener{
 
 	/**
 	 * Add an external <tt>PropertyChangeListener</tt> to pass events to as the

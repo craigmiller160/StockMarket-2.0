@@ -9,9 +9,6 @@ bin/
 *.project
 *.classpath
 
-# JUnit Test Directory
-src/test/
-
 # Maven Target Directory
 target/
 

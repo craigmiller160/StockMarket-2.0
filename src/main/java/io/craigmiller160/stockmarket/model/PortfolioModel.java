@@ -6,9 +6,6 @@ import static io.craigmiller160.stockmarket.controller.StockMarketController.NET
 import static io.craigmiller160.stockmarket.controller.StockMarketController.PORTFOLIO_NAME_PROPERTY;
 import static io.craigmiller160.stockmarket.controller.StockMarketController.STOCK_LIST_PROPERTY;
 import static io.craigmiller160.stockmarket.controller.StockMarketController.TOTAL_STOCK_VALUE_PROPERTY;
-import io.craigmiller160.mvp.core.AbstractPropertyModel;
-import io.craigmiller160.stockmarket.stock.DefaultOwnedStock;
-import io.craigmiller160.stockmarket.stock.OwnedStock;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -16,6 +13,17 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.OneToMany;
+import javax.persistence.Transient;
+
+import io.craigmiller160.mvp.core.AbstractPropertyModel;
+import io.craigmiller160.stockmarket.stock.DefaultOwnedStock;
+import io.craigmiller160.stockmarket.stock.OwnedStock;
 import net.jcip.annotations.GuardedBy;
 import net.jcip.annotations.ThreadSafe;
 
@@ -35,32 +43,38 @@ import net.jcip.annotations.ThreadSafe;
  * do not need locking, as this list is a synchronized collection.
  * 
  * @author craig
- * @version 2.0
+ * @version 2.2
  */
 @ThreadSafe
+@MappedSuperclass
+@Inheritance (strategy=InheritanceType.TABLE_PER_CLASS)
 public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 
 	/**
 	 * SerialVersionUID for serialization support.
 	 */
+	@Transient
 	private static final long serialVersionUID = -6524963260822254311L;
 
 	/**
 	 * The name of the portfolio.
 	 */
 	@GuardedBy("this")
+	@Column (name="portfolio_name")
 	private String portfolioName;
 	
 	/**
 	 * The cash balance available to purchase stocks.
 	 */
 	@GuardedBy("this")
+	@Column (name="cash_balance")
 	private BigDecimal cashBalance;
 	
 	/**
 	 * The total value of the stocks in the portfolio.
 	 */
 	@GuardedBy("this")
+	@Column (name="total_stock_value")
 	private BigDecimal totalStockValue;
 	
 	/**
@@ -68,6 +82,7 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 	 * with the cash balance.
 	 */
 	@GuardedBy("this")
+	@Column (name="net_worth")
 	private BigDecimal netWorth;
 	
 	/**
@@ -75,23 +90,27 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 	 * the change in net worth over time.
 	 */
 	@GuardedBy("this")
+	@Column (name="initial_value")
 	private BigDecimal initialValue;
 	
 	/**
 	 * The change in net worth since the creation of this portfolio.
 	 */
 	@GuardedBy("this")
+	@Transient
 	private BigDecimal changeInNetWorth;
 	
 	/**
 	 * The list of stocks owned by this portfolio.
 	 */
 	@GuardedBy("this")
+	@OneToMany (mappedBy="portfolio", targetEntity=DefaultOwnedStock.class, cascade=CascadeType.ALL)
 	private List<OwnedStock> stockList;
 	
 	/**
 	 * Shared logger for the program.
 	 */
+	@Transient
 	private static final Logger LOGGER = Logger.getLogger("stockmarket.model.PortfolioModel");
 	
 	/**
@@ -163,13 +182,11 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 				"setPortfolioName", "Entering method", 
 				new Object[] {"Name: " + portfolioName});
 		
-		String oldValue = null;
 		synchronized(this){
-			oldValue = this.portfolioName;
 			this.portfolioName = portfolioName;
 		}
 		
-		firePropertyChange(PORTFOLIO_NAME_PROPERTY, oldValue, portfolioName);
+		firePropertyChange(PORTFOLIO_NAME_PROPERTY, null, portfolioName);
 	}
 	
 	/**
@@ -202,13 +219,11 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 				"setNetWorth", "Entering method", 
 				new Object[] {"Net Worth: " + netWorth});
 		
-		BigDecimal oldValue = null;
 		synchronized(this){
-			oldValue = this.netWorth;
 			this.netWorth = netWorth;
 		}
 		
-		firePropertyChange(NET_WORTH_PROPERTY, oldValue, netWorth);
+		firePropertyChange(NET_WORTH_PROPERTY, null, netWorth);
 		
 		calculateChangeInNetWorth();
 	}
@@ -225,13 +240,11 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 				"setChangeInNetWorth", "Entering method", 
 				new Object[] {"Net Worth Change: " + netWorthChange});
 		
-		BigDecimal oldValue = null;
 		synchronized(this){
-			oldValue = this.changeInNetWorth;
 			this.changeInNetWorth = netWorthChange;
 		}
 		
-		firePropertyChange(CHANGE_IN_NET_WORTH_PROPERTY, oldValue, netWorthChange);
+		firePropertyChange(CHANGE_IN_NET_WORTH_PROPERTY, null, netWorthChange);
 	}
 	
 	/**
@@ -245,13 +258,11 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 				"setCashBalance", "Entering method", 
 				new Object[] {"Cash Balance: " + cashBalance});
 		
-		BigDecimal oldValue = null;
 		synchronized(this){
-			oldValue = this.cashBalance;
 			this.cashBalance = cashBalance;
 		}
 		
-		firePropertyChange(CASH_BALANCE_PROPERTY, oldValue, cashBalance);
+		firePropertyChange(CASH_BALANCE_PROPERTY, null, cashBalance);
 		
 		calculateNetWorth();
 	}
@@ -270,6 +281,8 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
 				"setStockInList", "Entering method", 
 				new Object[] {"Stock: " + stock});
+		
+		((DefaultOwnedStock)stock).setPortfolio(this);
 		
 		List<OwnedStock> copyList = null;
 		int index;
@@ -290,7 +303,7 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 		}
 		
 		LOGGER.logp(Level.INFO, this.getClass().getName(), 
-				"setSTockInList", "Completed. Index: " + index);
+				"setStockInList", "Completed. Index: " + index);
 		
 		firePropertyChange(STOCK_LIST_PROPERTY, null, copyList);
 		
@@ -344,6 +357,16 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 		}
 		
 		return result;
+	}
+	
+	/**
+	 * Get the current size of the stock list. This is the 
+	 * number of stocks owned by this portfolio.
+	 * 
+	 * @return the size of the stock list.
+	 */
+	public synchronized int getStockListSize(){
+		return stockList.size();
 	}
 	
 	/**

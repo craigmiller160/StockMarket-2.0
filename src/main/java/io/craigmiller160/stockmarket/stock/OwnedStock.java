@@ -2,6 +2,8 @@ package io.craigmiller160.stockmarket.stock;
 
 import java.math.BigDecimal;
 
+import javax.persistence.MappedSuperclass;
+
 /**
  * This interface extends the <tt>Stock</tt> interface with methods
  * and fields defining a stock that is owned as part of a stock portfolio.
@@ -33,8 +35,9 @@ import java.math.BigDecimal;
  * the implementation used by this program should be consulted.
  * 
  * @author craig
- * @version 2.0
+ * @version 2.2
  */
+@MappedSuperclass
 public interface OwnedStock extends Stock{
 
 	/**

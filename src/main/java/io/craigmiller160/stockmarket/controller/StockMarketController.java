@@ -423,6 +423,7 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 				refreshExecutor.submit(task);
 			}
 			
+			refreshExecutor.shutdown();
 			refreshExecutor.awaitTermination(1, TimeUnit.MINUTES);
 			
 			setModelProperty(STOCK_LIST_PROPERTY, stockList);
@@ -430,6 +431,7 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 			
 			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
 					"refreshPortfolio", "Refresh successful");
+			System.out.println("Refresh finished");
 			
 		}
 		catch(InterruptedException ex){

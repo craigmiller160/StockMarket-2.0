@@ -175,7 +175,7 @@ public class Main {
 	 * entire program.
 	 */
 	private static void configureLogger(){
-		LOGGER.setLevel(Level.INFO);
+		LOGGER.setLevel(Level.FINEST);
 		
 		try{
 			FileHandler fileHandler = new FileHandler(

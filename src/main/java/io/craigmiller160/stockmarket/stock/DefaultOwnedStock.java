@@ -9,6 +9,19 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import io.craigmiller160.stockmarket.model.PortfolioModel;
+import io.craigmiller160.stockmarket.model.SQLPortfolioModel;
 import net.jcip.annotations.GuardedBy;
 import net.jcip.annotations.ThreadSafe;
 
@@ -38,33 +51,39 @@ import net.jcip.annotations.ThreadSafe;
  * then this class can be properly relied upon in a concurrent environment.
  * 
  * @author craig
- * @version 2.0
+ * @version 2.2
  * @see io.craigmiller160.stockmarket.stock.StockDownloader StockDownloader
  * @see io.craigmiller160.stockmarket.stock.StockFileDownloader StockFileDownloader
  */
 @ThreadSafe
+@Entity
+@Table (name="stocks")
 public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 
 	/**
 	 * SerialVersionUID for serialization support.
 	 */
+	@Transient
 	private static final long serialVersionUID = -1417312411285855441L;
 	
 	/**
 	 * Logger for this class.
 	 */
+	@Transient
 	private static final Logger LOGGER = Logger.getLogger("stockmarket.stock.OwnedStock");
 	
 	/**
 	 * Private <tt>NumberFormat</tt> used for formatting <tt>BigDecimal</tt> values
 	 * for the logger.
 	 */
+	@Transient
 	private static final NumberFormat moneyFormat = new DecimalFormat("$###,###,###,##0.00");
 	
 	/**
 	 * Quantity of shares owned of this stock.
 	 */
 	@GuardedBy("this")
+	@Column (name="share_quantity")
 	private int quantityOfShares;
 	
 	/**
@@ -77,9 +96,17 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 	private BigDecimal principle;
 	
 	/**
+	 * The portfolio this stock is contained within.
+	 */
+	@JoinColumn (name="userid")
+	@ManyToOne (targetEntity=SQLPortfolioModel.class)
+	private PortfolioModel portfolio;
+	
+	/**
 	 * The total combined value of all shares of the stock.
 	 */
 	@GuardedBy("this")
+	@Column (name="total_value")
 	private BigDecimal totalValue;
 	
 	/**
@@ -88,6 +115,26 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 	 */
 	@GuardedBy("this")
 	private BigDecimal net;
+	
+	/**
+	 * The primary key value for this class in the SQL table.
+	 */
+	@SequenceGenerator (name="stock_sequence", sequenceName="stock_sequence", allocationSize=1)
+	@Id @GeneratedValue (strategy=GenerationType.TABLE, generator="stock_sequence")
+	@Column (name="stock_id")
+	private int stockId;
+	
+	/**
+	 * No argument constructor for use with Hibernate.
+	 * This constructor should NOT be used by any other
+	 * part of the program.
+	 */
+	public DefaultOwnedStock(){
+		super("");
+		principle = new BigDecimal(0);
+		totalValue = new BigDecimal(0);
+		net = new BigDecimal(0);
+	}
 	
 	/**
 	 * Constructs a <tt>DefaultOwnedStock</tt> defined by a stock symbol
@@ -153,6 +200,44 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 		}
 	}
 	
+	/**
+	 * Get the id of the primary key of this object
+	 * in the SQL table.
+	 * 
+	 * @return the id of the primary key of this object.
+	 */
+	public synchronized int getStockId() {
+		return stockId;
+	}
+
+	/**
+	 * Set the id of the primary key of this object
+	 * in the SQL table.
+	 * 
+	 * @param stockId the id of the primary key of this object.
+	 */
+	public synchronized void setStockId(int stockId) {
+		this.stockId = stockId;
+	}
+
+	/**
+	 * Get the portfolio this stock is a part of.
+	 * 
+	 * @return the portfolio this stock is a part of.
+	 */
+	public synchronized PortfolioModel getPortfolio() {
+		return portfolio;
+	}
+
+	/**
+	 * Set the portfolio this stock is a part of.
+	 * 
+	 * @param portfolio the portfolio this stock is a part of.
+	 */
+	public synchronized void setPortfolio(PortfolioModel portfolio) {
+		this.portfolio = portfolio;
+	}
+
 	@Override
 	public String getSymbol(){
 		return super.getSymbol();
@@ -184,16 +269,15 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 	}
 	
 	/**
-	 * Sets the quantity field. This method is protected to allow
-	 * this class and subclasses an internal tool to change this value.
-	 * Other classes should rely on <tt>setStockDetails(StockDownloader,boolean)</tt>
-	 * to update this stock.
+	 * Sets the quantity field. This method is public so that it can be used with
+	 * Hibernate. It's also available for use by subclasses. It should NOT be
+	 * used in any other way by this program.
 	 * 
 	 * @param quantity the quantity of shares owned of this stock.
 	 * @throws IllegalArgumentException if the value passed to this method is 
 	 * less than 0.
 	 */
-	protected void setQuantityOfShares(int quantity){
+	public void setQuantityOfShares(int quantity){
 		if(quantity < 0){
 			throw new IllegalArgumentException("Quantity can't be less than 0: " + quantity);
 		}
@@ -223,16 +307,15 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 	}
 	
 	/**
-	 * Sets the principle field. This method is protected to allow
-	 * this class and subclasses an internal tool to change this value.
-	 * Other classes should rely on <tt>setStockDetails(StockDownloader,boolean)</tt>
-	 * to update this stock.
+	 * Sets the principle field. This method is public so that it can be used with
+	 * Hibernate. It's also available for use by subclasses. It should NOT be
+	 * used in any other way by this program.
 	 * 
 	 * @param principle the principle, the initial amount spent on the stock.
 	 * @throws IllegalArgumentException if the value passed to this method is 
 	 * less than 0.
 	 */
-	protected void setPrinciple(BigDecimal principle){
+	public void setPrinciple(BigDecimal principle){
 		if(principle.compareTo(new BigDecimal(0)) < 0){
 			throw new IllegalArgumentException("Principle can't be less than 0: " + principle);
 		}
@@ -262,16 +345,15 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 	}
 	
 	/**
-	 * Sets the total value field. This method is protected to allow
-	 * this class and subclasses an internal tool to change this value.
-	 * Other classes should rely on <tt>setStockDetails(StockDownloader,boolean)</tt>
-	 * to update this stock.
+	 * Sets the total value field. This method is public so that it can be used with
+	 * Hibernate. It's also available for use by subclasses. It should NOT be
+	 * used in any other way by this program.
 	 * 
 	 * @param totalValue the totalValue of all shares of the stock.
 	 * @throws IllegalArgumentException if the value passed to this method is 
 	 * less than 0.
 	 */
-	protected void setTotalValue(BigDecimal totalValue){
+	public void setTotalValue(BigDecimal totalValue){
 		if(totalValue.compareTo(new BigDecimal(0)) < 0){
 			throw new IllegalArgumentException("Total Value can't be less than 0: " + totalValue);
 		}
@@ -294,14 +376,13 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 	}
 	
 	/**
-	 * Sets the net field. This method is protected to allow
-	 * this class and subclasses an internal tool to change this value.
-	 * Other classes should rely on <tt>setStockDetails(StockDownloader,boolean)</tt>
-	 * to update this stock.
+	 * Sets the net field. This method is public so that it can be used with
+	 * Hibernate. It's also available for use by subclasses. It should NOT be
+	 * used in any other way by this program.
 	 * 
 	 * @param net the net gains/losses on this stock.
 	 */
-	protected void setNet(BigDecimal net){
+	public void setNet(BigDecimal net){
 		synchronized(this){
 			this.net = net;
 		}

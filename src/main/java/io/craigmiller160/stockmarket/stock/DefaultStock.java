@@ -11,6 +11,10 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.persistence.Column;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.Transient;
+
 import net.jcip.annotations.GuardedBy;
 import net.jcip.annotations.ThreadSafe;
 
@@ -40,128 +44,149 @@ import net.jcip.annotations.ThreadSafe;
  * class being used is thread safe, and if it isn't then take appropriate measures to compensate.
  * 
  * @author craig
- * @version 2.0
+ * @version 2.2
  * @see io.craigmiller160.stockmarket.stock.StockDownloader
  */
 @ThreadSafe
+@MappedSuperclass
 public class DefaultStock extends AbstractStock {
 
 	/**
 	 * SerialVersionUID for serialization support.
 	 */
+	@Transient
 	private static final long serialVersionUID = 7534553580704011399L;
 	
 	/**
 	 * Logger object for this class.
 	 */
+	@Transient
 	private static final Logger LOGGER = Logger.getLogger("stockmarket.stock.Stock");
 	
 	/**
 	 * Company Name field.
 	 */
 	@GuardedBy("this")
+	@Column (name="name")
 	private String companyName;
 	
 	/**
 	 *  The change in price during the last day of trading.
 	 */
 	@GuardedBy("this")
+	@Transient
 	private BigDecimal changeToday;
 	
 	/**
 	 * The change in price during the last day of trading in percent.
 	 */
 	@GuardedBy("this")
+	@Transient
 	private BigDecimal changeTodayInPercent;
 	
 	/**
 	 * Fifty Day Average price field.
 	 */
 	@GuardedBy("this")
+	@Transient
 	private BigDecimal fiftyDayAvg;
 	
 	/**
 	 * Change in 50 Day Average price
 	 */
 	@GuardedBy("this")
+	@Transient
 	private BigDecimal change50DayAvg;
 	
 	/**
 	 * Change in 50 Day Average price percent.
 	 */
 	@GuardedBy("this")
+	@Transient
 	private BigDecimal change50DayAvgPercent;
 	
 	/**
 	 * 200 Day Average price.
 	 */
 	@GuardedBy("this")
+	@Transient
 	private BigDecimal twoHundredDayAvg;
 	
 	/**
 	 * Change in 200 Day Average price.
 	 */
 	@GuardedBy("this")
+	@Transient
 	private BigDecimal change200DayAvg;
 	
 	/**
 	 * Change in 200 Day Average Price percent.
 	 */
 	@GuardedBy("this")
+	@Transient
 	private BigDecimal change200DayAvgPercent;
 	
 	/**
 	 * Year High price.
 	 */
 	@GuardedBy("this")
+	@Transient
 	private BigDecimal yearHigh;
 	
 	/**
 	 * Change in price from Year High.
 	 */
 	@GuardedBy("this")
+	@Transient
 	private BigDecimal changeYearHigh;
 	
 	/**
 	 * Change in price from Year High in percent.
 	 */
 	@GuardedBy("this")
+	@Transient
 	private BigDecimal changeYearHighPercent;
 	
 	/**
 	 * Year Low price.
 	 */
 	@GuardedBy("this")
+	@Transient
 	private BigDecimal yearLow;
 	
 	/**
 	 * Change in price from Year Low.
 	 */
 	@GuardedBy("this")
+	@Transient
 	private BigDecimal changeYearLow;
 	
 	/**
 	 * Change in price from Year Low in percent.
 	 */
 	@GuardedBy("this")
+	@Transient
 	private BigDecimal changeYearLowPercent;
 	
 	/**
 	 * Current price.
 	 */
 	@GuardedBy("this")
+	@Column (name="current_price")
 	private BigDecimal currentPrice;
 	
 	/**
 	 * Last date the stock was traded.
 	 */
 	@GuardedBy("this")
+	@Transient
 	private Calendar lastTradeDate;
 	
 	/**
 	 * Last time the stock was traded on the last date it was traded.
 	 */
 	@GuardedBy("this")
+	@Transient
 	private Calendar lastTradeTime;
 	
 	/**
@@ -302,13 +327,16 @@ public class DefaultStock extends AbstractStock {
 	
 	
 	/**
-	 * Sets the company name field.
+	 * Sets the company name field. This method is only public so that 
+	 * it can be used with Hibernate. It should NOT be invoked directly
+	 * by the program in any other way. This value should always be set
+	 * by the downloader (and the downloader can be allowed to use this method).
 	 * 
-	 * @param rawText the raw text to be parsed and set to the field.
+	 * @param name the name of the company.
 	 */
-	private void setCompanyName(String rawText){
+	public void setCompanyName(String name){
 		synchronized(this){
-			this.companyName = rawText;
+			this.companyName = name;
 		}
 	}
 	
@@ -779,16 +807,14 @@ public class DefaultStock extends AbstractStock {
 	}
 	
 	/**
-	 * Sets the current share price field. This method is protected to allow
-	 * this class and subclasses an internal tool to change this value.
-	 * Other classes should rely on <tt>setStockDetails(StockDownloader,boolean)</tt>
-	 * to update this stock.
+	 * Sets the current share price field. This method is only public so it
+	 * can be used with Hibernate. It should NOT be used directly by the program.
 	 * 
 	 * @param currentPrice the current share price.
 	 * @throws IllegalArgumentException if the value passed to this method is 
 	 * less than 0.
 	 */
-	protected void setCurrentPrice(BigDecimal currentPrice){
+	public void setCurrentPrice(BigDecimal currentPrice){
 		if(currentPrice.compareTo(new BigDecimal(0)) < 0){
 			throw new IllegalArgumentException("Year Low cannot be less than 0: " + currentPrice);
 		}

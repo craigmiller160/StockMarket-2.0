@@ -96,7 +96,7 @@ public class SQLPortfolioDAO implements
 	 * The shared logger for the program.
 	 */
 	private static final Logger LOGGER = 
-			Logger.getLogger("stockmarket.controller.SQLController");
+			Logger.getLogger("stockmarket.controller.SQLPortfolioDAO");
 	
 	/**
 	 * A semaphore to restrict access to the database connection.
