@@ -2,7 +2,7 @@
 <Configuration xmlns="http://logging.apache.org/log4j/2.0/config">
 
 	<appenders>
-		<file name="fileAppender" fileName="${sys:user.dir}/logpractice/log4j.csv"
+		<file name="fileAppender" fileName="${sys:user.home}/logpractice/stockmarket.txt"
 			append="false">
 			<patternlayout>
 				<pattern>%n%c, %t, %M, %p, %m</pattern>
@@ -16,5 +16,10 @@
 		<root level="TRACE">
 			<appender-ref ref="fileAppender"/>
 		</root>
+		<logger name="org.hibernate" level="info"/>
+		<logger name="org.jboss.logger" level="info"/>
+		<logger name="org.springframework.beans" level="info"/>
+		<logger name="org.springframework.context" level="info"/>
+		<logger name="org.springframework.core" level="info"/>
 	</loggers>
 </Configuration>
