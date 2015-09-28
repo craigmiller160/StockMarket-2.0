@@ -8,8 +8,6 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
@@ -56,12 +54,6 @@ public class DefaultStock extends AbstractStock {
 	 */
 	@Transient
 	private static final long serialVersionUID = 7534553580704011399L;
-	
-	/**
-	 * Logger object for this class.
-	 */
-	@Transient
-	private static final Logger LOGGER = Logger.getLogger("stockmarket.stock.Stock");
 	
 	/**
 	 * Company Name field.
@@ -287,9 +279,6 @@ public class DefaultStock extends AbstractStock {
 			fields[1] = CURRENT_PRICE;
 		}
 		
-		LOGGER.logp(Level.INFO, this.getClass().getName(), "setStockDetails()", 
-				symbol + ": Downloading stock details. Full download: " + fullDetails);
-		
 		Map<String,String> stockDataMap = downloader.downloadStockDetails(symbol, fields);
 		
 		synchronized(this){
@@ -320,8 +309,6 @@ public class DefaultStock extends AbstractStock {
 	@Override
 	public List<HistoricalQuote> getStockHistory(StockDownloader downloader, 
 			int months) throws InvalidStockException, UnknownHostException, IOException{
-		LOGGER.logp(Level.INFO, this.getClass().getName(), "getStockHistory()", 
-				symbol + ": Downloading stock history for " + months + " months");
 		return super.getStockHistory(downloader, months);
 	}
 	

@@ -50,6 +50,9 @@ public class Main {
 	
 	//TODO if the log file is open for the program, it crashes at startup
 	
+	//TODO if a stock has been completely sold, Hibernate doesn't remove it
+	//from the database when the stock is saved
+	
 	/**
 	 * The logger for this program. With the exception of the default
 	 * root logger, this is the top of the logger hierarchy. It needs

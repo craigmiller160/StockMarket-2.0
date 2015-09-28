@@ -6,8 +6,6 @@ import java.net.UnknownHostException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -65,12 +63,6 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 	 */
 	@Transient
 	private static final long serialVersionUID = -1417312411285855441L;
-	
-	/**
-	 * Logger for this class.
-	 */
-	@Transient
-	private static final Logger LOGGER = Logger.getLogger("stockmarket.stock.OwnedStock");
 	
 	/**
 	 * Private <tt>NumberFormat</tt> used for formatting <tt>BigDecimal</tt> values
@@ -400,10 +392,6 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 					+ "adding/subtracting shares");
 		}
 		
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), "increaseShares()", 
-				symbol + ": Added Quantity: " + quantity + " Value To Add: " 
-				+ moneyFormat.format(valueToAdd));
-		
 		synchronized(this){
 			quantityOfShares += quantity;
 			principle = principle.add(valueToAdd);
@@ -437,10 +425,6 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 			
 			valueOfShares = getCurrentPrice().multiply(new BigDecimal(quantity));
 		}
-		
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), "decreaseShares()", 
-				symbol + ": Subtracted Quantity: " + quantity + " Value to Subtract From Principle: " 
-				+ moneyFormat.format(valueToSubtract));
 		
 		synchronized(this){
 			quantityOfShares -= quantity;
@@ -513,9 +497,6 @@ public class DefaultOwnedStock extends DefaultStock implements OwnedStock{
 				setTotalValue(valueMap.get(TOTAL_VALUE));
 				setNet(valueMap.get(NET));
 			}
-			
-			LOGGER.logp(Level.INFO, this.getClass().getName(), 
-					"setStockDetails", "StockFileDownloader has set owned values");
 			
 		}
 		else{

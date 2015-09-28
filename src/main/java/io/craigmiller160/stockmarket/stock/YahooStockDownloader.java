@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
@@ -15,8 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import net.jcip.annotations.ThreadSafe;
 
@@ -91,8 +90,6 @@ public final class YahooStockDownloader implements StockDownloader {
 	 */
 	private static final String SYMBOL_FIELD = "Symbol";
 	
-	private static final Logger LOGGER = Logger.getLogger("stockmarket.stock.YahooStockDownloader");
-	
 	/**
 	 * Static initializer creates the <tt>propertyCodeMap</tt>.
 	 */
@@ -149,17 +146,10 @@ public final class YahooStockDownloader implements StockDownloader {
 	@Override
 	public Map<String,String> downloadStockDetails(String symbol, String[] fields)
 			throws InvalidStockException, UnknownHostException, IOException{
-		//URL pieces
-		String urlStart = "http://download.finance.yahoo.com/d/quotes.csv?s=";
-		String urlProperties = getURLProperties(fields);
-		String urlEnd = "&e=.csv";
-		
 		StringBuffer csvFile = new StringBuffer();
 		
 		//Construct URL and connect to it
-		URL url = new URL(urlStart + symbol + urlProperties + urlEnd);
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), "downloadStockDetails()", 
-				symbol + ": URL: " + url);
+		URL url = createUrlForDetails(symbol, fields);
 		URLConnection connection = url.openConnection();
 		
 		//Download stock data
@@ -171,14 +161,11 @@ public final class YahooStockDownloader implements StockDownloader {
 			}
 		}
 		
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), "downloadStockDetails()", 
-				"\"" + symbol + ": CSV: " + csvFile.toString() + "\"");
-		
 		//Parse downloaded stock data
 		Map<String,String> stockDataMap = null;
 		if(!csvFile.toString().equals("")){
 			try{
-				stockDataMap = parseDetailsCSV(csvFile.toString(), fields);
+				stockDataMap = parseCsvForDetails(csvFile.toString(), fields);
 			}
 			catch(InvalidStockException ex){
 				throw new InvalidStockException(symbol);
@@ -191,6 +178,22 @@ public final class YahooStockDownloader implements StockDownloader {
 	}
 	
 	/**
+	 * Construct the URL from the values provided.
+	 * 
+	 * @param symbol the symbol of the stock.
+	 * @param fields the fields to get information for.
+	 * @return the constructed URL.
+	 * @throws MalformedURLException if the URL created is not valid.
+	 */
+	private URL createUrlForDetails(String symbol, String[] fields) throws MalformedURLException{
+		String urlStart = "http://download.finance.yahoo.com/d/quotes.csv?s=";
+		String urlProperties = getURLProperties(fields);
+		String urlEnd = "&e=.csv";
+		
+		return new URL(urlStart + symbol + urlProperties + urlEnd);
+	}
+	
+	/**
 	 * Parse the downloaded csv text and pair each entry with the appropriate
 	 * field name in a <tt>Map</tt>.
 	 * 
@@ -199,7 +202,7 @@ public final class YahooStockDownloader implements StockDownloader {
 	 * @return a <tt>Map</tt> containing data parsed from the csv text.
 	 * @throws InvalidStockException if the stock is not a valid marketplace stock.
 	 */
-	private Map<String, String> parseDetailsCSV(String csvText, String[] fields) 
+	private Map<String, String> parseCsvForDetails(String csvText, String[] fields) 
 			throws InvalidStockException{
 		Map<String,String> stockDataMap = new HashMap<>();
 		String[] tempData = csvText.split(",");
@@ -303,17 +306,8 @@ public final class YahooStockDownloader implements StockDownloader {
 	@Override
 	public List<HistoricalQuote> downloadStockHistory(String symbol, int months) 
 			throws InvalidStockException, UnknownHostException, IOException{
-		//URL pieces
-		String urlStart = "http://ichart.yahoo.com/table.csv?s=";
-		String urlFromDate = getFromDateURLCode(months);
-		String urlToDate = getToDateURLCode();
-		String urlInterval = "&g=d"; //Daily quote interval
-		String urlEnd = "&ignore=.csv";
-		
 		//Create URL & connect
-		URL url = new URL(urlStart + symbol + urlFromDate + urlToDate + urlInterval + urlEnd);
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), "downloadStockHistory()", 
-				symbol + ": URL: " + url);
+		URL url = createUrlForHistory(symbol, months);
 		URLConnection connection = url.openConnection();
 		
 		//Download the csv data 
@@ -332,16 +326,23 @@ public final class YahooStockDownloader implements StockDownloader {
 			throw new InvalidStockException(symbol);
 		}
 		
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), "downloadStockHistory()", 
-				symbol + ": CSV: " + csvFile.toString());
-		
 		//Parse the csv data for the stock history
 		List<HistoricalQuote> historyList = null;
 		if(!(csvFile.toString().equals(""))){
-			historyList = parseHistoryCSV(csvFile.toString(), symbol);
+			historyList = parseCsvForHistory(csvFile.toString(), symbol);
 		}
 
 		return historyList;
+	}
+	
+	private URL createUrlForHistory(String symbol, int months) throws MalformedURLException{
+		String urlStart = "http://ichart.yahoo.com/table.csv?s=";
+		String urlFromDate = getFromDateURLCode(months);
+		String urlToDate = getToDateURLCode();
+		String urlInterval = "&g=d"; //Daily quote interval
+		String urlEnd = "&ignore=.csv";
+		
+		return new URL(urlStart + symbol + urlFromDate + urlToDate + urlInterval + urlEnd);
 	}
 	
 	/**
@@ -352,7 +353,7 @@ public final class YahooStockDownloader implements StockDownloader {
 	 * @param csvData the raw csv data being parsed for historical stock information.
 	 * @return a list of <tt>HistoricalQuote</tt> objects composed from the raw data.
 	 */
-	private List<HistoricalQuote> parseHistoryCSV(String csvData, String symbol){
+	private List<HistoricalQuote> parseCsvForHistory(String csvData, String symbol){
 		List<HistoricalQuote> historyList = new StockHistoryList(symbol);
 		
 		try(Scanner scan = new Scanner(csvData)){
