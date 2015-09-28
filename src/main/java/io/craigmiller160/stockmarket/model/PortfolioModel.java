@@ -357,6 +357,20 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 	}
 	
 	/**
+	 * Determines if the specified stock exists in the list.
+	 * 
+	 * @param stock the stock to check agains the list.
+	 * @return true if the stock exists in the list.
+	 */
+	public boolean isStockInList(OwnedStock stock){
+		boolean result = false;
+		synchronized(this){
+			result = stockList.contains(stock);
+		}
+		return result;
+	}
+	
+	/**
 	 * Get the current size of the stock list. This is the 
 	 * number of stocks owned by this portfolio.
 	 * 
