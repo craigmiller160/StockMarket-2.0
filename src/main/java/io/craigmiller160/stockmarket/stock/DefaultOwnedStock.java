@@ -49,7 +49,7 @@ import net.jcip.annotations.ThreadSafe;
  * then this class can be properly relied upon in a concurrent environment.
  * 
  * @author craig
- * @version 2.2
+ * @version 2.3
  * @see io.craigmiller160.stockmarket.stock.StockDownloader StockDownloader
  * @see io.craigmiller160.stockmarket.stock.StockFileDownloader StockFileDownloader
  */

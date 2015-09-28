@@ -42,7 +42,7 @@ import net.jcip.annotations.ThreadSafe;
  * class being used is thread safe, and if it isn't then take appropriate measures to compensate.
  * 
  * @author craig
- * @version 2.2
+ * @version 2.3
  * @see io.craigmiller160.stockmarket.stock.StockDownloader
  */
 @ThreadSafe

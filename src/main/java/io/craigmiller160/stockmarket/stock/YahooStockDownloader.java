@@ -71,7 +71,7 @@ import org.joda.time.DateTime;
  * any instance of this class can be successfully used in a concurrent environment.
  * 
  * @author craig
- * @version 2.0
+ * @version 2.3
  */
 @ThreadSafe
 public final class YahooStockDownloader implements StockDownloader {
