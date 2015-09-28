@@ -57,12 +57,48 @@ public aspect ModelLogging {
 		LOGGER.debug("\"{} : {}\"", methodName, paramText);
 	}
 	
+	/**
+	 * Advice that runs after the <tt>setStockInList(OwnedStock)</tt>
+	 * method.
+	 */
 	after() : stockInListSetter(){
+		String methodName = thisJoinPoint.getSignature().getName();
 		PortfolioModel model = (PortfolioModel) thisJoinPoint.getTarget();
-		OwnedStock oStock = (OwnedStock) thisJoinPoint.getArgs()[0];
-		
+		OwnedStock paramStock = (OwnedStock) thisJoinPoint.getArgs()[0];
+		OwnedStock listStock = model.getStockInList(paramStock);
+		if(paramStock.getQuantityOfShares() == 0 && 
+				listStock == null){
+			logStockUpdateSuccessful(methodName, paramStock);
+		}
+		else if(listStock != null && 
+				paramStock.getQuantityOfShares() == listStock.getQuantityOfShares()){
+			logStockUpdateSuccessful(methodName, paramStock);
+		}
+		else{
+			logStockUpdateFailure(methodName, paramStock);
+		}
 	}
 	
+	/**
+	 * Log a successful update of a stock in the portfolio.
+	 * 
+	 * @param methodName the name of the method executed.
+	 * @param paramStock the stock that was successfully updated.
+	 */
+	private void logStockUpdateSuccessful(String methodName, OwnedStock paramStock){
+		LOGGER.info("\"{} Successful: {}, {} shares\"", 
+				methodName, paramStock.getSymbol(), paramStock.getQuantityOfShares());
+	}
 	
+	/**
+	 * Log a failed update of a stock in the portfolio.
+	 * 
+	 * @param methodName the name of the method executed.
+	 * @param paramStock the stock that failed to be updated.
+	 */
+	private void logStockUpdateFailure(String methodName, OwnedStock paramStock){
+		LOGGER.error("\"{} Failure: {}, {} shares\"", 
+				methodName, paramStock.getSymbol(), paramStock.getQuantityOfShares());
+	}
 	
 }

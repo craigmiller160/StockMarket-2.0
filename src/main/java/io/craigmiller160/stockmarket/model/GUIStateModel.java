@@ -6,9 +6,6 @@ import io.craigmiller160.mvp.core.AbstractPropertyModel;
 import io.craigmiller160.stockmarket.gui.PortfolioState;
 import io.craigmiller160.stockmarket.gui.dialog.Dialog;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import net.jcip.annotations.GuardedBy;
 import net.jcip.annotations.ThreadSafe;
 
@@ -20,7 +17,7 @@ import net.jcip.annotations.ThreadSafe;
  * mutable field is an int, which cannot be affected by a reference leak.
  * 
  * @author craig
- * @version 2.0
+ * @version 2.3
  */
 @ThreadSafe
 public class GUIStateModel extends AbstractPropertyModel {
@@ -43,11 +40,6 @@ public class GUIStateModel extends AbstractPropertyModel {
 	private Object[] dialogConfig;
 	
 	/**
-	 * Shared logger for the program.
-	 */
-	private static final Logger LOGGER = Logger.getLogger("stockmarket.model.GUIStateModel");
-
-	/**
 	 * Creates a new instance of this bound property model. Sets
 	 * the portfolio state to CLOSED by default.
 	 */
@@ -65,10 +57,6 @@ public class GUIStateModel extends AbstractPropertyModel {
 	 * @param portfolioState the state of the portfolio.
 	 */
 	public void setPortfolioState(PortfolioState portfolioState){
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"setPortfolioState", "Entering method", 
-				new Object[] {"Portfolio State: " + portfolioState});
-		
 		//No old value here, needs to be null so that even if the setting isn't actually
 		//being changed, it still registers so, in certain cases, the stock list gets cleared
 		synchronized(this){
@@ -100,10 +88,6 @@ public class GUIStateModel extends AbstractPropertyModel {
 	 * the dialog.
 	 */
 	public void setDialogDisplayed(Dialog dialog, Object... dialogConfig){
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"setDialogDisplayed", "Entering method", 
-				new Object[] {"Dialog: " + dialog, dialogConfig.toString()});
-		
 		Object[] fullConfig = new Object[dialogConfig.length + 1];
 		fullConfig[0] = dialog;
 		for(int i = 0; i < dialogConfig.length; i++){

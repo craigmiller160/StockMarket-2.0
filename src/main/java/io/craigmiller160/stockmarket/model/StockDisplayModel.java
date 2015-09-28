@@ -7,8 +7,6 @@ import io.craigmiller160.stockmarket.stock.AbstractStock;
 import io.craigmiller160.stockmarket.stock.HistoricalQuote;
 
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import net.jcip.annotations.GuardedBy;
 import net.jcip.annotations.ThreadSafe;
@@ -30,7 +28,7 @@ import net.jcip.annotations.ThreadSafe;
  * needed.
  * 
  * @author craig
- * @version 2.0
+ * @version 2.3
  */
 @ThreadSafe
 public class StockDisplayModel extends AbstractPropertyModel {
@@ -53,11 +51,6 @@ public class StockDisplayModel extends AbstractPropertyModel {
 	private List<HistoricalQuote> selectedStockHistory;
 	
 	/**
-	 * Shared logger for the program.
-	 */
-	private static final Logger LOGGER = Logger.getLogger("stockmarket.model.StockDisplayModel");
-	
-	/**
 	 * Creates a new instance of this bound property model.
 	 */
 	public StockDisplayModel() {
@@ -72,10 +65,6 @@ public class StockDisplayModel extends AbstractPropertyModel {
 	 * @param selectedStock the currently selected and displayed stock.
 	 */
 	public void setSelectedStock(AbstractStock selectedStock){
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"setSelectedStock", "Entering method", 
-				new Object[] {"Selected Stock: " + selectedStock});
-		
 		//Old value stays null here because otherwise re-setting the stock
 		//after changing its type to OwnedStock won't fire a new event
 		AbstractStock oldValue = null;
@@ -94,10 +83,6 @@ public class StockDisplayModel extends AbstractPropertyModel {
 	 * @param selectedStockHistory the history of the selected and displayed stock.
 	 */
 	public void setSelectedStockHistory(List<HistoricalQuote> selectedStockHistory){
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"setSelectedStockHistory", "Entering method", 
-				new Object[] {"Selected History: " + selectedStockHistory});
-		
 		List<HistoricalQuote> oldValue = null;
 		synchronized(this){
 			oldValue = this.selectedStockHistory;

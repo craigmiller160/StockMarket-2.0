@@ -1,8 +1,6 @@
 package io.craigmiller160.stockmarket.model;
 
 import java.util.Calendar;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -27,7 +25,7 @@ import net.jcip.annotations.ThreadSafe;
  * synchronization policy.
  * 
  * @author craig
- * @version 2.2
+ * @version 2.3
  */
 @ThreadSafe
 @Entity
@@ -63,12 +61,6 @@ public class SQLPortfolioModel extends PortfolioModel{
 	}
 	
 	/**
-	 * Shared logger for the program.
-	 */
-	@Transient
-	private static final Logger LOGGER = Logger.getLogger("stockmarket.model.SQLPortfolioModel");
-	
-	/**
 	 * Sets the SQL userid for this portfolio. This is not a bound
 	 * property, and is only necessary for saving and loading this
 	 * portfolio from the database. Because this value is essential
@@ -78,10 +70,6 @@ public class SQLPortfolioModel extends PortfolioModel{
 	 * @param userID the SQL userid for this portfolio.
 	 */
 	public void setUserID(int userID){
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"setUserID", "Entering method", 
-				new Object[] {"UserID: " + userID});
-		
 		synchronized(this){
 			this.userID = userID;
 		}

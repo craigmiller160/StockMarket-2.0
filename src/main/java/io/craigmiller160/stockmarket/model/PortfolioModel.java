@@ -10,8 +10,6 @@ import static io.craigmiller160.stockmarket.controller.StockMarketController.TOT
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -43,7 +41,7 @@ import net.jcip.annotations.ThreadSafe;
  * do not need locking, as this list is a synchronized collection.
  * 
  * @author craig
- * @version 2.2
+ * @version 2.3
  */
 @ThreadSafe
 @MappedSuperclass
@@ -108,12 +106,6 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 	private List<OwnedStock> stockList;
 	
 	/**
-	 * Shared logger for the program.
-	 */
-	@Transient
-	private static final Logger LOGGER = Logger.getLogger("stockmarket.model.PortfolioModel");
-	
-	/**
 	 * Create a new instance of this model.
 	 */
 	public PortfolioModel() {
@@ -149,10 +141,6 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 	 */
 	@Override
 	public void setStockList(List<OwnedStock> stockList){
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"setStockList", "Entering method", 
-				new Object[] {"Stock List: " + stockList});
-		
 		synchronized(this){
 			if(stockList == null){
 				this.stockList = new ArrayList<>();
@@ -175,10 +163,6 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 	 */
 	@Override
 	public void setPortfolioName(String portfolioName){
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"setPortfolioName", "Entering method", 
-				new Object[] {"Name: " + portfolioName});
-		
 		synchronized(this){
 			this.portfolioName = portfolioName;
 		}
@@ -194,10 +178,6 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 	 */
 	@Override
 	public void setTotalStockValue(BigDecimal portfolioValue){
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"setTotalStockValue", "Entering method", 
-				new Object[] {"Total Stock Value: " + portfolioValue});
-		
 		synchronized(this){
 			this.totalStockValue = portfolioValue;
 		}
@@ -212,10 +192,6 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 	 */
 	@Override
 	public void setNetWorth(BigDecimal netWorth){
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"setNetWorth", "Entering method", 
-				new Object[] {"Net Worth: " + netWorth});
-		
 		synchronized(this){
 			this.netWorth = netWorth;
 		}
@@ -233,10 +209,6 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 	 */
 	@Override
 	public void setChangeInNetWorth(BigDecimal netWorthChange){
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"setChangeInNetWorth", "Entering method", 
-				new Object[] {"Net Worth Change: " + netWorthChange});
-		
 		synchronized(this){
 			this.changeInNetWorth = netWorthChange;
 		}
@@ -251,10 +223,6 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 	 */
 	@Override
 	public void setCashBalance(BigDecimal cashBalance){
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"setCashBalance", "Entering method", 
-				new Object[] {"Cash Balance: " + cashBalance});
-		
 		synchronized(this){
 			this.cashBalance = cashBalance;
 		}
@@ -275,10 +243,6 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 	 * @param stock the stock to be set in the list.
 	 */
 	public void setStockInList(OwnedStock stock){
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"setStockInList", "Entering method", 
-				new Object[] {"Stock: " + stock});
-		
 		((DefaultOwnedStock)stock).setPortfolio(this);
 		
 		List<OwnedStock> copyList = null;
@@ -298,9 +262,6 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 			}
 			copyList = new ArrayList<>(stockList);
 		}
-		
-		LOGGER.logp(Level.INFO, this.getClass().getName(), 
-				"setStockInList", "Completed. Index: " + index);
 		
 		firePropertyChange(STOCK_LIST_PROPERTY, null, copyList);
 		
