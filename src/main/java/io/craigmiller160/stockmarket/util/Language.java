@@ -2,8 +2,6 @@ package io.craigmiller160.stockmarket.util;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import net.jcip.annotations.GuardedBy;
 import net.jcip.annotations.ThreadSafe;
@@ -23,7 +21,7 @@ import net.jcip.annotations.ThreadSafe;
  * locking should maintain this synchronization policy.
  * 
  * @author Craig
- * @version 2.0
+ * @version 2.3
  */
 @ThreadSafe
 public class Language{
@@ -35,15 +33,6 @@ public class Language{
 	 */
 	@GuardedBy("this")
 	private ResourceBundle localeText;
-	
-	/**
-	 * The Logger for this class. It passes log records
-	 * up the logging hierarchy to the "stockmarket" 
-	 * logger. No Handlers should be assigned to this 
-	 * logger, it should just pass the logs along.
-	 */
-	private static final Logger LOGGER = Logger.getLogger(
-			"stockmarket.util.Language");
 	
 	/**
 	 * Returns a shared instance of this <tt>Language</tt> module
@@ -89,10 +78,6 @@ public class Language{
 		synchronized(this){
 			localeText = ResourceBundle.getBundle("LocaleText", locale);
 		}
-		
-		LOGGER.logp(Level.INFO, this.getClass().getName(),
-				"setLocale()", "Language set as: " + locale.getLanguage(), 
-				new Object[]{"Locale: " + locale});
 	}
 	
 	/**

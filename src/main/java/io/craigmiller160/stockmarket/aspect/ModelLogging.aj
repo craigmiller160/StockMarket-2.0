@@ -48,7 +48,8 @@ public aspect ModelLogging {
 	
 	/**
 	 * Advice that runs before any method specified by the
-	 * <tt>modelPropertySetter()</tt> pointcut.
+	 * <tt>modelPropertySetter()</tt> pointcut. It logs the
+	 * new value that a model property is being set to.
 	 */
 	before() : modelPropertySetter() || stockInListSetter(){
 		Object[] params = thisJoinPoint.getArgs();
@@ -59,7 +60,7 @@ public aspect ModelLogging {
 	
 	/**
 	 * Advice that runs after the <tt>setStockInList(OwnedStock)</tt>
-	 * method.
+	 * method. It logs the change being made to the stock list.
 	 */
 	after() : stockInListSetter(){
 		String methodName = thisJoinPoint.getSignature().getName();
