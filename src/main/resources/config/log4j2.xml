@@ -2,19 +2,22 @@
 <Configuration xmlns="http://logging.apache.org/log4j/2.0/config">
 
 	<appenders>
-		<file name="fileAppender" fileName="${sys:user.home}/logpractice/stockmarket.txt"
+		<file name="fileAppender" fileName="${sys:user.home}/logpractice/stockmarket.csv"
 			append="false">
 			<patternlayout>
-				<pattern>%n%c, %t, %M, %p, %m</pattern>
-				<header>first,second,third </header>
+				<pattern>%n%p,%r,%t,%c,%m,%ex</pattern>
+				<header>Level,Timestamp,Thread,Logger,Message,Exception</header>
 			</patternlayout>
 		</file>
+		<async name="asyncAppender">
+			<appender-ref ref="fileAppender"/>
+		</async>
 	</appenders>
 	
 	
 	<loggers>
 		<root level="TRACE">
-			<appender-ref ref="fileAppender"/>
+			<appender-ref ref="asyncAppender"/>
 		</root>
 		<logger name="org.hibernate" level="info"/>
 		<logger name="org.jboss.logger" level="info"/>
