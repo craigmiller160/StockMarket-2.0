@@ -42,6 +42,14 @@ import net.jcip.annotations.NotThreadSafe;
 public class Main {
 
 	
+	//TODO registering shutdown hook occasionally causes exception because it's not
+	//registered before shutdown occurs
+	
+	//TODO hibernate seems to be keeping sessions/connections open when it should be
+	//closing them
+	
+	//TODO if the log file is open for the program, it crashes at startup
+	
 	/**
 	 * The logger for this program. With the exception of the default
 	 * root logger, this is the top of the logger hierarchy. It needs
