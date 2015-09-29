@@ -47,7 +47,7 @@ import io.craigmiller160.stockmarket.model.SQLPortfolioModel;
  * this class is already properly constructed for concurrent access.
  * 
  * @author craig
- * @version 2.3s
+ * @version 2.3
  */
 public class HibernatePortfolioDAO implements PortfolioDAO {
 

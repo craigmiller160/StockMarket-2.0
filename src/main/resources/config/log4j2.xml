@@ -5,10 +5,16 @@
 		<file name="fileAppender" fileName="${sys:user.home}/logpractice/stockmarket.csv"
 			append="false">
 			<patternlayout>
-				<pattern>%n%p,%r,%t,%c,%m,%ex</pattern>
-				<header>Level,Timestamp,Thread,Logger,Message,Exception</header>
+				<pattern>%n%p,%r,%t,%c,%m,%throwable</pattern>
+				<header>Level,Timestamp,Thread,Logger,Message (Expand Cell for Stack Trace),Exception</header>
 			</patternlayout>
 		</file>
+		<!-- Console Appender is here for temporary use for debugging the logger when necessary -->
+		<console name="consoleAppender">
+			<patternlayout>
+				<pattern>%n%p %throwable</pattern>
+			</patternlayout>
+		</console>
 		<async name="asyncAppender">
 			<appender-ref ref="fileAppender"/>
 		</async>

@@ -175,6 +175,8 @@ public class Main {
 				&& propertiesDirectoryExists;
 	}
 	
+	//TODO when AspectJ logging is completely integrated, remove this
+	//logging configuration from this class.
 	/**
 	 * Configure the properties of the main logger. Because the logger
 	 * in the <tt>Main</tt> class will be at the root of the hierarchy, 
@@ -195,9 +197,6 @@ public class Main {
 			LOGGER.setUseParentHandlers(false);
 		}
 		catch(IOException ex){
-			ex = new IOException(ex.getMessage() 
-					+ ": logger and debugging mode will not work.", 
-					ex);
 			displayExceptionDialog(ex);
 		}
 	}
@@ -220,19 +219,15 @@ public class Main {
 				throw new IOException();
 			}
 			
+			
+			
 			LOGGER.logp(Level.INFO, Main.class.getName(),
 					"loadDefaultProperties()",
 					"Default Properties file loaded successfully");
 			
 		}
 		catch (IOException ex){
-			String message = "Default properties failed to load";
-			ex = new IOException(ex.getMessage() + ": " + message, ex);
 			displayExceptionDialog(ex);
-			
-			LOGGER.logp(Level.SEVERE, Main.class.getName(), 
-					"loadDefaultProperties()", 
-					"Exception", ex);
 		}
 	}
 	
@@ -258,11 +253,7 @@ public class Main {
 						"User properties loaded from file");
 			}
 			catch(IOException ex){
-				String message = "User properties failed to load";
-				ex = new IOException(ex.getMessage() + ": " + message, ex);
 				displayExceptionDialog(ex);
-				LOGGER.logp(Level.SEVERE, Main.class.getName(), "loadUserProperties()",
-						"Exception", ex);
 			}
 			
 		}
@@ -339,8 +330,7 @@ public class Main {
     			}
     		}
     	}catch(Exception ex){
-    		LOGGER.logp(Level.SEVERE, Main.class.getName(), 
-    				"setLookAndFeel()", "Exception", ex);
+    		//Exception is logged by ExceptionLogging aspect
     	}
 	}
 	
@@ -416,9 +406,6 @@ public class Main {
 		@Override
 		public void uncaughtException(Thread thread, Throwable throwable) {
 			displayExceptionDialog(throwable);
-			
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), "uncaughtException()", 
-					"Uncaught Exception: " + thread.getName() + "." + thread.getId(), throwable);
 		}
 		
 	}

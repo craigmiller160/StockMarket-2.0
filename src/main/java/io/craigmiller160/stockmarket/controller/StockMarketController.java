@@ -431,37 +431,13 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 			
 			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
 					"refreshPortfolio", "Refresh successful");
-			System.out.println("Refresh finished");
 			
 		}
 		catch(InterruptedException ex){
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"refreshPortfolio", 
-					"Exception", ex);
+			Thread.currentThread().interrupt();
 		}
-		catch (NoSuchMethodException ex) {
-			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"refreshPortfolio", 
-					"Exception", ex);
-		} 
-		catch (IllegalAccessException ex) {
-			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"refreshPortfolio", 
-					"Exception", ex);
-		} 
-		catch (ReflectiveOperationException ex) {
-			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"refreshPortfolio", 
-					"Exception", ex);
-		} 
 		catch (Exception ex) {
 			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"refreshPortfolio", 
-					"Exception", ex);
 		}
 	}
 	
@@ -481,29 +457,8 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
 					"showSellStockDialog", "Sell Stock Dialog Displayed");
 		} 
-		catch (NoSuchMethodException ex) {
-			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"showSellStockDialog", 
-					"Exception", ex);
-		} 
-		catch (IllegalAccessException ex) {
-			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"showSellStockDialog", 
-					"Exception", ex);
-		} 
-		catch (ReflectiveOperationException ex) {
-			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"showSellStockDialog", 
-					"Exception", ex);
-		} 
 		catch (Exception ex) {
 			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"showSellStockDialog", 
-					"Exception", ex);
 		}
 	}
 	
@@ -544,29 +499,8 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 					"sellStock", selectedStock.getSymbol() 
 					+ " Shares sold: " + quantityToSell);
 		} 
-		catch (NoSuchMethodException ex) {
-			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"sellStock", 
-					"Exception", ex);
-		} 
-		catch (IllegalAccessException ex) {
-			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"sellStock", 
-					"Exception", ex);
-		} 
-		catch (ReflectiveOperationException ex) {
-			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"sellStock", 
-					"Exception", ex);
-		} 
 		catch (Exception ex) {
 			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"sellStock", 
-					"Exception", ex);
 		}
 	}
 	
@@ -615,33 +549,12 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 			setModelProperty(PORTFOLIO_STATE_PROPERTY, PortfolioState.OPEN_OWNED_STOCK);
 			setModelProperty(SELECTED_STOCK_PROPERTY, ownedStock);
 		} 
-		catch (NoSuchMethodException ex) {
-			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"buyStock", 
-					"Exception", ex);
-		} 
-		catch (IllegalAccessException ex) {
-			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"buyStock", 
-					"Exception", ex);
-		} 
-		catch (ReflectiveOperationException ex) {
-			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"buyStock", 
-					"Exception", ex);
-		}
 		catch(InsufficientFundsException ex){
 			displayExceptionDialog(LANGUAGE.getString("insufficient_funds_title"), 
 					LANGUAGE.getString("insufficient_funds_cash_message"));
 		}
 		catch (Exception ex) {
 			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"buyStock", 
-					"Exception", ex);
 		}
 		
 	}
@@ -663,29 +576,8 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
 					"showBuyStockDialog", "Buy Stock Dialog Displayed");
 		} 
-		catch (NoSuchMethodException ex) {
-			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"showBuyStockDialog", 
-					"Exception", ex);
-		} 
-		catch (IllegalAccessException ex) {
-			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"showBuyStockDialog", 
-					"Exception", ex);
-		} 
-		catch (ReflectiveOperationException ex) {
-			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"showBuyStockDialog", 
-					"Exception", ex);
-		} 
 		catch (Exception ex) {
 			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"showBuyStockDialog", 
-					"Exception", ex);
 		}
 	}
 	
@@ -741,35 +633,8 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 			LOGGER.logp(Level.SEVERE, this.getClass().getName(),
 					"changeStockHistoryInterval", "Exception", ex);
 		}
-		catch(IOException ex){
-			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"changeStockHistoryInterval", 
-					"Exception", ex);
-		}
-		catch(IllegalAccessException ex){
-			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"changeStockHistoryInterval", 
-					"Exception", ex);
-		}
-		catch(NoSuchMethodException ex){
-			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"changeStockHistoryInterval", 
-					"Exception", ex);
-		}
-		catch(ReflectiveOperationException ex){
-			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"changeStockHistoryInterval", 
-					"Exception", ex);
-		}
 		catch(Exception ex){
 			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"changeStockHistoryInterval", 
-					"Exception", ex);
 		}
 		
 	}
@@ -820,36 +685,12 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 		}
 		catch(InterruptedException ex){
 			Thread.currentThread().interrupt();
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"lookupPortfolioStock", 
-					"Exception", ex);
 		}
 		catch(ExecutionException ex){
 			launderStockExecutionException(ex);
 		}
-		catch (NoSuchMethodException ex) {
-			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"lookupPortfolioStock", 
-					"Exception", ex);
-		} 
-		catch (IllegalAccessException ex) {
-			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"lookupPortfolioStock", 
-					"Exception", ex);
-		} 
-		catch (ReflectiveOperationException ex) {
-			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"lookupPortfolioStock", 
-					"Exception", ex);
-		} 
 		catch (Exception ex) {
 			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"lookupPortfolioStock", 
-					"Exception", ex);
 		}
 	}
 	
@@ -907,36 +748,12 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 		}
 		catch(InterruptedException ex){
 			Thread.currentThread().interrupt();
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"searchForStock", 
-					"Exception", ex);
 		}
 		catch(ExecutionException ex){
 			launderStockExecutionException(ex);
 		}
-		catch(IllegalAccessException ex){
-			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"changeStockHistoryInterval", 
-					"Exception", ex);
-		}
-		catch(NoSuchMethodException ex){
-			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"searchForStock", 
-					"Exception", ex);
-		}
-		catch(ReflectiveOperationException ex){
-			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"changeStockHistoryInterval", 
-					"Exception", ex);
-		}
 		catch(Exception ex){
 			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"searchForStock", 
-					"Exception", ex);
 		}
 		
 	}
@@ -992,6 +809,7 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 		return downloadHistory;
 	}
 	
+	//TODO will need to figure out special logging for this one
 	/**
 	 * Launder the <tt>ExecutionException</tt> from the stock search 
 	 * and respond to it appropriately.
@@ -1071,17 +889,8 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 			LOGGER.logp(Level.INFO, this.getClass().getName(),
 					"marketDataWebpage", "Market data webpage is open");
 		}
-		catch(URISyntaxException ex){
+		catch(URISyntaxException | IOException ex){
 			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"marketDataWebpage", 
-					"Exception", ex);
-		}
-		catch(IOException ex){
-			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"marketDataWebpage", 
-					"Exception", ex);
 		}
 	}
 	
@@ -1135,35 +944,11 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 						"openPortfolio", "Portfolio loaded and opened in the program");
 				
 			}
-			catch(IllegalAccessException ex){
-				displayExceptionDialog(ex);
-				LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-						"changeStockHistoryInterval", 
-						"Exception", ex);
-			}
-			catch(NoSuchMethodException ex){
-				displayExceptionDialog(ex);
-				LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-						"openPortfolio", 
-						"Exception", ex);
-			}
-			catch(ReflectiveOperationException ex){
-				displayExceptionDialog(ex);
-				LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-						"changeStockHistoryInterval", 
-						"Exception", ex);
-			}
 			catch(InterruptedException ex){
 				Thread.currentThread().interrupt();
-				LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-						"openPortfolio", 
-						"Exception", ex);
 			}
 			catch(Exception ex){
 				displayExceptionDialog(ex);
-				LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-						"openPortfolio", 
-						"Exception", ex);
 			}
 		}
 		else{
@@ -1194,35 +979,11 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 						"showOpenPortfolioDialog()", 
 						"Open portfolio dialog displayed");
 			}
-			catch(IllegalAccessException ex){
-				displayExceptionDialog(ex);
-				LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-						"changeStockHistoryInterval", 
-						"Exception", ex);
-			}
-			catch(NoSuchMethodException ex){
-				displayExceptionDialog(ex);
-				LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-						"showPortfolioNameDialog()", 
-						"Exception", ex);
-			}
-			catch(ReflectiveOperationException ex){
-				displayExceptionDialog(ex);
-				LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-						"changeStockHistoryInterval", 
-						"Exception", ex);
-			}
 			catch(InterruptedException ex){
 				Thread.currentThread().interrupt();
-				LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-						"showPortfolioNameDialog()", 
-						"Exception", ex);
 			}
 			catch (Exception ex) {
 				displayExceptionDialog(ex);
-				LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-						"showPortfolioNameDialog()", 
-						"Exception", ex);
 			}
 		}
 		else{
@@ -1255,29 +1016,8 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 					"showPortfolioNameDialog", 
 					"Portfolio name dialog displayed");
 		}
-		catch(IllegalAccessException ex){
-			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"changeStockHistoryInterval", 
-					"Exception", ex);
-		}
-		catch(NoSuchMethodException ex){
-			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"showPortfolioNameDialog", 
-					"Exception", ex);
-		}
-		catch(ReflectiveOperationException ex){
-			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"changeStockHistoryInterval", 
-					"Exception", ex);
-		}
 		catch (Exception ex) {
 			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"showPortfolioNameDialog", 
-					"Exception", ex);
 		}
 	}
 	
@@ -1328,32 +1068,11 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 			LOGGER.logp(Level.INFO, this.getClass().getName(), 
 					"newPortfolio()", "New portfolio created");
 		}
-		catch(IllegalAccessException ex){
-			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"changeStockHistoryInterval", 
-					"Exception", ex);
-		}
-		catch(NoSuchMethodException ex){
-			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"newPortfolio", "Exception", ex);
-		}
-		catch(ReflectiveOperationException ex){
-			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"changeStockHistoryInterval", 
-					"Exception", ex);
-		}
 		catch(InterruptedException ex){
 			Thread.currentThread().interrupt();
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"newPortfolio", "Exception", ex);
 		}
 		catch(Exception ex){
 			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"newPortfolio", "Exception", ex);
 		}
 	}
 	
@@ -1385,32 +1104,11 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 			LOGGER.logp(Level.INFO, this.getClass().getName(), 
 					"savePortfolioName", "Portfolio Name Saved");
 		}
-		catch(IllegalAccessException ex){
-			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"changeStockHistoryInterval", 
-					"Exception", ex);
-		}
-		catch(NoSuchMethodException ex){
-			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"savePortfolioName", "Exception", ex);
-		}
-		catch(ReflectiveOperationException ex){
-			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"changeStockHistoryInterval", 
-					"Exception", ex);
-		}
 		catch(InterruptedException ex){
 			Thread.currentThread().interrupt();
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"savePortfolioName", "Exception", ex);
 		}
 		catch (Exception ex) {
 			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"savePortfolioName", "Exception", ex);
 		}
 	}
 	
@@ -1444,13 +1142,9 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 				}
 				catch(InterruptedException ex){
 					Thread.currentThread().interrupt();
-					LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-							"savePortfolio", "Exception", ex);
 				}
 				catch (Exception ex) {
 					displayExceptionDialog(ex);
-					LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-							"savePortfolio", "Exception", ex);
 				}
 			}
 			else{
@@ -1553,10 +1247,6 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 		@Override
 		public void uncaughtException(Thread thread, Throwable throwable) {
 			displayExceptionDialog(throwable);
-			
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"uncaughtException()", "Uncaught Exception: " + thread.getName() 
-					+ "." + thread.getId(), throwable);
 		}
 		
 	}
