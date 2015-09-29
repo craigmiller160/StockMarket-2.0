@@ -67,11 +67,18 @@ import net.jcip.annotations.NotThreadSafe;
  * the database at a time, this class should generally only be used by
  * one thread at a time. If this restriction is lifted in future versions,
  * this class is already properly constructed for concurrent access.
+ * <p>
+ * <b>DEPRECATED:</b> As of Version 2.2, this class has been deprecated in
+ * favor of <tt>HibernatePortfolioDAO</tt>. If it is decided to restore this
+ * class to use in the program, it will need to be overhauled to meet new
+ * API standards. Specifically, logging will have to be changed to match
+ * the AspectJ logging in Version 2.3.
  * 
  * @author craig
  * @version 2.0
  * @see io.craigmiller160.stockmarket.stock.OwnedStock OwnedStock
  * @see io.craigmiller160.stockmarket.stock.DefaultStock Stock
+ * @deprecated
  */
 @NotThreadSafe
 public class SQLPortfolioDAO implements
