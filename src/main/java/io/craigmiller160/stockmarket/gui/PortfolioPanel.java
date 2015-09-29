@@ -26,8 +26,6 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
@@ -63,11 +61,6 @@ public class PortfolioPanel extends AbstractListenerView {
 	 * Shared <tt>Language</tt> module for locale-specific text.
 	 */
 	private static final Language LANGUAGE = Language.getInstance();
-	
-	/**
-	 * Shared logger for the program.
-	 */
-	private static final Logger LOGGER = Logger.getLogger("stockmarket.gui.StockDetailsPanel");
 	
 	/**
 	 * The panel created by this class.
@@ -356,10 +349,6 @@ public class PortfolioPanel extends AbstractListenerView {
 	 */
 	@SuppressWarnings("serial") //This anonymous ListModel doesn't need a serialVersionUID.
 	public void setPortfolioContents(final List<OwnedStock> stockList){
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"setPortfolioContents", "Entering method", 
-				new Object[]{"Stock List: " + stockList});
-		
 		if(stockList == null){
 			ownedStockList.setModel(new DefaultListModel<OwnedStock>());
 		}
@@ -387,9 +376,6 @@ public class PortfolioPanel extends AbstractListenerView {
 	@Override
 	public void changeProperty(PropertyChangeEvent event) {
 		if(event.getPropertyName() == PORTFOLIO_STATE_PROPERTY){
-			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-					"changeProperty", "Changing Property", 
-					new Object[]{"Property: " + event.getPropertyName()});
 			if(event.getNewValue() instanceof PortfolioState){
 				portfolioStateChanged((PortfolioState) event.getNewValue());
 			}
@@ -399,10 +385,6 @@ public class PortfolioPanel extends AbstractListenerView {
 			}
 		}
 		else if(event.getPropertyName() == STOCK_LIST_PROPERTY){
-			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-					"changeProperty", "Changing Property", 
-					new Object[]{"Property: " + event.getPropertyName()});
-			
 			if(event.getNewValue() instanceof List<?> || event.getNewValue() == null){
 				setPortfolioContents((List<OwnedStock>) event.getNewValue());
 			}
@@ -412,10 +394,6 @@ public class PortfolioPanel extends AbstractListenerView {
 			}
 		}
 		else if(event.getPropertyName() == CASH_BALANCE_PROPERTY){
-			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-					"changeProperty", "Changing Property", 
-					new Object[]{"Property: " + event.getPropertyName()});
-			
 			if(event.getNewValue() instanceof BigDecimal){
 				setCashBalanceValue((BigDecimal) event.getNewValue());
 			}
@@ -425,10 +403,6 @@ public class PortfolioPanel extends AbstractListenerView {
 			}
 		}
 		else if(event.getPropertyName() == TOTAL_STOCK_VALUE_PROPERTY){
-			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-					"changeProperty", "Changing Property", 
-					new Object[]{"Property: " + event.getPropertyName()});
-			
 			if(event.getNewValue() instanceof BigDecimal){
 				setTotalStockValue((BigDecimal) event.getNewValue());
 			}
@@ -438,10 +412,6 @@ public class PortfolioPanel extends AbstractListenerView {
 			}
 		}
 		else if(event.getPropertyName() == NET_WORTH_PROPERTY){
-			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-					"changeProperty", "Changing Property", 
-					new Object[]{"Property: " + event.getPropertyName()});
-			
 			if(event.getNewValue() instanceof BigDecimal){
 				setNetWorthValue((BigDecimal) event.getNewValue());
 			}
@@ -451,10 +421,6 @@ public class PortfolioPanel extends AbstractListenerView {
 			}
 		}
 		else if(event.getPropertyName() == CHANGE_IN_NET_WORTH_PROPERTY){
-			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-					"changeProperty", "Changing Property", 
-					new Object[]{"Property: " + event.getPropertyName()});
-			
 			if(event.getNewValue() instanceof BigDecimal){
 				setChangeInNetWorthValue((BigDecimal) event.getNewValue());
 			}
@@ -471,10 +437,6 @@ public class PortfolioPanel extends AbstractListenerView {
 	 * @param value the change in net worth.
 	 */
 	public void setChangeInNetWorthValue(BigDecimal value){
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"setChangeInNetWorthValue", "Entering method", 
-				new Object[] {"Net Worth Change: " + value});
-		
 		String text = moneyFormat.format(value);
 		changeInNetWorthValue.setText(text);
 	}
@@ -485,10 +447,6 @@ public class PortfolioPanel extends AbstractListenerView {
 	 * @param value the net worth value.
 	 */
 	public void setNetWorthValue(BigDecimal value){
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"setChangeInNetWorthValue", "Entering method", 
-				new Object[] {"Net Worth: " + value});
-		
 		String text = moneyFormat.format(value);
 		netWorthValue.setText(text);
 	}
@@ -499,10 +457,6 @@ public class PortfolioPanel extends AbstractListenerView {
 	 * @param value the total stock value label.
 	 */
 	public void setTotalStockValue(BigDecimal value){
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"setTotalStockValue", "Entering method", 
-				new Object[] {"Total Stock Value: " + value});
-		
 		String text = moneyFormat.format(value);
 		totalStockValue.setText(text);
 	}
@@ -513,10 +467,6 @@ public class PortfolioPanel extends AbstractListenerView {
 	 * @param value the cash balance value.
 	 */
 	public void setCashBalanceValue(BigDecimal value){
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"setCashBalanceValue", "Entering method", 
-				new Object[] {"Cash Balance: " + value});
-		
 		String text = moneyFormat.format(value);
 		cashBalanceValue.setText(text);
 	}
@@ -528,10 +478,6 @@ public class PortfolioPanel extends AbstractListenerView {
 	 * @param portfolioState the state of the portfolio.
 	 */
 	public void portfolioStateChanged(PortfolioState portfolioState){
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"portfolioStateChanged", "Entering method", 
-				new Object[] {"Enable State: " + portfolioState});
-		
 		if(portfolioState == PortfolioState.CLOSED){
 			detailsButton.setEnabled(false);
 			refreshButton.setEnabled(false);
@@ -554,9 +500,6 @@ public class PortfolioPanel extends AbstractListenerView {
 	public Object getValueForAction(String actionCommand) {
 		Object result = null;
 		if(actionCommand == LOOKUP_PORTFOLIO_STOCK_ACTION){
-			LOGGER.logp(Level.FINEST, this.getClass().getName(), "getValue", 
-					"Entering method", new Object[] {"Command: " + actionCommand});
-			
 			result = ownedStockList.getSelectedIndex();
 		}
 		

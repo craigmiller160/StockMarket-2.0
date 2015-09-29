@@ -39,8 +39,6 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -64,11 +62,6 @@ import net.miginfocom.swing.MigLayout;
 @NotThreadSafe
 public class StockDetailsPanel extends AbstractListenerView {
 
-	/**
-	 * Shared logger for the program.
-	 */
-	private static final Logger LOGGER = Logger.getLogger("stockmarket.gui.StockDetailsPanel");
-	
 	/**
 	 * Format for displaying amounts of money in the GUI.
 	 */
@@ -532,10 +525,6 @@ public class StockDetailsPanel extends AbstractListenerView {
 	@Override
 	public void changeProperty(PropertyChangeEvent event) {
 		if(event.getPropertyName() == SELECTED_STOCK_PROPERTY){
-			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-					"changeProperty", "Changing Property",
-					new Object[] {"Property: " + event.getPropertyName()});
-			
 			if(event.getNewValue() instanceof Stock){
 				displayStockDetails((Stock) event.getNewValue());
 			}
@@ -545,10 +534,6 @@ public class StockDetailsPanel extends AbstractListenerView {
 			}
 		}
 		else if(event.getPropertyName() == PORTFOLIO_STATE_PROPERTY){
-			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-					"changeProperty", "Changing Property", 
-					new Object[]{"Property: " + event.getPropertyName()});
-			
 			if(event.getNewValue() instanceof PortfolioState){
 				portfolioStateChanged((PortfolioState) event.getNewValue());
 			}
@@ -565,13 +550,6 @@ public class StockDetailsPanel extends AbstractListenerView {
 	 * @param stock the stock to display.
 	 */
 	public void displayStockDetails(Stock stock){
-		boolean owned = stock instanceof OwnedStock ? true : false;
-		
-		LOGGER.logp(Level.INFO, this.getClass().getName(), 
-				"displayStockDetails", "Displaying Stock Details. Owned: " + owned,
-				new Object[] {"Stock: " + stock});
-		
-		
 		Map<String,Object> valueMap = stock.getValueMap(true);
 		
 		String symbol = (String) valueMap.get(SYMBOL);
@@ -804,10 +782,6 @@ public class StockDetailsPanel extends AbstractListenerView {
 	 * @param portfolioState the state of the portfolio.
 	 */
 	public void portfolioStateChanged(PortfolioState portfolioState){
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"portfolioStateChanged", "Entering method", 
-				new Object[] {"Portfolio State: " + portfolioState});
-		
 		if(portfolioState == PortfolioState.CLOSED){
 			
 		}

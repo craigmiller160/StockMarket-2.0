@@ -8,8 +8,6 @@ import io.craigmiller160.stockmarket.util.Fonts;
 import io.craigmiller160.stockmarket.util.Language;
 
 import java.beans.PropertyChangeEvent;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -37,11 +35,6 @@ public class BuySellPanel extends AbstractListenerView {
 	 * Shared <tt>Language</tt> module for locale-specific text.
 	 */
 	private static final Language LANGUAGE = Language.getInstance();
-	
-	/**
-	 * Shared logger for the program.
-	 */
-	private static final Logger LOGGER = Logger.getLogger("stockmarket.gui.BuySellPanel");
 	
 	/**
 	 * The panel created by this class.
@@ -143,10 +136,6 @@ public class BuySellPanel extends AbstractListenerView {
 	@Override
 	public void changeProperty(PropertyChangeEvent event) {
 		if(event.getPropertyName() == PORTFOLIO_STATE_PROPERTY){
-			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-					"changeProperty", "Changing Property", 
-					new Object[]{"Property: " + event.getPropertyName()});
-			
 			if(event.getNewValue() instanceof PortfolioState){
 				portfolioStateChanged((PortfolioState) event.getNewValue());
 			}
@@ -164,10 +153,6 @@ public class BuySellPanel extends AbstractListenerView {
 	 * @param portfolioState the state of the portfolio.
 	 */
 	public void portfolioStateChanged(PortfolioState portfolioState){
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"portfolioStateChanged", "Entering method", 
-				new Object[] {"Portfolio State: " + portfolioState});
-		
 		if(portfolioState == PortfolioState.CLOSED){
 			buyButton.setEnabled(false);
 			sellButton.setEnabled(false);

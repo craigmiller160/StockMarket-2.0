@@ -7,8 +7,6 @@ import io.craigmiller160.stockmarket.util.Language;
 
 import java.awt.CardLayout;
 import java.beans.PropertyChangeEvent;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -36,11 +34,6 @@ import net.miginfocom.swing.MigLayout;
  */
 public class StockDisplayPanel extends AbstractListenerView {
 
-	/**
-	 * Shared logger for the program.
-	 */
-	private static final Logger LOGGER = Logger.getLogger("stockmarket.gui.StockDisplayPanel");
-	
 	/**
 	 * The panel created by this class.
 	 */
@@ -296,10 +289,6 @@ public class StockDisplayPanel extends AbstractListenerView {
 	@Override
 	public void changeProperty(PropertyChangeEvent event) {
 		if(event.getPropertyName() == PORTFOLIO_STATE_PROPERTY){
-			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-					"changeProperty", "Changing Property", 
-					new Object[]{"Property: " + event.getPropertyName()});
-			
 			if(event.getNewValue() instanceof PortfolioState){
 				portfolioStateChanged((PortfolioState) event.getNewValue());
 			}
@@ -317,10 +306,6 @@ public class StockDisplayPanel extends AbstractListenerView {
 	 * @param portfolioState the state of the portfolio.
 	 */
 	public void portfolioStateChanged(PortfolioState portfolioState){
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"portfolioStateChanged", "Entering method", 
-				new Object[] {"Enable State: " + portfolioState});
-		
 		if(portfolioState == PortfolioState.CLOSED){
 			displaySwitchLayout.show(displaySwitchPanel, NOTHING_SELECTED_PANEL);
 		}
@@ -337,9 +322,6 @@ public class StockDisplayPanel extends AbstractListenerView {
 
 	@Override
 	public Object getValueForAction(String actionCommand) {
-		//LOGGER.logp(Level.FINEST, this.getClass().getName(), "getValue", 
-				//"Entering method", new Object[] {"Command: " + valueToGet});
-		
 		return null;
 	}
 

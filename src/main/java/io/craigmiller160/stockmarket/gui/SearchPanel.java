@@ -11,8 +11,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
@@ -42,11 +40,6 @@ import net.miginfocom.swing.MigLayout;
 @NotThreadSafe
 public class SearchPanel extends AbstractListenerView {
 
-	/**
-	 * Shared logger for the program.
-	 */
-	private static final Logger LOGGER = Logger.getLogger("stockmarket.gui.SearchPanel");
-	
 	/**
 	 * Button that displays the stock search field.
 	 */
@@ -266,10 +259,6 @@ public class SearchPanel extends AbstractListenerView {
 	@Override
 	public void changeProperty(PropertyChangeEvent event) {
 		if(event.getPropertyName() == PORTFOLIO_STATE_PROPERTY){
-			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-					"changeProperty", "Changing Property", 
-					new Object[]{"Property: " + event.getPropertyName()});
-			
 			if(event.getNewValue() instanceof PortfolioState){
 				portfolioStateChanged((PortfolioState) event.getNewValue());
 			}
@@ -287,10 +276,6 @@ public class SearchPanel extends AbstractListenerView {
 	 * @param portfolioState the state of the portfolio.
 	 */
 	public void portfolioStateChanged(PortfolioState portfolioState){
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"portfolioStateChanged", "Entering method", 
-				new Object[] {"Enable State: " + portfolioState});
-		
 		if(portfolioState == PortfolioState.CLOSED){
 			lookupStockButton.setEnabled(false);
 		}
@@ -335,9 +320,6 @@ public class SearchPanel extends AbstractListenerView {
 	public Object getValueForAction(String actionCommand) {
 		Object result = null;
 		if(actionCommand == STOCK_SEARCH_ACTION){
-			LOGGER.logp(Level.FINEST, this.getClass().getName(), "getValue", 
-					"Entering method", new Object[] {"Command: " + actionCommand});
-			
 			result = getSearchFieldText();
 			setSearchFieldText("");
 		}

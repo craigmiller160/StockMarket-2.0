@@ -13,8 +13,6 @@ import io.craigmiller160.stockmarket.util.Fonts;
 import io.craigmiller160.stockmarket.util.Language;
 
 import java.beans.PropertyChangeEvent;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -38,11 +36,6 @@ import net.jcip.annotations.NotThreadSafe;
 @NotThreadSafe
 public class ToolBar extends AbstractListenerView {
 
-	/**
-	 * Shared logger for the program.
-	 */
-	private static final Logger LOGGER = Logger.getLogger("stockmarket.gui.ToolBar");
-	
 	/**
 	 * Shared <tt>Language</tt> module for locale-specific text.
 	 */
@@ -238,10 +231,6 @@ public class ToolBar extends AbstractListenerView {
 	@Override
 	public void changeProperty(PropertyChangeEvent event) {
 		if(event.getPropertyName() == PORTFOLIO_STATE_PROPERTY){
-			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-					"changeProperty", "Changing Property", 
-					new Object[]{"Property: " + event.getPropertyName()});
-			
 			if(event.getNewValue() instanceof PortfolioState){
 				portfolioStateChanged((PortfolioState) event.getNewValue());
 			}
@@ -251,10 +240,6 @@ public class ToolBar extends AbstractListenerView {
 			}
 		}
 		else if(event.getPropertyName() == PORTFOLIO_NAME_PROPERTY){
-			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-					"changeProperty", "Changing Property", 
-					new Object[]{"Property: " + event.getPropertyName()});
-			
 			if(event.getNewValue() instanceof String){
 				setPortfolioNameFieldText((String) event.getNewValue());
 			}
@@ -272,10 +257,6 @@ public class ToolBar extends AbstractListenerView {
 	 * @param portfolioState the state of the portfolio.
 	 */
 	public void portfolioStateChanged(PortfolioState portfolioState){
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"portfolioStateChanged", "Entering method", 
-				new Object[] {"Enable State: " + portfolioState});
-		
 		if(portfolioState == PortfolioState.CLOSED){
 			savePortfolioButton.setEnabled(false);
 			closePortfolioButton.setEnabled(false);
@@ -309,10 +290,6 @@ public class ToolBar extends AbstractListenerView {
 
 	@Override
 	public Object getValueForAction(String actionCommand) {
-		//LOGGER.logp(Level.FINEST, this.getClass().getName(), "getValue", 
-				//"Entering method", new Object[] {"Command: " + valueToGet});
-		
-		
 		return null;
 	}
 

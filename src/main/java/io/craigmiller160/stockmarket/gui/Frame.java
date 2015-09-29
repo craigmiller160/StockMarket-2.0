@@ -12,8 +12,6 @@ import io.craigmiller160.stockmarket.util.Language;
 import java.beans.PropertyChangeEvent;
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -46,11 +44,6 @@ import net.miginfocom.swing.MigLayout;
 @NotThreadSafe
 public class Frame extends AbstractListenerView {
 
-	/**
-	 * Shared logger for the program.
-	 */
-	private static final Logger LOGGER = Logger.getLogger("stockmarket.gui.Frame");
-	
 	/**
 	 * The Frame created by this class.
 	 */
@@ -237,10 +230,6 @@ public class Frame extends AbstractListenerView {
 	@Override
 	public void changeProperty(PropertyChangeEvent event) {
 		if(event.getPropertyName() == DIALOG_DISPLAYED_PROPERTY){
-			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-					"changeProperty", "Changing Property", 
-					new Object[]{"Property: " + event.getPropertyName()});
-			
 			if(event.getNewValue() instanceof Object[]){
 				displayDialog((Object[]) event.getNewValue());
 			}
@@ -262,10 +251,6 @@ public class Frame extends AbstractListenerView {
 	 */
 	@SuppressWarnings("unchecked") //Because it can't verify the type parameter on the list due to type erasure
 	public void displayDialog(Object[] dialogConfig){
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"displayDialog", "Entering method", 
-				new Object[]{"Dialog: " + dialogConfig.toString()});
-		
 		ListenerDialog dialog = null;
 		if(dialogConfig[0] instanceof Dialog){
 			if((Dialog) dialogConfig[0] == Dialog.PORTFOLIO_NAME_DIALOG){
@@ -332,12 +317,14 @@ public class Frame extends AbstractListenerView {
 			dialog.addActionListener(this);
 			dialog.showDialog();
 			
-			LOGGER.logp(Level.INFO, this.getClass().getName(), 
-					"displayDialog", "Displaying Dialog: Code: " + dialogConfig[0]);
+			//TODO can I figure out a way to add a log entry for the dialog successfully displaying?
+			//LOGGER.logp(Level.INFO, this.getClass().getName(), 
+					//"displayDialog", "Displaying Dialog: Code: " + dialogConfig[0]);
 		}
 		else{
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"displayDialog", "Failed to display dialog");
+			//TODO can I figure out a way to add a log entry for the dialog being null here?
+			//LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
+					//"displayDialog", "Failed to display dialog");
 		}
 	}
 	
@@ -345,9 +332,6 @@ public class Frame extends AbstractListenerView {
 
 	@Override
 	public Object getValueForAction(String actionCommand) {
-		//LOGGER.logp(Level.FINEST, this.getClass().getName(), "getValue", 
-				//"Entering method", new Object[] {"Command: " + valueToGet});
-		
 		return null;
 	}
 

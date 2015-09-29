@@ -14,8 +14,6 @@ import java.beans.PropertyChangeEvent;
 import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -53,11 +51,6 @@ public class StockHistoryPanel extends AbstractListenerView {
 	 * Shared <tt>Language</tt> module for locale-specific text.
 	 */
 	private static final Language LANGUAGE = Language.getInstance();
-	
-	/**
-	 * Shared logger for the program.
-	 */
-	private static final Logger LOGGER = Logger.getLogger("stockmarket.gui.StockHistoryPanel");
 	
 	/**
 	 * The panel created by this class.
@@ -198,10 +191,6 @@ public class StockHistoryPanel extends AbstractListenerView {
 	 * @param historyList the stock history to be displayed.
 	 */
 	public void setStockHistory(List<HistoricalQuote> historyList){
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"setStockHistory", "Entering", 
-				new Object[]{"History List: " + historyList});
-		
 		String chartName = "";
 		if(historyList instanceof StockHistoryList){
 			chartName = ((StockHistoryList) historyList).getSymbol();
@@ -214,8 +203,7 @@ public class StockHistoryPanel extends AbstractListenerView {
 		chartPanel = createChartPanel(dataset, chartName);
 		assembleHistoryPanel();
 		
-		LOGGER.logp(Level.INFO, this.getClass().getName(), 
-				"setStockHistory", "Stock History Displayed");
+		//TODO can a log entry be done here for successful display of history?
 	}
 	
 	/**
@@ -286,17 +274,9 @@ public class StockHistoryPanel extends AbstractListenerView {
 	@Override
 	public void changeProperty(PropertyChangeEvent event) {
 		if(event.getPropertyName() == SELECTED_STOCK_PROPERTY){
-			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-					"changeProperty", "Changing Property", 
-					new Object[]{"Property: " + event.getPropertyName()});
-			
 			resetCombo();
 		}
 		else if(event.getPropertyName() == SELECTED_STOCK_HISTORY_PROPERTY){
-			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-					"changeProperty", "Changing Property", 
-					new Object[]{"Property: " + event.getPropertyName()});
-			
 			if(event.getNewValue() instanceof List<?>){
 				setStockHistory((List<HistoricalQuote>) event.getNewValue());
 			}
@@ -306,10 +286,6 @@ public class StockHistoryPanel extends AbstractListenerView {
 			}
 		}
 		else if(event.getPropertyName() == PORTFOLIO_STATE_PROPERTY){
-			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-					"changeProperty", "Changing Property", 
-					new Object[]{"Property: " + event.getPropertyName()});
-			
 			if(event.getNewValue() instanceof PortfolioState){
 				portfolioStateChanged((PortfolioState) event.getNewValue());
 			}
@@ -327,10 +303,6 @@ public class StockHistoryPanel extends AbstractListenerView {
 	 * @param portfolioState the state of the portfolio.
 	 */
 	public void portfolioStateChanged(PortfolioState portfolioState){
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"portfolioStateChanged", "Entering method", 
-				new Object[] {"Portfolio State: " + portfolioState});
-		
 		if(portfolioState == PortfolioState.CLOSED){
 			
 		}
@@ -347,9 +319,6 @@ public class StockHistoryPanel extends AbstractListenerView {
 
 	@Override
 	public Object getValueForAction(String actionCommand) {
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), "getValue", 
-				"Entering method", new Object[] {"Command: " + actionCommand});
-		
 		Object result = null;
 		if(actionCommand == STOCK_HISTORY_INTERVAL_ACTION){
 			result = historyLengthCombo.getSelectedIndex() + 1;
