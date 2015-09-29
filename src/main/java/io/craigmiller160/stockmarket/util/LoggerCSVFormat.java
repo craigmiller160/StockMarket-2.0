@@ -31,9 +31,13 @@ import net.jcip.annotations.ThreadSafe;
  * <b>THREAD SAFETY:</b> This formatter uses a counter to assign a unique index
  * number to each record it formats. This counter is properly synchronized, allowing
  * this formatter to be handled safely by as many threads as necessary.
+ * <p>
+ * <b>DEPRECATED:</b> As of Version 2.3, this class is deprecated due to the switching
+ * of logging frameworks to slf4j+log4j2.
  * 
  * @author craig
  * @version 2.0
+ * @deprecated
  */
 @ThreadSafe
 public class LoggerCSVFormat extends Formatter{

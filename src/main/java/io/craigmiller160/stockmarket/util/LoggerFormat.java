@@ -8,9 +8,13 @@ import java.util.logging.LogRecord;
 /**
  * A format designed to display key information for all entries
  * into this program's log.
+ * <p>
+ * <b>DEPRECATED:</b> As of Version 2.0, this class is deprecated in
+ * favor of <tt>LoggerCSVFormat</tt>.
  * 
  * @author Craig
- * @version 2.0
+ * @version 1.0
+ * @deprecated
  */
 public class LoggerFormat extends Formatter{
 	
