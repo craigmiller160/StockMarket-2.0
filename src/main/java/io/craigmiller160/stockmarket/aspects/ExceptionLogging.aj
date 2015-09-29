@@ -5,6 +5,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.UnknownHostException;
+import java.util.concurrent.ExecutionException;
 
 /**
  * An Aspect for logging exceptions that occur during the 
@@ -74,8 +76,20 @@ public aspect ExceptionLogging {
 			(handler(Exception) && args(ex))
 			|| (handler(IOException) && args(ex))
 			|| (handler(InterruptedException) && args(ex))
-			|| (handler(URISyntaxException) && args(ex))){
+			|| (handler(URISyntaxException) && args(ex))
+			|| (handler(UnknownHostException) && args(ex))){
 		String stackTrace = getStackTraceString(ex);
+		LOGGER.error("\"EXCEPTION: {}\"", stackTrace);
+	}
+	
+	/**
+	 * Advice that runs before an <tt>ExecutionException</tt> is handled
+	 * in the controller class. It logs the cause of that exception.
+	 * 
+	 * @param ex the <tt>ExecutionException</tt> to be logged.
+	 */
+	before(ExecutionException ex) : controller() && handler(ExecutionException) && args(ex){
+		String stackTrace = getStackTraceString(ex.getCause());
 		LOGGER.error("\"EXCEPTION: {}\"", stackTrace);
 	}
 	

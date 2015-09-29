@@ -622,16 +622,12 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 		catch(UnknownHostException ex){
 			displayExceptionDialog(LANGUAGE.getString("connect_exception_title"), 
 					LANGUAGE.getString("connect_exception_message"));
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(),
-					"changeStockHistoryInterval", "Exception", ex);
 		}
 		catch(InvalidStockException ex){
 			displayExceptionDialog(
 					LANGUAGE.getString("invalid_stock_title"), 
 					"\"" + ex.getMessage() + "\" " 
 					+ LANGUAGE.getString("invalid_stock_message"));
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(),
-					"changeStockHistoryInterval", "Exception", ex);
 		}
 		catch(Exception ex){
 			displayExceptionDialog(ex);
@@ -809,7 +805,6 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 		return downloadHistory;
 	}
 	
-	//TODO will need to figure out special logging for this one
 	/**
 	 * Launder the <tt>ExecutionException</tt> from the stock search 
 	 * and respond to it appropriately.
@@ -826,40 +821,16 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 					LANGUAGE.getString("invalid_stock_title"), 
 					"\"" + symbol + "\" " 
 					+ LANGUAGE.getString("invalid_stock_message"));
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"launderStockExecutionException", 
-					"Exception", ex.getCause());
 		}
 		else if(ex.getCause() instanceof UnknownHostException){
 			displayExceptionDialog(LANGUAGE.getString("connect_exception_title"), 
 					LANGUAGE.getString("connect_exception_message"));
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"launderStockExecutionException", 
-					"Exception", ex.getCause());
-		}
-		else if(ex.getCause() instanceof IOException){
-			displayExceptionDialog(ex.getCause());
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"launderStockExecutionException", 
-					"Exception", ex.getCause());
-		}
-		else if(ex.getCause() instanceof RuntimeException){
-			displayExceptionDialog(ex.getCause());
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"launderStockExecutionException", 
-					"Exception", ex.getCause());
 		}
 		else if(ex.getCause() instanceof Error){
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"launderStockExecutionException", 
-					"Error", ex.getCause());
 			throw (Error) ex.getCause();
 		}
 		else{
 			displayExceptionDialog(ex);
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					"launderStockExecutionException", 
-					"Exception", ex);
 		}
 	}
 	
