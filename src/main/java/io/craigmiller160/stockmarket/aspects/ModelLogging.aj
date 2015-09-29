@@ -1,4 +1,4 @@
-package io.craigmiller160.stockmarket.aspect;
+package io.craigmiller160.stockmarket.aspects;
 
 import java.util.Arrays;
 

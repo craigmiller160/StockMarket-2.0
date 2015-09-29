@@ -7,8 +7,6 @@ import io.craigmiller160.stockmarket.util.Fonts;
 import io.craigmiller160.stockmarket.util.Language;
 
 import java.awt.Frame;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -33,11 +31,6 @@ public class SellDialog extends TransactionDialog {
 	 * Shared <tt>Language</tt> module for locale-specific text.
 	 */
 	private static final Language LANGUAGE = Language.getInstance();
-	
-	/**
-	 * The logger for the program.
-	 */
-	private static final Logger LOGGER = Logger.getLogger("stockmarket.gui.dialog.SellDialog");
 	
 	/**
 	 * The maximum limit on how many shares can be sold.
@@ -124,9 +117,6 @@ public class SellDialog extends TransactionDialog {
 	public Object getValueForAction(String actionCommand) {
 		Object result = null;
 		if(actionCommand == SELL_STOCK_ACTION){
-			LOGGER.logp(Level.FINEST, this.getClass().getName(), "getValue", 
-					"Entering method", new Object[] {"Command: " + actionCommand});
-			
 			result = getQuantity();
 		}
 		

@@ -14,8 +14,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractListModel;
@@ -35,11 +33,6 @@ import net.miginfocom.swing.MigLayout;
 
 public class OpenPortfolioDialog extends AbstractDefaultDialog {
 
-	/**
-	 * The logger for the program.
-	 */
-	private static final Logger LOGGER = Logger.getLogger("stockmarket.gui.dialog.OpenPortfolioDialog");
-	
 	/**
 	 * Shares <tt>Language</tt> module for locale-specific text.
 	 */
@@ -114,10 +107,6 @@ public class OpenPortfolioDialog extends AbstractDefaultDialog {
 	public Object getValueForAction(String actionCommand) {
 		Object result = null;
 		if(actionCommand == OPEN_SELECTED_PORTFOLIO_ACTION){
-			LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-					"getValue", "Entering method", 
-					new Object[] {"Command: " + actionCommand});
-			
 			int index = getSelectedIndex();
 			result = portfolioNameList.getModel().getElementAt(index);
 		}

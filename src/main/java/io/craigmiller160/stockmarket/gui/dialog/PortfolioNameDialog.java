@@ -11,8 +11,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
@@ -47,11 +45,6 @@ public class PortfolioNameDialog extends AbstractDefaultDialog {
 	 * Shared <tt>Language</tt> module for locale-based text support.
 	 */
 	private static final Language LANGUAGE = Language.getInstance();
-	
-	/**
-	 * Shared logger for the program.
-	 */
-	private static final Logger LOGGER = Logger.getLogger("stockmarket.gui.dialog.PortfolioNameDialog");
 	
 	/**
 	 * The title label of the dialog.
@@ -263,9 +256,6 @@ public class PortfolioNameDialog extends AbstractDefaultDialog {
 	@Override
 	public Object getValueForAction(String actionCommand) {
 		if(actionCommand == SAVE_PORTFOLIO_NAME_ACTION){
-			LOGGER.logp(Level.FINEST, this.getClass().getName(), "getValue", 
-					"Entering method", new Object[] {"Command: " + actionCommand});
-			
 			//Get the text from the name field, then clear the field
 			String name = getPortfolioNameFieldText();
 			setPortfolioNameFieldText("");

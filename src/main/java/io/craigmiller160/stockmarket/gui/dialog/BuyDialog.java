@@ -8,8 +8,6 @@ import java.awt.Frame;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -35,11 +33,6 @@ public class BuyDialog extends TransactionDialog {
 	 */
 	private static final Language LANGUAGE = Language.getInstance();
 	
-	/**
-	 * The logger for this program.
-	 */
-	private static final Logger LOGGER = Logger.getLogger("stockmarket.gui.dialog.BuyDialog");
-
 	/**
 	 * Format for displaying money values.
 	 */
@@ -148,9 +141,6 @@ public class BuyDialog extends TransactionDialog {
 	public Object getValueForAction(String actionCommand) {
 		Object result = null;
 		if(actionCommand == BUY_STOCK_ACTION){
-			LOGGER.logp(Level.FINEST, this.getClass().getName(), "getValue", 
-					"Entering method", new Object[] {"Command: " + actionCommand});
-			
 			result = getQuantity();
 		}
 		

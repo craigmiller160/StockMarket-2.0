@@ -8,4 +8,4 @@
  * @author Craig
  * @since Version 2.3
  */
-package io.craigmiller160.stockmarket.aspect;
+package io.craigmiller160.stockmarket.aspects;

@@ -126,9 +126,6 @@ public class ExceptionDialog extends AbstractDefaultDialog {
 
 	@Override
 	public Object getValueForAction(String actionCommand) {
-		//LOGGER.logp(Level.FINEST, this.getClass().getName(), "getValue", 
-				//"Entering method", new Object[] {"Command: " + valueToGet});
-		
 		return null;
 	}
 	
