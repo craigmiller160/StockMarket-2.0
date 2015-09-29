@@ -442,5 +442,10 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 	public synchronized BigDecimal getInitialValue(){
 		return initialValue;
 	}
+	
+	@Override
+	public synchronized String toString(){
+		return portfolioName != null ? portfolioName : "Portfolio";
+	}
 
 }
