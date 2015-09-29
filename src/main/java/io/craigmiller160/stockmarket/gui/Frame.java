@@ -316,18 +316,8 @@ public class Frame extends AbstractListenerView {
 		if(dialog != null){
 			dialog.addActionListener(this);
 			dialog.showDialog();
-			
-			//TODO can I figure out a way to add a log entry for the dialog successfully displaying?
-			//LOGGER.logp(Level.INFO, this.getClass().getName(), 
-					//"displayDialog", "Displaying Dialog: Code: " + dialogConfig[0]);
-		}
-		else{
-			//TODO can I figure out a way to add a log entry for the dialog being null here?
-			//LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-					//"displayDialog", "Failed to display dialog");
 		}
 	}
-	
 	
 
 	@Override

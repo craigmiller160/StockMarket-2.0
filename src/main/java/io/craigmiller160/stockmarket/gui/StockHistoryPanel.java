@@ -202,8 +202,6 @@ public class StockHistoryPanel extends AbstractListenerView {
 		XYDataset dataset = createDataset(historyList);
 		chartPanel = createChartPanel(dataset, chartName);
 		assembleHistoryPanel();
-		
-		//TODO can a log entry be done here for successful display of history?
 	}
 	
 	/**

@@ -42,9 +42,6 @@ import net.jcip.annotations.NotThreadSafe;
 public class Main {
 
 	
-	//TODO registering shutdown hook occasionally causes exception because it's not
-	//registered before shutdown occurs
-	
 	//TODO hibernate seems to be keeping sessions/connections open when it should be
 	//closing them
 	
