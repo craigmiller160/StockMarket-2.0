@@ -5,7 +5,7 @@
 		<file name="fileAppender" fileName="${sys:user.home}/logpractice/stockmarket.csv"
 			append="false">
 			<patternlayout>
-				<pattern>%n%p,%r,%t,%c,%m,%throwable</pattern>
+				<pattern>%n%p,%r,%t,%c,\"%m\",%throwable</pattern>
 				<header>Level,Timestamp,Thread,Logger,Message (Expand Cell for Stack Trace),Exception</header>
 			</patternlayout>
 		</file>

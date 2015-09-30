@@ -6,9 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Properties;
-import java.util.logging.FileHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -21,7 +18,6 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import io.craigmiller160.mvp.listener.ListenerDialog;
 import io.craigmiller160.stockmarket.gui.dialog.DialogFactory;
 import io.craigmiller160.stockmarket.util.Language;
-import io.craigmiller160.stockmarket.util.LoggerCSVFormat;
 import net.jcip.annotations.NotThreadSafe;
 
 
@@ -36,7 +32,7 @@ import net.jcip.annotations.NotThreadSafe;
  * the program, and should not be accessed by any other threads during runtime.
  * 
  * @author Craig
- * @version 2.1
+ * @version 2.3
  */
 @NotThreadSafe
 public class Main {
@@ -49,14 +45,6 @@ public class Main {
 	
 	//TODO if a stock has been completely sold, Hibernate doesn't remove it
 	//from the database when the stock is saved
-	
-	/**
-	 * The logger for this program. With the exception of the default
-	 * root logger, this is the top of the logger hierarchy. It needs
-	 * to be configured prior to the launch of the program to have the
-	 * necessary <tt>Level</tt>s and <tt>Handler</tt>s set.<br><br>
-	 */
-	private static final Logger LOGGER = Logger.getLogger("stockmarket");
 	
 	/**
 	 * Constant properties of this program that never change.
@@ -118,7 +106,7 @@ public class Main {
 			}
 			
 			//Configure the program's logger
-			configureLogger();
+			//configureLogger();
 			
 			//Load the default properties file as a 
 			//resource stream from the jar
@@ -165,14 +153,13 @@ public class Main {
 	 * user an error message and shutting down.
 	 * 
 	 * @return whether the program could establish a save directory on 
-	 * the hosts filesystem. 
+	 * the hosts filesystem.
 	 */
 	private static boolean verifyDirectory(){
 		File logDirectory = new File(LOG_DIRECTORY);
 		File propertiesDirectory = new File(PROPERTIES_DIRECTORY);
 		
 		boolean logDirectoryExists = true;
-		boolean saveDirectoryExists = true;
 		boolean propertiesDirectoryExists = true;
 		
 		if(! logDirectory.exists()){
@@ -183,34 +170,7 @@ public class Main {
 			propertiesDirectoryExists = propertiesDirectory.mkdirs();
 		}
 		
-		return logDirectoryExists && saveDirectoryExists 
-				&& propertiesDirectoryExists;
-	}
-	
-	//TODO when AspectJ logging is completely integrated, remove this
-	//logging configuration from this class.
-	/**
-	 * Configure the properties of the main logger. Because the logger
-	 * in the <tt>Main</tt> class will be at the root of the hierarchy, 
-	 * all logging events will ultimately be passed to it. The settings
-	 * on this logger determine how all logging will be recorded for the 
-	 * entire program.
-	 */
-	private static void configureLogger(){
-		LOGGER.setLevel(Level.FINEST);
-		
-		try{
-			FileHandler fileHandler = new FileHandler(
-					LOG_DIRECTORY + "/StockMarketLog.csv");
-			fileHandler.setFormatter(new LoggerCSVFormat());
-			fileHandler.setLevel(Level.FINEST);
-			
-			LOGGER.addHandler(fileHandler);
-			LOGGER.setUseParentHandlers(false);
-		}
-		catch(IOException ex){
-			displayExceptionDialog(ex);
-		}
+		return logDirectoryExists && propertiesDirectoryExists;
 	}
 	
 	/**
@@ -229,10 +189,6 @@ public class Main {
 		if(defaultProperties.size() == 0){
 			throw new IOException();
 		}
-		
-		LOGGER.logp(Level.INFO, Main.class.getName(),
-				"loadDefaultProperties()",
-				"Default Properties file loaded successfully");
 	}
 	
 	/**
@@ -253,21 +209,18 @@ public class Main {
 		if(userPropertiesFile.exists()){
 			try(FileInputStream userPropertiesStream = new FileInputStream(userPropertiesFile)){
 				userProperties.load(userPropertiesStream);
-				
-				LOGGER.logp(Level.INFO, Main.class.getName(), "loadUserProperties()",
-						"User properties loaded from file");
 			}
 		}
 		else{
-			LOGGER.logp(Level.INFO, Main.class.getName(), "loadUserProperties()",
-					"User properties file didn't exist, creating new one");
-			
-			saveUserProperties(userPropertiesFile);
+			createUserPropertiesFile(userPropertiesFile);
 		}
 	}
 	
+	//TODO at the moment, user.properties are not altered during runtime.
+	//If that feature is added later on, a method saving them will need to
+	//be executed at that time.
 	/**
-	 * Saves a brand new user.properties file to the save directory.<br><br> 
+	 * Creates and saves a brand new user.properties file to the save directory.<br><br> 
 	 * 
 	 * If the user.properties file had to be created for the first time
 	 * when the <tt>loadUserProperties()</tt> method ran, this method should
@@ -278,23 +231,20 @@ public class Main {
 	 * a <tt>null</tt> value.
 	 * 
 	 * @param userPropertiesFile the filepath to save the user.properties file to.
+	 * @throws IOException if unable to save the user.properties file.
 	 */
-	private static void saveUserProperties(File userPropertiesFile){
-		if(userProperties != null){
-			try(FileOutputStream userPropertiesStream = new FileOutputStream(userPropertiesFile)){
-				
-				userProperties.store(userPropertiesStream, null);
-				
-				LOGGER.logp(Level.INFO, Main.class.getName(), "saveUserProperties()", 
-						"New user properties file saved successfully");
+	private static void createUserPropertiesFile(File userPropertiesFile) throws IOException{
+		if(userProperties == null){
+			if(defaultProperties != null){
+				userProperties = new Properties(defaultProperties);
 			}
-			catch(IOException ex){
-				String message = "User properties failed to load";
-				ex = new IOException(ex.getMessage() + ": " + message, ex);
-				displayExceptionDialog(ex);
-				LOGGER.logp(Level.SEVERE, Main.class.getName(), "saveUserProperties()",
-						"Exception", ex);
+			else{
+				userProperties = new Properties();
 			}
+		}
+		
+		try(FileOutputStream userPropertiesStream = new FileOutputStream(userPropertiesFile)){
+			userProperties.store(userPropertiesStream, null);
 		}
 	}
 	

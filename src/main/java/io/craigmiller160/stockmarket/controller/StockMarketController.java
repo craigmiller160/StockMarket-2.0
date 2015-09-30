@@ -1,5 +1,27 @@
 package io.craigmiller160.stockmarket.controller;
 
+import java.awt.Desktop;
+import java.io.IOException;
+import java.lang.Thread.UncaughtExceptionHandler;
+import java.math.BigDecimal;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
+
+import javax.swing.SwingUtilities;
+import javax.transaction.NotSupportedException;
+
+import org.hibernate.HibernateException;
+
 import io.craigmiller160.mvp.concurrent.AbstractConcurrentListenerController;
 import io.craigmiller160.mvp.core.AbstractPropertyModel;
 import io.craigmiller160.mvp.listener.ListenerDialog;
@@ -17,28 +39,6 @@ import io.craigmiller160.stockmarket.stock.Stock;
 import io.craigmiller160.stockmarket.stock.StockDownloader;
 import io.craigmiller160.stockmarket.stock.YahooStockDownloader;
 import io.craigmiller160.stockmarket.util.Language;
-
-import java.awt.Desktop;
-import java.io.IOException;
-import java.lang.Thread.UncaughtExceptionHandler;
-import java.math.BigDecimal;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.swing.SwingUtilities;
-
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -61,7 +61,7 @@ import net.jcip.annotations.ThreadSafe;
  * can be accessed by multiple threads simultaneously.
  * 
  * @author craig
- * @version 2.2
+ * @version 2.3
  */
 @ThreadSafe
 public class StockMarketController extends AbstractConcurrentListenerController {
@@ -247,12 +247,6 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 	public static final int INITIAL_HISTORY_LENGTH_MONTHS = 6;
 	
 	/**
-	 * The logger for this program.
-	 */
-	private static final Logger LOGGER = Logger.getLogger(
-			"stockmarket.controller.StockMarketController");
-	
-	/**
 	 * The data access object for saving/loading the program's state.
 	 */
 	private PortfolioDAO portfolioDAO;
@@ -402,6 +396,9 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 	 * @throws RuntimeException if a runtime exception occurs while
 	 * executing the download.
 	 * @throws Error if an error occurs while executing the download.
+	 * @throws NotSupportedException if desktop access is not supported
+	 * by the platform running this application.
+	 * @throws NoDaoException if the DAO object has not been set in this class.
 	 */
 	private void parseEvent(String actionCommand, Object valueFromView) throws Exception{
 		if(actionCommand == BUY_STOCK_DIALOG_ACTION){
@@ -485,10 +482,6 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 	 * 
 	 */
 	public void refreshPortfolio() throws InterruptedException, ExecutionException, Exception{
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"refreshPortfolio", "Entering method");
-		
-		
 		@SuppressWarnings("unchecked") //The getter method being called returns the correct type
 		List<OwnedStock> oldStockList = (List<OwnedStock>) getModelProperty(STOCK_LIST_PROPERTY);
 		StockDownloader downloader = new YahooStockDownloader();
@@ -516,9 +509,6 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 		
 		setModelProperty(STOCK_LIST_PROPERTY, oldStockList);
 		setModelProperty(PORTFOLIO_STATE_PROPERTY, PortfolioState.OPEN_NO_STOCK);
-		
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"refreshPortfolio", "Refresh successful");
 	}
 	
 	/**
@@ -534,18 +524,9 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 	 * reflectively executing the method.
 	 */
 	public void showSellStockDialog() throws Exception{
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"showSellStockDialog", "Entering method");
-		
-		
 		Stock selectedStock = (Stock) getModelProperty(SELECTED_STOCK_PROPERTY);
-		
 		setModelProperty(DIALOG_DISPLAYED_PROPERTY, 
 				Dialog.SELL_STOCK_DIALOG, selectedStock);
-		
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"showSellStockDialog", "Sell Stock Dialog Displayed");
-		
 	}
 	
 	/**
@@ -564,9 +545,6 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 	 * reflectively executing the method.
 	 */
 	public void sellStock(Object valueFromView) throws Exception{
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"sellStock", "Entering method");
-		
 		int quantityToSell;
 		if(valueFromView instanceof Integer){
 			quantityToSell = (Integer) valueFromView;
@@ -590,11 +568,6 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 		setModelProperty(SELECTED_STOCK_PROPERTY, selectedStock);
 		setModelProperty(STOCK_IN_LIST_PROPERTY, selectedStock);
 		setModelProperty(CASH_BALANCE_PROPERTY, cashBalance);
-		
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"sellStock", selectedStock.getSymbol() 
-				+ " Shares sold: " + quantityToSell);
-		
 	}
 	
 	/**
@@ -616,9 +589,6 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 	 * available to purchase the selected number of shares of the stock.
 	 */
 	public void buyStock(Object valueFromView) throws Exception{
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"buyStock", "Entering method");
-		
 		int quantityToBuy;
 		if(valueFromView instanceof Integer){
 			quantityToBuy = (Integer) valueFromView;
@@ -651,8 +621,6 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 		setModelProperty(STOCK_IN_LIST_PROPERTY, ownedStock);
 		setModelProperty(PORTFOLIO_STATE_PROPERTY, PortfolioState.OPEN_OWNED_STOCK);
 		setModelProperty(SELECTED_STOCK_PROPERTY, ownedStock);
-		
-		
 	}
 	
 	/**
@@ -668,19 +636,11 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 	 * reflectively executing the method.
 	 */
 	public void showBuyStockDialog() throws Exception{
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"showBuyStockDialog", "Entering method");
-		
-		
 		Stock selectedStock = (Stock) getModelProperty(SELECTED_STOCK_PROPERTY);
 		BigDecimal cashBalance = (BigDecimal) getModelProperty(CASH_BALANCE_PROPERTY);
 		
 		setModelProperty(DIALOG_DISPLAYED_PROPERTY, 
 				Dialog.BUY_STOCK_DIALOG, selectedStock, cashBalance);
-		
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"showBuyStockDialog", "Buy Stock Dialog Displayed");
-		
 	}
 	
 	/**
@@ -709,12 +669,7 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 	 * the server to download the data.
 	 */
 	public void changeStockHistoryInterval(Object valueFromView) throws Exception{
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"changeStockHistoryInterval", "Entering method", 
-				new Object[] {"Months: " + valueFromView});
-		
 		YahooStockDownloader downloader = new YahooStockDownloader();
-		
 		
 		Integer months = null;
 		if(valueFromView instanceof Integer){
@@ -730,12 +685,6 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 				selectedStock.getStockHistory(downloader, months);
 		
 		setModelProperty(SELECTED_STOCK_HISTORY_PROPERTY, historyList);
-		
-		LOGGER.logp(Level.INFO, this.getClass().getName(), 
-				"changeStockHistoryInterval", 
-				"Stock History Interval Changed: " + months);
-		
-		
 	}
 	
 	/**
@@ -758,10 +707,6 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 	 * @throws Error if an error occurs while trying to search for the stock.
 	 */
 	public void lookupPortfolioStock(Object valueFromView) throws Exception{
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"lookupPortfolioStock", "Entering method", 
-				new Object[] {"Symbol: " + valueFromView});
-		
 		Integer index = null;
 		if(valueFromView instanceof Integer){
 			index = (Integer) valueFromView;
@@ -789,9 +734,6 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 				setModelProperty(SELECTED_STOCK_PROPERTY, downloadedStock);
 				setModelProperty(SELECTED_STOCK_HISTORY_PROPERTY, historyList);
 				setModelProperty(STOCK_IN_LIST_PROPERTY, downloadedStock);
-				
-				LOGGER.logp(Level.INFO, this.getClass().getName(), 
-						"lookupPortfolioStock", "Stock Found: " + stock.getSymbol());
 			}
 		}
 		
@@ -820,10 +762,6 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 	 * reflectively executing the method.
 	 */
 	public void searchForStock(Object valueFromView) throws Exception{
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"searchForStock", "Entering method", 
-				new Object[] {"Symbol: " + valueFromView});
-		
 		String symbol = null;
 		if(valueFromView instanceof String){
 			symbol = ((String) valueFromView).toUpperCase();
@@ -857,11 +795,6 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 		
 		setModelProperty(SELECTED_STOCK_PROPERTY, downloadedStock);
 		setModelProperty(SELECTED_STOCK_HISTORY_PROPERTY, historyList);
-		
-		LOGGER.logp(Level.INFO, this.getClass().getName(), 
-				"searchForStock", "Stock Found: " + symbol);
-		
-		
 	}
 	
 	/**
@@ -951,30 +884,20 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 	 * Open a webpage displaying market data in the default browser.
 	 * @throws URISyntaxException if the URI for the webpage is invalid.
 	 * @throws IOException if unable to access the webpage.
+	 * @throws NotSupportedException if desktop access is not supported
+	 * by the platform running this application.
 	 */
-	public void marketDataWebpage() throws URISyntaxException, IOException{
-		LOGGER.logp(Level.FINEST, this.getClass().getName(),
-				"marketDataWebpage", "Entering method");
-		
-		
+	public void marketDataWebpage() throws Exception{
 		//Create the URL for the webpage and call on the default browser to open it.
 		URI uri = new URI("http://finance.yahoo.com/stock-center/");
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"marketDataWebpage", "URI: " + uri);
 		if(Desktop.isDesktopSupported()){
 			Desktop.getDesktop().browse(uri);
 		}
 		else{
 			displayExceptionDialog(LANGUAGE.getString("error_title"), 
 					LANGUAGE.getString("desktop_not_supported"));
-			
-			LOGGER.logp(Level.SEVERE, this.getClass().getName(),
-					"marketDataWebpage", "Desktop access not supported");
+			throw new NotSupportedException("Desktop Access is not supported");
 		}
-		
-		LOGGER.logp(Level.INFO, this.getClass().getName(),
-				"marketDataWebpage", "Market data webpage is open");
-		
 	}
 	
 	/**
@@ -995,10 +918,6 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 	 * execute this operation.
 	 */
 	public void openPortfolio(Object valueFromView) throws Exception{
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"openPortfolio", "Entering method", 
-				new Object[]{"|" + valueFromView + "|"});
-		
 		if(portfolioDAO != null){
 			
 			//Enable GUI components
@@ -1032,18 +951,12 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 			
 			//Add new portfolio model
 			addPropertyModel(portfolioModel);
-			
-			LOGGER.logp(Level.INFO, this.getClass().getName(), 
-					"openPortfolio", "Portfolio loaded and opened in the program");
-				
-			
 		}
 		else{
 			displayExceptionDialog(LANGUAGE.getString("database_failed_title"), 
 					LANGUAGE.getString("database_failed_text"));
+			throw new NoDaoException("DAO not set, cannot access database");
 		}
-		
-		
 	}
 	
 	/**
@@ -1059,25 +972,17 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 	 * execute this operation.
 	 */
 	public void showOpenPortfolioDialog() throws Exception{
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"showOpenPortfolioDialog", 
-				"Entering method");
-		
 		if(portfolioDAO != null){
 			
 			List<String> portfolioNameList = portfolioDAO.getSavedPortfolios();
 			
 			setModelProperty(DIALOG_DISPLAYED_PROPERTY, 
 					Dialog.OPEN_PORTFOLIO_DIALOG, portfolioNameList);
-			
-			LOGGER.logp(Level.INFO, this.getClass().getName(), 
-					"showOpenPortfolioDialog()", 
-					"Open portfolio dialog displayed");
-			
 		}
 		else{
 			displayExceptionDialog(LANGUAGE.getString("database_failed_title"), 
 					LANGUAGE.getString("database_failed_text"));
+			throw new NoDaoException("DAO not set, cannot access database");
 		}
 		
 	}
@@ -1099,10 +1004,6 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 	 * database operation.
 	 */
 	public void showPortfolioNameDialog() throws Exception{
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"showPortfolioNameDialog", 
-				"Entering method");
-		
 		String name = "";
 		
 		Object obj = getModelProperty(PORTFOLIO_NAME_PROPERTY);
@@ -1112,11 +1013,6 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 		
 		setModelProperty(DIALOG_DISPLAYED_PROPERTY, 
 				Dialog.PORTFOLIO_NAME_DIALOG, name);
-		
-		LOGGER.logp(Level.INFO, this.getClass().getName(), 
-				"showPortfolioNameDialog", 
-				"Portfolio name dialog displayed");
-		
 	}
 	
 	/**
@@ -1135,9 +1031,6 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 	 * attempting to execute this method.
 	 */
 	public void createNewPortfolio() throws Exception{
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"newPortfolio", "Entering method");
-		
 		//Enable GUI components
 		setModelProperty(PORTFOLIO_STATE_PROPERTY, PortfolioState.OPEN_NO_STOCK);
 		
@@ -1174,10 +1067,6 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 		
 		//Add new portfolio model
 		addPropertyModel(portfolioModel);
-		
-		LOGGER.logp(Level.INFO, this.getClass().getName(), 
-				"newPortfolio()", "New portfolio created");
-		
 	}
 	
 	/**
@@ -1199,10 +1088,6 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 	 * attempting to execute this method.
 	 */
 	public void savePortfolioName(Object valueFromView) throws Exception{
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"savePortfolioName", "Entering method", 
-				new Object[] {"Name: " + valueFromView});
-		
 		//Get the new name of the portfolio 
 		String newName = "";
 		if(valueFromView instanceof String){
@@ -1217,9 +1102,6 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 		
 		setModelProperty(PORTFOLIO_NAME_PROPERTY, newName);
 		savePortfolio();
-		LOGGER.logp(Level.INFO, this.getClass().getName(), 
-				"savePortfolioName", "Portfolio Name Saved");
-		
 	}
 	
 	/**
@@ -1236,11 +1118,10 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 	 * database operation.
 	 * @throws InterruptedException if the thread is interrupted while
 	 * attempting to execute this method.
+	 * @throws NullPointerException if the <tt>PortfolioModel</tt> isn't
+	 * found in the list of registered models.
 	 */
 	public void savePortfolio() throws Exception{
-		LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-				"savePortfolio", "Entering method");
-		
 		if(portfolioDAO != null){
 			PortfolioModel portfolioModel = null;
 			synchronized(modelList){
@@ -1253,25 +1134,16 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 			}
 			
 			if(portfolioModel != null){
-				LOGGER.logp(Level.FINEST, this.getClass().getName(), 
-						"savePortfolio", "Portfolio Model found and "
-								+ "about to try to save it");
-				
-				
 				portfolioDAO.savePortfolio(portfolioModel);
-				LOGGER.logp(Level.INFO, this.getClass().getName(), 
-						"savePortfolio", "Portfolio saved successfully");
-				
 			}
 			else{
-				LOGGER.logp(Level.SEVERE, this.getClass().getName(), 
-						"savePortfolio", "Portfolio Model not found and saving"
-								+ " has failed");
+				throw new NullPointerException("PortfolioModel not found");
 			}
 		}
 		else{
 			displayExceptionDialog(LANGUAGE.getString("database_failed_title"),
 					LANGUAGE.getString("database_failed_text"));
+			throw new NoDaoException("DAO not set, cannot access database");
 		}
 		
 	}
