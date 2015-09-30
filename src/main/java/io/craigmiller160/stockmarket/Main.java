@@ -48,9 +48,7 @@ public class Main {
 	//TODO if the log file is open for the program, it crashes at startup
 	
 	//TODO if a stock has been completely sold, Hibernate doesn't remove it
-	//from the database when the stock is saved. ADDITIONAL INFO: Hibernate does
-	//an update query for each individual stock. If the stock is gone, no update
-	//query gets done
+	//from the database when the stock is saved
 	
 	/**
 	 * The logger for this program. With the exception of the default
@@ -220,6 +218,8 @@ public class Main {
 			if(defaultProperties.size() == 0){
 				throw new IOException();
 			}
+			
+			
 			
 			LOGGER.logp(Level.INFO, Main.class.getName(),
 					"loadDefaultProperties()",
