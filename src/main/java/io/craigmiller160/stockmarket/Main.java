@@ -11,7 +11,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -81,6 +80,12 @@ public class Main {
 	 */
 	private static final String PROPERTIES_DIRECTORY = PROGRAM_DIRECTORY + "/Properties";
 	
+	/**
+	 * The <tt>ApplicationContext</tt> container for model, controller, and data
+	 * beans.
+	 */
+	private static AbstractApplicationContext modelControllerDataContext;
+	
 	
 	/**
 	 * Main method to begin running the <tt>StockMarket</tt> program. Calls 
@@ -128,6 +133,9 @@ public class Main {
 			
 			//Set the LookAndFeel of the GUI
 			setLookAndFeel();
+			
+			//Initialize model beans, data access components, controller, etc
+			init();
 			
 			//Initialize the gui and link to the controller
 			initGUI();
@@ -282,6 +290,17 @@ public class Main {
     }
 	
 	/**
+	 * Initialize model beans, data access components, controller, etc.
+	 */
+	private static void init(){
+		modelControllerDataContext = new ClassPathXmlApplicationContext(
+				"spring-context-controller.xml", 
+				"spring-context-data.xml", 
+				"spring-context-model.xml");
+		modelControllerDataContext.registerShutdownHook();
+	}
+	
+	/**
 	 * Initialize the program's GUI.
 	 */
 	private static void initGUI(){
@@ -292,9 +311,11 @@ public class Main {
 						new GUIUncaughtExceptionHandler());
 				
 				@SuppressWarnings("resource") //Shutdown hook is registered, it'll be closed when VM shuts down
-				ApplicationContext context = new ClassPathXmlApplicationContext("spring.xml");
-				
-				((AbstractApplicationContext)context).registerShutdownHook();
+				AbstractApplicationContext guiContext = 
+						new ClassPathXmlApplicationContext(
+								new String[] {"spring-context-gui.xml"}, 
+								modelControllerDataContext);
+				guiContext.registerShutdownHook();
 			}
 		});
 	}
@@ -353,9 +374,7 @@ public class Main {
 		@Override
 		public void uncaughtException(Thread thread, Throwable throwable) {
 			displayExceptionDialog(throwable);
-			//TODO add additional handling for specific RuntimeExceptions that
-			//should result in system shutdown
-			if(throwable instanceof Error){
+			if(throwable instanceof Error || throwable instanceof RuntimeException){
 				System.exit(1);
 			}
 		}

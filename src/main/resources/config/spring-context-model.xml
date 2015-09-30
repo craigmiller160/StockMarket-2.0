@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://www.springframework.org/schema/beans
+    		http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+ 
+ 	<!-- GUIStateModel for storing values for the state of the UI -->
+ 	<bean id="guiStateModel" class="io.craigmiller160.stockmarket.model.GUIStateModel"/>
+    
+    <!-- StockDisplayModel for storing the stock to display in the UI -->
+    <bean id="stockDisplayModel" class="io.craigmiller160.stockmarket.model.StockDisplayModel"/>
+    
+    <!-- ModelPostProcessor for adding these models to the controller -->
+    <bean class="io.craigmiller160.stockmarket.ModelPostProcessor"/>
+ 
+ </beans>

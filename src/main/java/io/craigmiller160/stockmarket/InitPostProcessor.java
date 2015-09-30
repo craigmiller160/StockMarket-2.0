@@ -13,10 +13,14 @@ import io.craigmiller160.stockmarket.controller.StockMarketController;
  * Performs post-processing initialization actions on the controller
  * for this program. Primarily focused on adding all views/models to
  * the controller for it to manage at runtime.
+ * <p>
+ * <b>DEPRECATED</b>: As of Version 2.3, this class has been deprecated
+ * in favor of <tt>GuiPostProcessor</tt> and <tt>ModelPostProcessor</tt>.
  * 
  * @author craig
  * @version 2.1
  */
+@Deprecated
 public class InitPostProcessor implements BeanPostProcessor, ApplicationContextAware {
 
 	/**

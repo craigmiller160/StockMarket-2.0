@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://www.springframework.org/schema/beans
+    		http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+ 
+ 	<!-- StockDisplayPanel GUI class -->
+ 	<bean id="stockDisplayPanel" class="io.craigmiller160.stockmarket.gui.StockDisplayPanel">
+    	<property name="SearchPanel" value="#{searchPanel.getPanel()}"/>
+    	<property name="StockDetailsPanel" value="#{stockDetailsPanel.getPanel()}"/>
+    	<property name="StockHistoryPanel" value="#{stockHistoryPanel.getPanel()}"/>
+    	<property name="BuySellPanel" value="#{buySellPanel.getPanel()}"/>
+    </bean>
+    
+    <!-- Frame GUI class -->
+    <bean id="frame" class="io.craigmiller160.stockmarket.gui.Frame">
+    	<property name="MenuBar" value="#{menuBar.getMenuBar()}"/>
+    	<property name="ToolBar" value="#{toolBar.getToolBar()}"/>
+    	<property name="PortfolioPanel" value="#{portfolioPanel.getPanel()}"/>
+    	<property name="StockDisplayPanel" value="#{stockDisplayPanel.getPanel()}"/>
+    </bean>
+    
+    <!-- SearchPanel GUI class -->
+    <bean id="searchPanel" class="io.craigmiller160.stockmarket.gui.SearchPanel"/>
+    
+    <!-- StockDetailsPanel GUI class -->
+    <bean id="stockDetailsPanel" class="io.craigmiller160.stockmarket.gui.StockDetailsPanel"/>
+    
+    <!-- StockHistoryPanel GUI class -->
+    <bean id="stockHistoryPanel" class="io.craigmiller160.stockmarket.gui.StockHistoryPanel"/>
+    
+    <!-- BuySellPanel GUI class -->
+    <bean id="buySellPanel" class="io.craigmiller160.stockmarket.gui.BuySellPanel"/>
+    
+    <!-- MenuBar GUI class -->
+    <bean id="menuBar" class="io.craigmiller160.stockmarket.gui.MenuBar"/>
+    
+    <!-- ToolBar GUI class -->
+    <bean id="toolBar" class="io.craigmiller160.stockmarket.gui.ToolBar"/>
+    
+    <!-- PortfolioPanel GUI class -->
+    <bean id="portfolioPanel" class="io.craigmiller160.stockmarket.gui.PortfolioPanel"/>
+    
+    <!-- Post Processor for GUI Classes -->
+    <bean class="io.craigmiller160.stockmarket.GuiPostProcessor"/>
+ 
+ 
+ </beans>

@@ -51,7 +51,7 @@ public aspect ExceptionLogging {
 	before(Thread thread, Throwable t) : 
 		uncaughtExceptionHandler() && args(thread,t){
 		String stackTrace = getStackTraceString(t);
-		LOGGER.error("\"UNCAUGHT EXCEPTION: {}\"", stackTrace);
+		LOGGER.error("UNCAUGHT EXCEPTION: {}", stackTrace);
 	}
 	
 	/**
@@ -63,7 +63,7 @@ public aspect ExceptionLogging {
 	before(Exception ex) : mainClass() && ((handler(Exception) && args(ex))
 		|| (handler(IOException) && args(ex))){
 		String stackTrace = getStackTraceString(ex);
-		LOGGER.error("\"EXCEPTION: {}\"", stackTrace);
+		LOGGER.error("EXCEPTION: {}", stackTrace);
 	}
 	
 	/**
@@ -79,7 +79,7 @@ public aspect ExceptionLogging {
 			|| (handler(URISyntaxException) && args(ex))
 			|| (handler(UnknownHostException) && args(ex))){
 		String stackTrace = getStackTraceString(ex);
-		LOGGER.error("\"EXCEPTION: {}\"", stackTrace);
+		LOGGER.error("EXCEPTION: {}", stackTrace);
 	}
 	
 	/**
@@ -90,7 +90,7 @@ public aspect ExceptionLogging {
 	 */
 	before(ExecutionException ex) : controller() && handler(ExecutionException) && args(ex){
 		String stackTrace = getStackTraceString(ex.getCause());
-		LOGGER.error("\"EXCEPTION: {}\"", stackTrace);
+		LOGGER.error("EXCEPTION: {}", stackTrace);
 	}
 	
 	/**
