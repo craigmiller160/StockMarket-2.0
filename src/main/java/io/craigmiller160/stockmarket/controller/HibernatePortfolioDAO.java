@@ -14,9 +14,11 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.hibernate.Criteria;
+import org.hibernate.FetchMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Restrictions;
 
 import io.craigmiller160.stockmarket.model.PortfolioModel;
 import io.craigmiller160.stockmarket.model.SQLPortfolioModel;
@@ -195,6 +197,12 @@ public class HibernatePortfolioDAO implements PortfolioDAO {
 			session = factory.openSession();
 			session.beginTransaction();
 			portfolio = session.get(SQLPortfolioModel.class, userid);
+			//TODO partially completed work on creating a better way of retrieving portfolio
+			//from database
+			/*portfolio = (SQLPortfolioModel) session.createCriteria(SQLPortfolioModel.class)
+							.add(Restrictions.naturalId().set("userID", userid))
+							.setFetchMode("stockList", FetchMode.JOIN)
+							.uniqueResult();*/
 			
 			//This section is here to conform to the established design of the program
 			//Because a listener could not be added prior to session.get(), the model
