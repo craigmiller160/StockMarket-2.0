@@ -2,7 +2,7 @@
 <Configuration xmlns="http://logging.apache.org/log4j/2.0/config" shutdownHook="disable">
 
 	<appenders>
-		<file name="fileAppender" fileName="${sys:user.home}/logpractice/stockmarket.csv"
+		<file name="fileAppender" fileName="${sys:user.home}/StockMarket/Log/StockMarketLog.csv"
 			append="false">
 			<patternlayout>
 				<pattern>%n%p,%r,%t,%c,\"%m\",%throwable</pattern>
