@@ -103,39 +103,51 @@ public class Main {
 	 * @param args command line arguments that may be passed to this program.
 	 */
 	public static void main(String[] args){
-		//Check and set up the program's save directory
-		boolean saveLocationExists = verifyDirectory();
-		if(!saveLocationExists){
-			//The error message here is hard-coded and not locale-based because
-			//it occurs before the language module has a chance to load.
-			String errorText = "StockMarket was unable to properly read "
-					+ "your filesystem and was unable to initialize. "
-					+ "Please contact the developer at <u>craigmiller160@gmail.com";
+		try{
+			//Check and set up the program's save directory
+			boolean saveLocationExists = verifyDirectory();
+			if(!saveLocationExists){
+				//The error message here is hard-coded and not locale-based because
+				//it occurs before the language module has a chance to load.
+				String errorText = "StockMarket was unable to properly read "
+						+ "your filesystem and was unable to initialize. "
+						+ "Please contact the developer at <u>craigmiller160@gmail.com";
+				
+				displayExceptionDialog("Critical Error!", errorText);
+				System.exit(1);
+			}
 			
-			displayExceptionDialog("Critical Error!", errorText);
+			//Configure the program's logger
+			configureLogger();
+			
+			//Load the default properties file as a 
+			//resource stream from the jar
+			loadDefaultProperties();
+			
+			//Separate try-catch block because an exception here
+			//shouldn't kill the whole program.
+			try{
+				//Load the user properties file, or create
+				//it if the program hasn't been run before
+				loadUserProperties();
+			}
+			catch(IOException ex){
+				displayExceptionDialog(ex);
+			}
+			
+			//Sets the language based on user.properties
+			configureLanguageModule();
+			
+			//Set the LookAndFeel of the GUI
+			setLookAndFeel();
+			
+			//Initialize the gui and link to the controller
+			initGUI();
+		}
+		catch(Exception ex){
+			displayExceptionDialog(ex);
 			System.exit(1);
 		}
-		
-		//Configure the program's logger
-		configureLogger();
-		
-		//Load the default properties file as a 
-		//resource stream from the jar
-		loadDefaultProperties();
-		
-		//Load the user properties file, or create
-		//it if the program hasn't been run before
-		loadUserProperties();
-		
-		//Sets the language based on user.properties
-		configureLanguageModule();
-		
-		//Set the LookAndFeel of the GUI
-		setLookAndFeel();
-		
-		//Initialize the gui and link to the controller
-		initGUI();
-		
 	}
 	
 	/**
@@ -206,36 +218,29 @@ public class Main {
 	 * 
 	 * @throws NullPointerException if the file doesn't load properly and has
 	 * no contents.
+	 * @throws IOException if the default properties fail to load properly.
 	 */
-	private static void loadDefaultProperties(){
+	private static void loadDefaultProperties() throws IOException{
 		defaultProperties = new Properties();
+		defaultProperties.load(
+				Main.class.getClassLoader().getResourceAsStream(
+						"default.properties"));
 		
-		try {
-			defaultProperties.load(
-					Main.class.getClassLoader().getResourceAsStream(
-							"default.properties"));
-			
-			if(defaultProperties.size() == 0){
-				throw new IOException();
-			}
-			
-			
-			
-			LOGGER.logp(Level.INFO, Main.class.getName(),
-					"loadDefaultProperties()",
-					"Default Properties file loaded successfully");
-			
+		if(defaultProperties.size() == 0){
+			throw new IOException();
 		}
-		catch (IOException ex){
-			displayExceptionDialog(ex);
-		}
+		
+		LOGGER.logp(Level.INFO, Main.class.getName(),
+				"loadDefaultProperties()",
+				"Default Properties file loaded successfully");
 	}
 	
 	/**
 	 * Load the user-set properties for the program, which are saved
 	 * so they can persist between program runs.
+	 * @throws IOException if the default properties fail to load properly.
 	 */
-	private static void loadUserProperties(){
+	private static void loadUserProperties() throws IOException{
 		if(defaultProperties != null){
 			userProperties = new Properties(defaultProperties);
 		}
@@ -252,10 +257,6 @@ public class Main {
 				LOGGER.logp(Level.INFO, Main.class.getName(), "loadUserProperties()",
 						"User properties loaded from file");
 			}
-			catch(IOException ex){
-				displayExceptionDialog(ex);
-			}
-			
 		}
 		else{
 			LOGGER.logp(Level.INFO, Main.class.getName(), "loadUserProperties()",
@@ -319,20 +320,16 @@ public class Main {
 	/**
 	 * Set the <tt>LookAndFeel</tt> for the <tt>UIManager</tt>. Must be
 	 * invoked prior to initializing the GUI. 
+	 * @throws Exception if the look-and-feel is unable to be applied.
 	 */
-	private static void setLookAndFeel(){
+	private static void setLookAndFeel() throws Exception{
 		String lookAndFeelName = "Nimbus";
-		
-		try{
-			for(LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()){
-				if(lookAndFeelName.equals(info.getName())){
-					UIManager.setLookAndFeel(info.getClassName());
-    			}
-    		}
-    	}catch(Exception ex){
-    		//Exception is logged by ExceptionLogging aspect
-    	}
-	}
+		for(LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()){
+			if(lookAndFeelName.equals(info.getName())){
+				UIManager.setLookAndFeel(info.getClassName());
+			}
+		}
+    }
 	
 	/**
 	 * Initialize the program's GUI.
@@ -406,6 +403,11 @@ public class Main {
 		@Override
 		public void uncaughtException(Thread thread, Throwable throwable) {
 			displayExceptionDialog(throwable);
+			//TODO add additional handling for specific RuntimeExceptions that
+			//should result in system shutdown
+			if(throwable instanceof Error){
+				System.exit(1);
+			}
 		}
 		
 	}
