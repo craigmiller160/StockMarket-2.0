@@ -102,7 +102,10 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 	 * The list of stocks owned by this portfolio.
 	 */
 	@GuardedBy("this")
-	@OneToMany (mappedBy="portfolio", targetEntity=DefaultOwnedStock.class, cascade=CascadeType.ALL)
+	@OneToMany (mappedBy="portfolio", 
+				targetEntity=DefaultOwnedStock.class, 
+				cascade=CascadeType.ALL, 
+				orphanRemoval=true)
 	private List<OwnedStock> stockList;
 	
 	/**
