@@ -67,9 +67,9 @@ public aspect StockLogging {
 	 */
 	before(StockDownloader d, boolean b) : stockDetailsSetter() && stockPackageAllClasses() && args(d,b){
 		String methodName = thisJoinPoint.getSignature().getName();
-		LOGGER.info("\"{}, Downloading. Full Details: {}\"", methodName, b);
+		LOGGER.info("{}, Downloading. Full Details: {}", methodName, b);
 		if(d instanceof StockFileDownloader){
-			LOGGER.info("\"{}, FileDownloader setting values\"", methodName);
+			LOGGER.info("{}, FileDownloader setting values", methodName);
 		}
 	}
 	
@@ -117,7 +117,7 @@ public aspect StockLogging {
 	after() returning(URL url) : 
 		execution(private URL io.craigmiller160.stockmarket.stock.YahooStockDownloader.createUrl*(..)) {
 		String methodName = thisJoinPoint.getSignature().getName();
-		LOGGER.debug("\"Downloading Stock: {} : {}\"", methodName, url);
+		LOGGER.debug("Downloading Stock: {} : {}", methodName, url);
 	}
 	
 	/**
@@ -128,7 +128,7 @@ public aspect StockLogging {
 		execution(private * io.craigmiller160.stockmarket.stock.YahooStockDownloader.parseCsv*(..)){
 		String methodName = thisJoinPoint.getSignature().getName();
 		String csvText = (String) thisJoinPoint.getArgs()[0];
-		LOGGER.debug("\"Downloading Stock: {} : {}\"", methodName, csvText);
+		LOGGER.debug("Downloading Stock: {} : {}", methodName, csvText);
 	}
 	
 	

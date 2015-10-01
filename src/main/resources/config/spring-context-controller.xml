@@ -9,7 +9,7 @@
  	<import resource="spring-context-data.xml"/>
  	
  	<!-- The controller for this program -->
- 	<bean id="controller" class="io.craigmiller160.stockmarket.controller.StockMarketController" destroy-method="savePortfolio">
+ 	<bean id="controller" class="io.craigmiller160.stockmarket.controller.StockMarketController">
     	<constructor-arg value="5"/>
     	<constructor-arg value="20"/>
     	<constructor-arg value="60"/>
