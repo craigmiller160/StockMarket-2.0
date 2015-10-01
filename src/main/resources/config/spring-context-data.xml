@@ -28,7 +28,7 @@
     			<prop key="connection.pool_size">1</prop>
     			<prop key="show_sql">false</prop>
     			<!-- Might need this one below for transactions, not sure yet -->
-    			<!-- <prop key="hibernate.transaction.factory_class">org.hibernate.transaction.JDBCTransactionFactory</prop> -->
+    			<prop key="hibernate.transaction.factory_class">org.hibernate.transaction.JDBCTransactionFactory</prop>
     		</props>
     	</property>
     	<property name="annotatedClasses">

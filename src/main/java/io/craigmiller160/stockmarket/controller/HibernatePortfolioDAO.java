@@ -19,6 +19,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.transaction.annotation.Transactional;
 
 import io.craigmiller160.stockmarket.model.PortfolioModel;
 import io.craigmiller160.stockmarket.model.SQLPortfolioModel;
@@ -53,10 +54,16 @@ import io.craigmiller160.stockmarket.model.SQLPortfolioModel;
  */
 public class HibernatePortfolioDAO implements PortfolioDAO {
 
+	//TODO split this into a dao and a service layer
+	//Additional create portfolio info goes there
+	//getPortfolio by name goes there
+	//Converting portfolio list to strings goes there
+	//Remove property change listener stuff
+	
 	/**
 	 * The <tt>SessionFactory</tt> for this DAO.
 	 */
-	private SessionFactory factory;
+	private SessionFactory sessionFactory;
 	
 	/**
 	 * The format for amounts of money to display.
@@ -80,7 +87,7 @@ public class HibernatePortfolioDAO implements PortfolioDAO {
 	 * @param factory the <tt>SessionFactory</tt> for this DAO.
 	 */
 	public HibernatePortfolioDAO(SessionFactory factory) {
-		this.factory = factory;
+		this.sessionFactory = factory;
 	}
 	
 	/**
@@ -89,7 +96,7 @@ public class HibernatePortfolioDAO implements PortfolioDAO {
 	 * and avoid resource leaks.
 	 */
 	public void closeFactory(){
-		factory.close();
+		sessionFactory.close();
 	}
 
 	/**
@@ -97,6 +104,7 @@ public class HibernatePortfolioDAO implements PortfolioDAO {
 	 * @throws HibernateException if Hibernate is unable to perform
 	 * the required operation.
 	 */
+	@Transactional
 	@Override
 	public PortfolioModel createNewPortfolio(String portfolioName, 
 			BigDecimal startingCashBalance) throws HibernateException {
@@ -106,18 +114,7 @@ public class HibernatePortfolioDAO implements PortfolioDAO {
 		portfolio.setCashBalance(startingCashBalance);
 		portfolio.setNetWorth(startingCashBalance);
 		
-		Session session = null;
-		try{
-			session = factory.openSession();
-			session.beginTransaction();
-			session.save(portfolio);
-			session.getTransaction().commit();
-		}
-		finally{
-			if(session != null){
-				session.close();
-			}
-		}
+		sessionFactory.getCurrentSession().save(portfolio);
 		
 		return portfolio;
 	}
@@ -127,23 +124,15 @@ public class HibernatePortfolioDAO implements PortfolioDAO {
 	 * @throws HibernateException if Hibernate is unable to perform
 	 * the required operation.
 	 */
+	@Transactional
 	@Override
 	@SuppressWarnings("unchecked") //hibernate list() method doesn't support generics
 	public List<String> getSavedPortfolios() throws HibernateException {
 		List<String> portfolioNames = new ArrayList<>();
 		
-		List<SQLPortfolioModel> portfolioList = null;
-		Session session = null;
-		try{
-			session = factory.openSession();
-			Criteria portfolioListCriteria = session.createCriteria(PortfolioModel.class);
-			portfolioList = (List<SQLPortfolioModel>) portfolioListCriteria.list();
-		}
-		finally{
-			if(session != null){
-				session.close();
-			}
-		}
+		List<SQLPortfolioModel> portfolioList = sessionFactory.getCurrentSession()
+									.createCriteria(PortfolioModel.class)
+									.list();
 		
 		for(SQLPortfolioModel portfolio : portfolioList){
 			int id = portfolio.getUserID();
@@ -167,6 +156,7 @@ public class HibernatePortfolioDAO implements PortfolioDAO {
 	 * @throws IllegalArgumentException if the fileName parameter is
 	 * not a valid fileName for a portfolio.
 	 */
+	@Transactional
 	@Override
 	public PortfolioModel getPortfolio(String fileName) throws HibernateException {
 		String regex = "\\d+-.+-.+-\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}";
@@ -190,25 +180,13 @@ public class HibernatePortfolioDAO implements PortfolioDAO {
 	 * @throws HibernateException if Hibernate is unable to perform
 	 * the required operation.
 	 */
+	@Transactional
 	public PortfolioModel getPortfolio(int userid) throws HibernateException{
-		SQLPortfolioModel portfolio = null;
-		
-		Session session = null;
-		try{
-			session = factory.openSession();
-			session.beginTransaction();
-			portfolio = (SQLPortfolioModel) session.createCriteria(SQLPortfolioModel.class)
-							.add(Restrictions.naturalId().set("userID", userid))
-							.setFetchMode("stockList", FetchMode.JOIN)
-							.uniqueResult();
-			
-			session.getTransaction().commit();
-		}
-		finally{
-			if(session != null){
-				session.close();
-			}
-		}
+		SQLPortfolioModel portfolio = (SQLPortfolioModel) sessionFactory.getCurrentSession()
+											.createCriteria(SQLPortfolioModel.class)
+											.add(Restrictions.naturalId().set("userID", userid))
+											.setFetchMode("stockList", FetchMode.JOIN)
+											.uniqueResult();
 		
 		return portfolio;
 	}
@@ -218,20 +196,10 @@ public class HibernatePortfolioDAO implements PortfolioDAO {
 	 * @throws HibernateException if Hibernate is unable to perform
 	 * the required operation.
 	 */
+	@Transactional
 	@Override
 	public void savePortfolio(PortfolioModel portfolio) throws HibernateException {
-		Session session = null;
-		try{
-			session = factory.openSession();
-			session.beginTransaction();
-			session.saveOrUpdate(portfolio);
-			session.getTransaction().commit();
-		}
-		finally{
-			if(session != null){
-				session.close();
-			}
-		}
+		sessionFactory.getCurrentSession().saveOrUpdate(portfolio);
 	}
 
 	@Override
