@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:tx="http://www.springframework.org/schema/tx"
 		xsi:schemaLocation="http://www.springframework.org/schema/beans
-    		http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+    		http://www.springframework.org/schema/beans/spring-beans.xsd
+    		http://www.springframework.org/schema/tx
+       		http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	<!-- Sets annotation-driven transactions -->
+	<tx:annotation-driven transaction-manager="transactionManager"/>
 
 	<!-- DataSource object for providing database connections -->
-	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+	<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
     	<property name="driverClassName" value="com.mysql.jdbc.Driver"/>
     	<property name="url" value="jdbc:mysql://localhost/stockmarket"/>
     	<property name="username" value="stockmarket"/>
@@ -15,11 +21,36 @@
     <!-- SessionFactory object for creating sessions for database access -->
     <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
     	<property name="dataSource" ref="dataSource"/>
-    	<property name="configLocation" value="classpath:hibernate.cfg.xml"/>
+    	<!-- <property name="configLocation" value="classpath:hibernate.cfg.xml"/>-->
+    	<property name="hibernateProperties">
+    		<props>
+    			<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+    			<prop key="connection.pool_size">1</prop>
+    			<prop key="show_sql">false</prop>
+    			<!-- Might need this one below for transactions, not sure yet -->
+    			<!-- <prop key="hibernate.transaction.factory_class">org.hibernate.transaction.JDBCTransactionFactory</prop> -->
+    		</props>
+    	</property>
+    	<property name="annotatedClasses">
+    		<list>
+    			<value>io.craigmiller160.stockmarket.stock.AbstractStock</value>
+	    		<value>io.craigmiller160.stockmarket.stock.OwnedStock</value>
+	    		<value>io.craigmiller160.stockmarket.stock.DefaultStock</value>
+	    		<value>io.craigmiller160.stockmarket.stock.DefaultOwnedStock</value>
+	    		<value>io.craigmiller160.stockmarket.model.PortfolioModel</value>
+	    		<value>io.craigmiller160.stockmarket.model.SQLPortfolioModel</value>
+    		</list>
+    	</property>
+    </bean>
+    
+    <!-- Hibernate Transaction Manager -->
+    <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+    	<property name="sessionFactory" ref="sessionFactory"/>
     </bean>
     
     <!-- HibernateDAO class for performing database operations -->
-	<bean id="hibernateDao" class="io.craigmiller160.stockmarket.controller.HibernatePortfolioDAO">
+	<bean id="hibernateDao" class="io.craigmiller160.stockmarket.controller.HibernatePortfolioDAO"
+		destroy-method="closeFactory">
     	<constructor-arg ref="sessionFactory"/>
     </bean>
     		
