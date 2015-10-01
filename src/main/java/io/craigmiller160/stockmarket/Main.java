@@ -37,14 +37,6 @@ import net.jcip.annotations.NotThreadSafe;
 public class Main {
 
 	
-	//TODO hibernate seems to be keeping sessions/connections open when it should be
-	//closing them
-	
-	//TODO if the log file is open for the program, it crashes at startup
-	
-	//TODO if a stock has been completely sold, Hibernate doesn't remove it
-	//from the database when the stock is saved
-	
 	/**
 	 * Constant properties of this program that never change.
 	 */
