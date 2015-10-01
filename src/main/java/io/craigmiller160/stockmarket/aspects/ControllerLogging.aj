@@ -41,7 +41,8 @@ public aspect ControllerLogging {
 		&& !execution(private FutureTask<Stock> getDownload*(..))
 		&& !execution(private void launderStockExecutionException(..))
 		&& !execution(private void displayExceptionDialog(..))
-		&& !execution(public * *PortfolioDAO(..));
+		&& !execution(public * *PortfolioDAO(..))
+		&& !execution(private void firePortfolioPropertyChanges(..));
 	
 	/**
 	 * Advice to run before the execution of methods in the <tt>StockMarketController</tt>

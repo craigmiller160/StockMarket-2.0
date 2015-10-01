@@ -104,7 +104,8 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 	@GuardedBy("this")
 	@OneToMany (mappedBy="portfolio", 
 				targetEntity=DefaultOwnedStock.class, 
-				cascade=CascadeType.ALL)
+				cascade=CascadeType.ALL,
+				orphanRemoval=true)
 	private List<OwnedStock> stockList;
 	
 	/**
@@ -427,8 +428,12 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 	}
 	
 	@Override
-	public synchronized BigDecimal getChangeInNetWorth(){
-		return changeInNetWorth;
+	public BigDecimal getChangeInNetWorth(){
+		//Just in case it wasn't properly calculated already...
+		calculateChangeInNetWorth();
+		synchronized(this){
+			return changeInNetWorth;
+		}
 	}
 	
 	@Override
@@ -443,6 +448,59 @@ public class PortfolioModel extends AbstractPropertyModel implements Portfolio {
 	 */
 	public synchronized BigDecimal getInitialValue(){
 		return initialValue;
+	}
+	
+	/**
+	 * Force the firing of a <tt>PropertyChangeEvent</tt> whether
+	 * or not anything has actually changed. Meant primarily to 
+	 * help with updating the UI after Hibernate loads this model
+	 * from the database.
+	 * 
+	 * @param propertyName the name of the property to fire an event for.
+	 */
+	public void forceFirePropertyChangeEvent(String propertyName){
+		if(propertyName == STOCK_LIST_PROPERTY){
+			List<OwnedStock> stockList = null;
+			synchronized(this){
+				stockList = new ArrayList<>(this.stockList);
+			}
+			firePropertyChange(STOCK_LIST_PROPERTY, null, stockList);
+		}
+		else if(propertyName == PORTFOLIO_NAME_PROPERTY){
+			String portfolioName = null;
+			synchronized(this){
+				portfolioName = getPortfolioName();
+			}
+			firePropertyChange(PORTFOLIO_NAME_PROPERTY, null, portfolioName);
+		}
+		else if(propertyName == TOTAL_STOCK_VALUE_PROPERTY){
+			BigDecimal totalStockValue = null;
+			synchronized(this){
+				totalStockValue = new BigDecimal(getTotalStockValue().doubleValue());
+			}
+			firePropertyChange(TOTAL_STOCK_VALUE_PROPERTY, null, totalStockValue);
+		}
+		else if(propertyName == NET_WORTH_PROPERTY){
+			BigDecimal netWorth = null;
+			synchronized(this){
+				netWorth = new BigDecimal(getNetWorth().doubleValue());
+			}
+			firePropertyChange(NET_WORTH_PROPERTY, null, netWorth);
+		}
+		else if(propertyName == CHANGE_IN_NET_WORTH_PROPERTY){
+			BigDecimal changeInNetWorth = null;
+			synchronized(this){
+				changeInNetWorth = new BigDecimal(getChangeInNetWorth().doubleValue());
+			}
+			firePropertyChange(CHANGE_IN_NET_WORTH_PROPERTY, null, changeInNetWorth);
+		}
+		else if(propertyName == CASH_BALANCE_PROPERTY){
+			BigDecimal cashBalance = null;
+			synchronized(this){
+				cashBalance = new BigDecimal(getCashBalance().doubleValue());
+			}
+			firePropertyChange(CASH_BALANCE_PROPERTY, null, cashBalance);
+		}
 	}
 	
 	@Override

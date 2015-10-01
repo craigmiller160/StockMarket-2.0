@@ -101,6 +101,7 @@ public class HibernatePortfolioDAO implements PortfolioDAO {
 	public PortfolioModel createNewPortfolio(String portfolioName, 
 			BigDecimal startingCashBalance) throws HibernateException {
 		SQLPortfolioModel portfolio = new SQLPortfolioModel();
+		portfolio.setPortfolioName(portfolioName);
 		portfolio.setInitialValue(startingCashBalance);
 		portfolio.setCashBalance(startingCashBalance);
 		portfolio.setNetWorth(startingCashBalance);
@@ -196,23 +197,10 @@ public class HibernatePortfolioDAO implements PortfolioDAO {
 		try{
 			session = factory.openSession();
 			session.beginTransaction();
-			portfolio = session.get(SQLPortfolioModel.class, userid);
-			//TODO partially completed work on creating a better way of retrieving portfolio
-			//from database
-			/*portfolio = (SQLPortfolioModel) session.createCriteria(SQLPortfolioModel.class)
+			portfolio = (SQLPortfolioModel) session.createCriteria(SQLPortfolioModel.class)
 							.add(Restrictions.naturalId().set("userID", userid))
 							.setFetchMode("stockList", FetchMode.JOIN)
-							.uniqueResult();*/
-			
-			//This section is here to conform to the established design of the program
-			//Because a listener could not be added prior to session.get(), the model
-			//is setting its fields to their existing values to fire PropertyChangeEvents
-			portfolio.addPropertyChangeListener(this);
-			portfolio.setCashBalance(portfolio.getCashBalance());
-			portfolio.setPortfolioName(portfolio.getPortfolioName());
-			portfolio.setNetWorth(portfolio.getNetWorth());
-			portfolio.setStockList(portfolio.getStockList());
-			portfolio.removePropertyChangeListener(this);
+							.uniqueResult();
 			
 			session.getTransaction().commit();
 		}

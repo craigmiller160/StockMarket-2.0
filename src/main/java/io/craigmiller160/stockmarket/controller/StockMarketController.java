@@ -951,12 +951,29 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 			
 			//Add new portfolio model
 			addPropertyModel(portfolioModel);
+			
+			firePortfolioPropertyChanges(portfolioModel);
 		}
 		else{
 			displayExceptionDialog(LANGUAGE.getString("database_failed_title"), 
 					LANGUAGE.getString("database_failed_text"));
 			throw new NoDaoException("DAO not set, cannot access database");
 		}
+	}
+	
+	/**
+	 * Force fire <tt>PropertyChangeEvents</tt> for the properties
+	 * of a portfolio.
+	 * 
+	 * @param portfolioModel the portfolio to fire change events on.
+	 */
+	private void firePortfolioPropertyChanges(PortfolioModel portfolioModel){
+		portfolioModel.forceFirePropertyChangeEvent(STOCK_LIST_PROPERTY);
+		portfolioModel.forceFirePropertyChangeEvent(PORTFOLIO_NAME_PROPERTY);
+		portfolioModel.forceFirePropertyChangeEvent(TOTAL_STOCK_VALUE_PROPERTY);
+		portfolioModel.forceFirePropertyChangeEvent(NET_WORTH_PROPERTY);
+		portfolioModel.forceFirePropertyChangeEvent(CHANGE_IN_NET_WORTH_PROPERTY);
+		portfolioModel.forceFirePropertyChangeEvent(CASH_BALANCE_PROPERTY);
 	}
 	
 	/**
@@ -1067,6 +1084,8 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 		
 		//Add new portfolio model
 		addPropertyModel(portfolioModel);
+		
+		firePortfolioPropertyChanges(portfolioModel);
 	}
 	
 	/**
