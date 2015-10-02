@@ -59,7 +59,7 @@ public interface PortfolioPersistService {
 	/**
 	 * Save a portfolio to the database.
 	 * 
-	 * @param portfolio the portfolio to save.
+	 * @param portfolioModel the portfolio to save.
 	 */
 	void savePortfolio(PortfolioModel portfolioModel);
 }

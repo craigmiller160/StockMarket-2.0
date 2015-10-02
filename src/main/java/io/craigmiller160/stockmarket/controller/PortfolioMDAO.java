@@ -71,7 +71,7 @@ public interface PortfolioMDAO extends PropertyChangeListener{
 	 * @return the portfolio loaded from the data source.
 	 * @throws Exception if a problem occurs while trying to access the data source,
 	 * or if the file name parameter isn't a valid file name for a portfolio.
-	 * @see io.craigmiller160.stockmarket.controller.PortfolioDAO#getSavedPortfolios() 
+	 * @see io.craigmiller160.stockmarket.controller.PortfolioMDAO#getSavedPortfolios() 
 	 * PortfolioDAO.getSavedPortfolios()
 	 */
 	PortfolioModel getPortfolio(String fileName) throws Exception;
