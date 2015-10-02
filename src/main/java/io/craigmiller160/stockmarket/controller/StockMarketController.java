@@ -249,7 +249,7 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 	/**
 	 * The data access object for saving/loading the program's state.
 	 */
-	private PortfolioDAO portfolioDAO;
+	private PortfolioMDAO portfolioDAO;
 	
 	/**
 	 * The shared <tt>Language</tt> module for locale-specific text.
@@ -309,7 +309,7 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 	 * 
 	 * @param dao the DAO to handle database access.
 	 */
-	public void setPortfolioDAO(PortfolioDAO dao){
+	public void setPortfolioDAO(PortfolioMDAO dao){
 		this.portfolioDAO = dao;
 		this.portfolioDAO.addPropertyChangeListener(this);
 	}
@@ -320,7 +320,7 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 	 * 
 	 * @return the DAO to handle database access.
 	 */
-	public PortfolioDAO getPortfolioDAO(){
+	public PortfolioMDAO getPortfolioDAO(){
 		return portfolioDAO;
 	}
 

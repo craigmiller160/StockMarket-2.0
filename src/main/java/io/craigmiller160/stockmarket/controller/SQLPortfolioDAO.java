@@ -82,7 +82,7 @@ import net.jcip.annotations.NotThreadSafe;
  */
 @NotThreadSafe
 public class SQLPortfolioDAO implements
-		PortfolioDAO, PropertyChangeListener {
+		PortfolioMDAO, PropertyChangeListener {
 
 	/**
 	 * The database URL.

@@ -12,11 +12,16 @@ import io.craigmiller160.stockmarket.model.PortfolioModel;
  * used to save/load a stock portfolio between program sessions. This
  * allows for an abstraction layer to exist between the program's 
  * implementation and the logic used to access the data storage location.
+ * <p>
+ * <b>DEPRECATED:</b> As of Version 2.4, this class has been deprecated.
+ * Its attributes have been split between <tt>PortfolioDao</tt> and 
+ * <tt>PortfolioPersistService</tt>.
  * 
  * @author craig
  * @version 2.0
  */
-public interface PortfolioDAO extends PropertyChangeListener{
+@Deprecated
+public interface PortfolioMDAO extends PropertyChangeListener{
 
 	/**
 	 * Add an external <tt>PropertyChangeListener</tt> to pass events to as the

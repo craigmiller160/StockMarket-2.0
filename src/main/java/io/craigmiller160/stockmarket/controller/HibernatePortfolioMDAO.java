@@ -13,10 +13,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
 import org.hibernate.HibernateException;
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,11 +46,17 @@ import io.craigmiller160.stockmarket.model.SQLPortfolioModel;
  * the database at a time, this class should generally only be used by
  * one thread at a time. If this restriction is lifted in future versions,
  * this class is already properly constructed for concurrent access.
+ * <p>
+ * <b>DEPRECATED:</b> As of Version 2.4, this class is deprecated.
+ * Its attributes have been split between the new <tt>HibernatePortfolioDao</tt>
+ * and <tt>PortfolioPersistServiceImpl</tt>.
  * 
  * @author craig
  * @version 2.3
+ * 
  */
-public class HibernatePortfolioDAO implements PortfolioDAO {
+@Deprecated
+public class HibernatePortfolioMDAO implements PortfolioMDAO {
 
 	//TODO split this into a dao and a service layer
 	//Additional create portfolio info goes there
@@ -86,7 +90,7 @@ public class HibernatePortfolioDAO implements PortfolioDAO {
 	 * 
 	 * @param factory the <tt>SessionFactory</tt> for this DAO.
 	 */
-	public HibernatePortfolioDAO(SessionFactory factory) {
+	public HibernatePortfolioMDAO(SessionFactory factory) {
 		this.sessionFactory = factory;
 	}
 	
