@@ -16,6 +16,8 @@
     	<property name="url" value="jdbc:mysql://localhost/stockmarket"/>
     	<property name="username" value="stockmarket"/>
     	<property name="password" value="stockmarket"/>
+    	<property name="initialSize" value="1"/>
+    	<property name="maxTotal" value="4"/>
     </bean>
     
     <!-- SessionFactory object for creating sessions for database access -->
@@ -25,7 +27,7 @@
     	<property name="hibernateProperties">
     		<props>
     			<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
-    			<prop key="connection.pool_size">1</prop>
+    			<!-- <prop key="connection.pool_size">1</prop>--> <!-- Might not need this with dbcp datasource -->
     			<prop key="show_sql">false</prop>
     			<!-- Might need this one below for transactions, not sure yet -->
     			<prop key="hibernate.transaction.factory_class">org.hibernate.transaction.JDBCTransactionFactory</prop>
@@ -49,9 +51,14 @@
     </bean>
     
     <!-- HibernateDAO class for performing database operations -->
-	<bean id="hibernateDao" class="io.craigmiller160.stockmarket.controller.HibernatePortfolioDAO"
+	<bean id="hibernateDao" class="io.craigmiller160.stockmarket.controller.HibernatePortfolioDao"
 		destroy-method="closeFactory">
     	<constructor-arg ref="sessionFactory"/>
+    </bean>
+    
+    <!-- Service Layer Bean for Persistence Operations -->
+    <bean id="persistService" class="io.craigmiller160.stockmarket.controller.PortfolioPersistServiceImpl">
+    	<constructor-arg ref="hibernateDao"/>
     </bean>
     		
  </beans>

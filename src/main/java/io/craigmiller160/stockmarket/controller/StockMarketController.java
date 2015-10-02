@@ -247,9 +247,9 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 	public static final int INITIAL_HISTORY_LENGTH_MONTHS = 6;
 	
 	/**
-	 * The data access object for saving/loading the program's state.
+	 * The persistence service for this program.
 	 */
-	private PortfolioMDAO portfolioDAO;
+	private PortfolioPersistService persistService;
 	
 	/**
 	 * The shared <tt>Language</tt> module for locale-specific text.
@@ -302,26 +302,25 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 	}
 	
 	/**
-	 * Set the <tt>PortfolioDAO</tt> object for saving and loading
-	 * portfolios to and from the database. If this property is not
+	 * Set the <tt>PortfolioPersistService</tt> object for creating,
+	 * saving, and loading portfolios to and from the database. If this property is not
 	 * set at the start of the program, the program will be unable
-	 * to access the database.
+	 * to perform persistence operations.
 	 * 
-	 * @param dao the DAO to handle database access.
+	 * @param persistService the persistence service for this program.
 	 */
-	public void setPortfolioDAO(PortfolioMDAO dao){
-		this.portfolioDAO = dao;
-		this.portfolioDAO.addPropertyChangeListener(this);
+	public void setPersistService(PortfolioPersistService persistService){
+		this.persistService = persistService;
 	}
 	
 	/**
-	 * Get the <tt>PortfolioDAO</tt> object currently
+	 * Get the <tt>PortfolioPersistService</tt> object currently
 	 * set in this class.
 	 * 
-	 * @return the DAO to handle database access.
+	 * @return the persistence service for this program.
 	 */
-	public PortfolioMDAO getPortfolioDAO(){
-		return portfolioDAO;
+	public PortfolioPersistService getPersistService(){
+		return persistService;
 	}
 
 	/**
@@ -918,7 +917,7 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 	 * execute this operation.
 	 */
 	public void openPortfolio(Object valueFromView) throws Exception{
-		if(portfolioDAO != null){
+		if(persistService != null){
 			
 			//Enable GUI components
 			setModelProperty(PORTFOLIO_STATE_PROPERTY, PortfolioState.OPEN_NO_STOCK);
@@ -932,7 +931,7 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 			}
 			
 			//Load portfolio model from the DAO
-			PortfolioModel portfolioModel = portfolioDAO.getPortfolio(
+			PortfolioModel portfolioModel = persistService.getPortfolio(
 					portfolioName);
 			
 			//If there's already a PortfolioModel in this controller, remove it.
@@ -989,9 +988,9 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 	 * execute this operation.
 	 */
 	public void showOpenPortfolioDialog() throws Exception{
-		if(portfolioDAO != null){
+		if(persistService != null){
 			
-			List<String> portfolioNameList = portfolioDAO.getSavedPortfolios();
+			List<String> portfolioNameList = persistService.getSavedPortfolioNames();
 			
 			setModelProperty(DIALOG_DISPLAYED_PROPERTY, 
 					Dialog.OPEN_PORTFOLIO_DIALOG, portfolioNameList);
@@ -1052,8 +1051,8 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 		setModelProperty(PORTFOLIO_STATE_PROPERTY, PortfolioState.OPEN_NO_STOCK);
 		
 		PortfolioModel portfolioModel = null;
-		if(portfolioDAO != null){
-			portfolioModel = portfolioDAO.createNewPortfolio(
+		if(persistService != null){
+			portfolioModel = persistService.createNewPortfolio(
 					LANGUAGE.getString("new_portfolio_name"), 
 					new BigDecimal(INITIAL_CASH_BALANCE_VALUE));
 		}
@@ -1141,7 +1140,7 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 	 * found in the list of registered models.
 	 */
 	public void savePortfolio() throws Exception{
-		if(portfolioDAO != null){
+		if(persistService != null){
 			PortfolioModel portfolioModel = null;
 			synchronized(modelList){
 				for(AbstractPropertyModel model : modelList){
@@ -1153,7 +1152,7 @@ public class StockMarketController extends AbstractConcurrentListenerController 
 			}
 			
 			if(portfolioModel != null){
-				portfolioDAO.savePortfolio(portfolioModel);
+				persistService.savePortfolio(portfolioModel);
 			}
 			else{
 				throw new NullPointerException("PortfolioModel not found");

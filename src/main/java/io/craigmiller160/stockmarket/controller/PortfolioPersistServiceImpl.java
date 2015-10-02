@@ -31,14 +31,6 @@ import net.jcip.annotations.ThreadSafe;
 @ThreadSafe
 public class PortfolioPersistServiceImpl implements PortfolioPersistService {
 
-	/*
-	 * TODO
-	 * + Update Controller class with new service/dao
-	 * + Update spring xml files with new service/dao
-	 * + Update logging aspects with new service/dao
-	 * + Dao destroy method must be set up
-	 */
-	
 	/**
 	 * The DAO for this class.
 	 */

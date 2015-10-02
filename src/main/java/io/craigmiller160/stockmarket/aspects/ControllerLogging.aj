@@ -41,7 +41,7 @@ public aspect ControllerLogging {
 		&& !execution(private FutureTask<Stock> getDownload*(..))
 		&& !execution(private void launderStockExecutionException(..))
 		&& !execution(private void displayExceptionDialog(..))
-		&& !execution(public * *PortfolioDAO(..))
+		&& !execution(public * *PersistService(..))
 		&& !execution(private void firePortfolioPropertyChanges(..));
 	
 	/**
